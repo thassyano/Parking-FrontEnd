@@ -1,4 +1,5 @@
 export interface TokenInterface {
-  accessToken: string;
-  expiresIn: number;
+  token: string;
+  usuario: string,
+  expiraEm: string;
 }

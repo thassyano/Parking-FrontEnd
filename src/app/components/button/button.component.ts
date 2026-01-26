@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
+import { BtnClass } from '../../models/enums/button/button-class.enum';
 
 @Component({
   selector: 'app-button',
@@ -7,5 +8,11 @@ import { Component } from '@angular/core';
   styleUrl: './button.component.css',
 })
 export class ButtonComponent {
+    public message = input.required<string>();
+    public class = input.required<BtnClass>();
+    public onClick = output<void>();
 
+    public clicked(): void {
+        this.onClick.emit();
+    }
 }

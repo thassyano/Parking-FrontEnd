@@ -1,1 +1,30 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+:root {
+  --primary-color: #155dfc;
+  --primary-color-light: #eff6ff;
+  --primary-color-dark: #1140a6;
+  --secondary-color: #e5f0ff;
+  --secondary-color-light: #f9fafb;
+  --secondary-color-dark: #030213;
+
+  --positive-feedback: #00a63e;
+  --positive-feedback-light: #dbfce7;
+  --positive-feedback-dark: #038432;
+  --negative-feedback: #e98b9e;
+  --negative-feedback-light: #ffe2e2;
+  --negative-feedback-dark: #d4183d;
+
+  --text-dark: #0a0a0a;
+  --text-light: #faf9f6;
+
+  --inactive-option: #cbced4;
+}

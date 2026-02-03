@@ -2,7 +2,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 html {
@@ -27,10 +27,15 @@ html {
   --text-dark: #0a0a0a;
   --text-light: #faf9f6;
 
-  --btn-light : #ffffff;
+  --btn-light: #ffffff;
+  --btn-light-hover-darker: #e4e4e4;
   --btn-dark-hover: #333;
 
-  --primary-background: #E3EFFE;
+  --primary-background: #e3effe;
 
   --inactive-option: #cbced4;
+}
+
+.login_container {
+  padding: 0 440px;
 }

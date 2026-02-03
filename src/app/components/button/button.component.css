@@ -20,7 +20,7 @@ button {
 }
 
 .claro_g:hover {
-  background-color: var(--text-light);
+  background-color: var(--btn-light-hover-darker);
   transition: 0.3s;
 }
 

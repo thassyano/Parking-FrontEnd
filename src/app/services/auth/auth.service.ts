@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   public login(loginRequest: LoginInterface): Observable<TokenInterface> {
-    return this.http.post<TokenInterface>(`${this.baseUrl()}/login`, { loginRequest }).pipe(
+    return this.http.post<TokenInterface>(`${this.baseUrl()}/login`, loginRequest).pipe(
       tap((response) => {
         if (response && 'token' in response) {
           this.token.set(response);
@@ -60,6 +60,6 @@ export class AuthService {
 
     this.token.set(null);
 
-    this.router.navigateByUrl('/login');
+    this.router.navigateByUrl('/home');
   }
 }

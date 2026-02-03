@@ -1,0 +1,15 @@
+.header_btn {
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  background-color: transparent;
+  color: var(--text-light);
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.header_btn:hover {
+  background-color: var(--btn-dark-hover);
+}

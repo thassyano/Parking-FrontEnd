@@ -1,0 +1,112 @@
+<div class="page-header">
+  <h1 class="page-title">Nova Reserva Presencial</h1>
+</div>
+
+<div class="card">
+  <form (ngSubmit)="submeter()">
+    <div class="form-group">
+      <label class="form-label" for="nomeCliente">Nome do Cliente *</label>
+      <input
+        id="nomeCliente"
+        type="text"
+        class="form-control"
+        [(ngModel)]="nomeCliente"
+        name="nomeCliente"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="telefoneCliente">Telefone *</label>
+      <input
+        id="telefoneCliente"
+        type="tel"
+        class="form-control"
+        [(ngModel)]="telefoneCliente"
+        name="telefoneCliente"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="cpfCliente">CPF</label>
+      <input
+        id="cpfCliente"
+        type="text"
+        class="form-control"
+        [(ngModel)]="cpfCliente"
+        name="cpfCliente"
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="placaVeiculo">Placa do Veiculo *</label>
+      <input
+        id="placaVeiculo"
+        type="text"
+        class="form-control"
+        [(ngModel)]="placaVeiculo"
+        name="placaVeiculo"
+        placeholder="ABC1D23"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="tipoVaga">Tipo de Vaga</label>
+      <select
+        id="tipoVaga"
+        class="form-control form-select"
+        [(ngModel)]="tipoVaga"
+        name="tipoVaga"
+      >
+        <option value="Coberta">Coberta</option>
+        <option value="Descoberta">Descoberta</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="dataEntrada">Data de Entrada *</label>
+      <input
+        id="dataEntrada"
+        type="date"
+        class="form-control"
+        [(ngModel)]="dataEntrada"
+        name="dataEntrada"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="qtdDias">Quantidade de Dias</label>
+      <input
+        id="qtdDias"
+        type="number"
+        class="form-control"
+        [(ngModel)]="qtdDias"
+        name="qtdDias"
+        min="1"
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="observacoes">Observacoes</label>
+      <textarea
+        id="observacoes"
+        class="form-control"
+        [(ngModel)]="observacoes"
+        name="observacoes"
+        rows="3"
+      ></textarea>
+    </div>
+
+    @if (erro()) {
+      <div class="alert alert-danger">{{ erro() }}</div>
+    }
+
+    <button
+      type="submit"
+      class="btn btn-primary btn-lg"
+      [disabled]="loading()"
+    >
+      @if (loading()) {
+        Carregando...
+      } @else {
+        Registrar Entrada
+      }
+    </button>
+  </form>
+</div>

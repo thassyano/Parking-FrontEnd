@@ -1,0 +1,19 @@
+<header class="public-header">
+  <div class="header-content">
+    <a routerLink="/" class="logo">
+      <span class="logo-icon">P</span>
+      <span class="logo-text">Parking</span>
+    </a>
+    <nav class="nav-links">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+      <a routerLink="/orcamento" routerLinkActive="active">Orcamento</a>
+      <a routerLink="/reservar" routerLinkActive="active">Reservar</a>
+    </nav>
+  </div>
+</header>
+<main class="public-main">
+  <router-outlet />
+</main>
+<footer class="public-footer">
+  <p>2026 Parking - Todos os direitos reservados</p>
+</footer>

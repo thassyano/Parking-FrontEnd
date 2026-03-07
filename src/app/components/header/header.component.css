@@ -1,0 +1,31 @@
+:host {
+  width: 100%;
+}
+
+.admin {
+  background-color: var(--text-dark);
+}
+
+.usuario {
+  background-color: var(--primary-color);
+}
+
+.admin,
+.usuario {
+  width: 100%;
+  color: var(--text-light);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.login_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}

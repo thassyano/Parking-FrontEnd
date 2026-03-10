@@ -1,8 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DisponibilidadeService } from '../../../core/services/disponibilidade.service';
-import { DisponibilidadeDia } from '../../../core/models/disponibilidade.model';
+import { DisponibilidadePeriodo } from '../../../core/models/disponibilidade.model';
 import { ClienteFlowService } from '../../../core/services/cliente-flow.service';
 
 @Component({
@@ -18,7 +18,19 @@ export class ClienteConsulta {
   loading = signal(false);
   erro = signal('');
   showModal = signal(false);
-  disponibilidade = signal<DisponibilidadeDia | null>(null);
+  disponibilidade = signal<DisponibilidadePeriodo | null>(null);
+
+  minCoberta = computed(() => {
+    const d = this.disponibilidade();
+    if (!d?.dias.length) return 0;
+    return Math.min(...d.dias.map((dia) => dia.vagasCobertaDisponiveis));
+  });
+
+  minDescoberta = computed(() => {
+    const d = this.disponibilidade();
+    if (!d?.dias.length) return 0;
+    return Math.min(...d.dias.map((dia) => dia.vagasDescobertaDisponiveis));
+  });
 
   constructor(
     private disponibilidadeService: DisponibilidadeService,
@@ -51,7 +63,10 @@ export class ClienteConsulta {
     this.loading.set(true);
     this.erro.set('');
 
-    this.disponibilidadeService.consultarDia(this.dataEntrada).subscribe({
+    const dataHoraInicio = `${this.dataEntrada}T${this.horaEntrada || '00:00'}`;
+    const dataHoraFim = `${this.dataSaida}T${this.horaSaida || '00:00'}`;
+
+    this.disponibilidadeService.consultarPeriodo(dataHoraInicio, dataHoraFim).subscribe({
       next: (data) => {
         this.disponibilidade.set(data);
         this.showModal.set(true);
@@ -65,24 +80,22 @@ export class ClienteConsulta {
   }
 
   temVagas(): boolean {
-    const d = this.disponibilidade();
-    return !!d && (d.vagasCobertaDisponiveis > 0 || d.vagasDescobertaDisponiveis > 0);
+    return this.minCoberta() > 0 || this.minDescoberta() > 0;
   }
 
   continuar() {
-    const entrada = new Date(`${this.dataEntrada}T${this.horaEntrada || '00:00'}`);
-    const saida = new Date(`${this.dataSaida}T${this.horaSaida || '00:00'}`);
-    const diffMs = saida.getTime() - entrada.getTime();
-    const qtdDias = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+    const entradaDate = new Date(`${this.dataEntrada}T00:00`);
+    const saidaDate = new Date(`${this.dataSaida}T00:00`);
+    const diffDays = (saidaDate.getTime() - entradaDate.getTime()) / (1000 * 60 * 60 * 24);
+    const qtdDias = Math.max(1, diffDays);
 
-    const d = this.disponibilidade()!;
     this.clienteFlow.dataEntrada = this.dataEntrada;
     this.clienteFlow.horaEntrada = this.horaEntrada;
     this.clienteFlow.dataSaida = this.dataSaida;
     this.clienteFlow.horaSaida = this.horaSaida;
     this.clienteFlow.qtdDias = qtdDias;
-    this.clienteFlow.vagasCobertaDisponiveis = d.vagasCobertaDisponiveis;
-    this.clienteFlow.vagasDescobertaDisponiveis = d.vagasDescobertaDisponiveis;
+    this.clienteFlow.vagasCobertaDisponiveis = this.minCoberta();
+    this.clienteFlow.vagasDescobertaDisponiveis = this.minDescoberta();
 
     this.showModal.set(false);
     this.router.navigate(['/cliente/reservar']);

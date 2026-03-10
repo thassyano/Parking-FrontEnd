@@ -21,6 +21,7 @@ export class ClienteReserva implements OnInit {
   orcamento = signal<OrcamentoResponse | null>(null);
   orcamentoLoading = signal(false);
   erro = signal('');
+  showConfirmacao = signal(false);
 
   constructor(
     protected flow: ClienteFlowService,
@@ -85,25 +86,33 @@ export class ClienteReserva implements OnInit {
     return this.flow.vagasDescobertaDisponiveis > 0;
   }
 
-  confirmar() {
+  abrirConfirmacao() {
     if (!this.nome || !this.telefone) {
       this.erro.set('Preencha nome e telefone');
       return;
     }
+    this.erro.set('');
+    this.showConfirmacao.set(true);
+  }
 
+  fecharConfirmacao() {
+    this.showConfirmacao.set(false);
+  }
+
+  confirmar() {
+    this.showConfirmacao.set(false);
     this.loading.set(true);
     this.erro.set('');
-
-    const observacoes = this.placa ? `Placa: ${this.placa}` : undefined;
 
     this.reservaService
       .criarOnline({
         nomeCliente: this.nome,
         telefoneCliente: this.telefone,
+        placaVeiculo: this.placa || undefined,
         tipoVaga: this.tipoVaga,
-        dataEntrada: this.flow.dataEntrada,
+        dataEntrada: `${this.flow.dataEntrada}T${this.flow.horaEntrada || '00:00'}`,
+        dataSaidaPrevista: `${this.flow.dataSaida}T${this.flow.horaSaida || '00:00'}`,
         qtdDias: this.flow.qtdDias,
-        observacoes,
       })
       .subscribe({
         next: (reserva) => {

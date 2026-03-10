@@ -60,16 +60,53 @@
         <option value="Descoberta">Descoberta</option>
       </select>
     </div>
-    <div class="form-group">
-      <label class="form-label" for="dataEntrada">Data de Entrada *</label>
-      <input
-        id="dataEntrada"
-        type="date"
-        class="form-control"
-        [(ngModel)]="dataEntrada"
-        name="dataEntrada"
-        required
-      />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="dataEntrada">Data de Entrada *</label>
+        <input
+          id="dataEntrada"
+          type="date"
+          class="form-control"
+          [(ngModel)]="dataEntrada"
+          name="dataEntrada"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="horaEntrada">Hora de Entrada *</label>
+        <input
+          id="horaEntrada"
+          type="time"
+          class="form-control"
+          [(ngModel)]="horaEntrada"
+          name="horaEntrada"
+          required
+        />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="dataSaida">Data de Saida Prevista *</label>
+        <input
+          id="dataSaida"
+          type="date"
+          class="form-control"
+          [(ngModel)]="dataSaida"
+          name="dataSaida"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="horaSaida">Hora de Saida Prevista *</label>
+        <input
+          id="horaSaida"
+          type="time"
+          class="form-control"
+          [(ngModel)]="horaSaida"
+          name="horaSaida"
+          required
+        />
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label" for="qtdDias">Quantidade de Dias</label>

@@ -59,19 +59,21 @@
   @if (showModal()) {
     <div class="modal-overlay" (click)="fecharModal()">
       <div class="modal-card" (click)="$event.stopPropagation()">
-        <h2 class="modal-title">Disponibilidade</h2>
+        <h2 class="modal-title">Disponibilidade no Periodo</h2>
         @if (disponibilidade(); as d) {
+          <p class="dispo-periodo-label">{{ d.dataInicio }} a {{ d.dataFim }} ({{ d.dias.length }} dia(s))</p>
+
           <div class="dispo-info">
             <div class="dispo-row">
               <span>Vagas Cobertas</span>
-              <span class="dispo-value" [class.dispo-ok]="d.vagasCobertaDisponiveis > 0" [class.dispo-zero]="d.vagasCobertaDisponiveis === 0">
-                {{ d.vagasCobertaDisponiveis }} disponiveis
+              <span class="dispo-value" [class.dispo-ok]="minCoberta() > 0" [class.dispo-zero]="minCoberta() === 0">
+                {{ minCoberta() }} disponiveis
               </span>
             </div>
             <div class="dispo-row">
               <span>Vagas Descobertas</span>
-              <span class="dispo-value" [class.dispo-ok]="d.vagasDescobertaDisponiveis > 0" [class.dispo-zero]="d.vagasDescobertaDisponiveis === 0">
-                {{ d.vagasDescobertaDisponiveis }} disponiveis
+              <span class="dispo-value" [class.dispo-ok]="minDescoberta() > 0" [class.dispo-zero]="minDescoberta() === 0">
+                {{ minDescoberta() }} disponiveis
               </span>
             </div>
           </div>
@@ -82,7 +84,7 @@
               <button class="btn btn-outline btn-block" (click)="fecharModal()">Cancelar</button>
             </div>
           } @else {
-            <p class="sem-vagas-msg">Sem vagas disponiveis para esta data.</p>
+            <p class="sem-vagas-msg">Sem vagas disponiveis para este periodo.</p>
             <button class="btn btn-outline btn-block" (click)="fecharModal()">Fechar</button>
           }
         }

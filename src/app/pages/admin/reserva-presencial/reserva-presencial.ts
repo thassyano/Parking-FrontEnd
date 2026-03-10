@@ -15,6 +15,9 @@ export class ReservaPresencial {
   placaVeiculo = '';
   tipoVaga = 'Coberta';
   dataEntrada = '';
+  horaEntrada = '';
+  dataSaida = '';
+  horaSaida = '';
   qtdDias = 1;
   observacoes = '';
   loading = signal(false);
@@ -24,7 +27,12 @@ export class ReservaPresencial {
     private reservaService: ReservaService,
     private router: Router,
   ) {
-    this.dataEntrada = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    this.dataEntrada = now.toISOString().split('T')[0];
+    this.horaEntrada = now.toTimeString().slice(0, 5);
+    const saida = new Date(now.getTime() + 86400000);
+    this.dataSaida = saida.toISOString().split('T')[0];
+    this.horaSaida = this.horaEntrada;
   }
 
   submeter() {
@@ -43,7 +51,8 @@ export class ReservaPresencial {
         cpfCliente: this.cpfCliente || undefined,
         placaVeiculo: this.placaVeiculo,
         tipoVaga: this.tipoVaga,
-        dataEntrada: this.dataEntrada,
+        dataEntrada: `${this.dataEntrada}T${this.horaEntrada || '00:00'}`,
+        dataSaidaPrevista: `${this.dataSaida}T${this.horaSaida || '00:00'}`,
         qtdDias: this.qtdDias,
         observacoes: this.observacoes || undefined,
       })

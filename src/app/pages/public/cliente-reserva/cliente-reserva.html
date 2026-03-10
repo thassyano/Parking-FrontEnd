@@ -92,7 +92,7 @@
 
     <button
       class="btn btn-dark btn-block btn-lg"
-      (click)="confirmar()"
+      (click)="abrirConfirmacao()"
       [disabled]="loading() || orcamentoLoading() || !orcamento()"
     >
       @if (loading()) {
@@ -102,4 +102,64 @@
       }
     </button>
   </div>
+
+  @if (showConfirmacao()) {
+    <div class="modal-overlay" (click)="fecharConfirmacao()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="confirm-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h2 class="modal-title">Confirmar Reserva?</h2>
+        <p class="confirm-text">
+          Ao confirmar, sua reserva sera registrada e voce sera
+          redirecionado para o <strong>WhatsApp</strong> para
+          enviar os dados ao estacionamento.
+        </p>
+
+        <div class="confirm-resumo">
+          <div class="confirm-resumo-row">
+            <span>Nome</span>
+            <span>{{ nome }}</span>
+          </div>
+          <div class="confirm-resumo-row">
+            <span>Telefone</span>
+            <span>{{ telefone }}</span>
+          </div>
+          @if (placa) {
+            <div class="confirm-resumo-row">
+              <span>Placa</span>
+              <span>{{ placa }}</span>
+            </div>
+          }
+          <div class="confirm-resumo-row">
+            <span>Tipo de Vaga</span>
+            <span>{{ tipoVaga }}</span>
+          </div>
+          <div class="confirm-resumo-row">
+            <span>Entrada</span>
+            <span>{{ dataEntradaFormatted }}</span>
+          </div>
+          <div class="confirm-resumo-row">
+            <span>Saida</span>
+            <span>{{ dataSaidaFormatted }}</span>
+          </div>
+          @if (orcamento(); as orc) {
+            <div class="confirm-resumo-row confirm-resumo-total">
+              <span>Valor Total</span>
+              <span>{{ orc.valorTotalCartao | currency:'BRL':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="confirm-resumo-row confirm-resumo-total confirm-resumo-desconto">
+              <span>Valor (Pix/Dinheiro)</span>
+              <span>{{ orc.valorTotalPixDinheiro | currency:'BRL':'symbol':'1.2-2' }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-dark btn-block" (click)="confirmar()">Confirmar e ir para WhatsApp</button>
+          <button class="btn btn-outline btn-block" (click)="fecharConfirmacao()">Voltar</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

@@ -45,14 +45,14 @@ export class ReservaOnline {
 
     this.reservaService
       .criarOnline({
-        nomeCliente: this.nomeCliente,
-        telefoneCliente: this.telefoneCliente,
-        cpfCliente: this.cpfCliente || undefined,
-        tipoVaga: this.tipoVaga,
-        dataEntrada: `${this.dataEntrada}T${this.horaEntrada || '00:00'}`,
-        dataSaidaPrevista: `${this.dataSaida}T${this.horaSaida || '00:00'}`,
-        qtdDias: this.qtdDias,
-        observacoes: this.observacoes || undefined,
+          nomeCliente: this.nomeCliente,
+          telefoneCliente: this.telefoneCliente,
+          cpfCliente: this.cpfCliente || undefined,
+          tipoVaga: this.tipoVaga,
+          dataEntrada: this.dataEntrada,
+          qtdDias: this.qtdDias,
+          observacoes: this.observacoes || undefined,
+          dataSaidaPrevista: ''
       })
       .subscribe({
         next: (reserva) => {

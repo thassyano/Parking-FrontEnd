@@ -1,0 +1,41 @@
+:host {
+  position: fixed;
+  top: 96px;
+  right: 24px;
+  z-index: 10;
+}
+
+.popup {
+  min-width: 260px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.sucesso {
+  background-color: var(--positive-feedback);
+  color: var(--text-light);
+}
+
+.alerta {
+  background-color: var(--negative-feedback);
+  color: var(--text-dark);
+}
+
+.erro {
+  background-color: var(--negative-feedback-dark);
+  color: var(--text-light);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

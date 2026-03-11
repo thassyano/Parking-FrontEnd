@@ -1,0 +1,165 @@
+<div class="cliente-page">
+  <h1 class="cliente-title">Reservar Vaga</h1>
+
+  @if (erro()) {
+    <div class="alert alert-danger" style="max-width: 480px; margin: 0 auto 1rem;">{{ erro() }}</div>
+  }
+
+  <div class="cliente-card">
+    <div class="reservation-summary">
+      <div class="summary-item">
+        <span class="summary-label">Entrada</span>
+        <span class="summary-value">{{ dataEntradaFormatted }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Saida</span>
+        <span class="summary-value">{{ dataSaidaFormatted }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Dias</span>
+        <span class="summary-value">{{ flow.qtdDias }}</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label form-label-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#64748b"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Nome Completo
+      </label>
+      <input type="text" class="form-control" [(ngModel)]="nome" placeholder="Seu nome completo" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label form-label-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#64748b"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        Telefone
+      </label>
+      <input type="tel" class="form-control" [(ngModel)]="telefone" placeholder="61999999999" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label form-label-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#64748b"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+        Placa do Automovel
+      </label>
+      <input type="text" class="form-control" [(ngModel)]="placa" placeholder="ABC1D23" style="text-transform: uppercase;" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Tipo de Vaga</label>
+      <select class="form-control form-select" [(ngModel)]="tipoVaga" (ngModelChange)="calcularOrcamento()">
+        @if (cobertaDisponivel()) {
+          <option value="Coberta">Coberta</option>
+        }
+        @if (descobertaDisponivel()) {
+          <option value="Descoberta">Descoberta</option>
+        }
+      </select>
+    </div>
+
+    @if (orcamentoLoading()) {
+      <div class="loading-spinner">Calculando preco...</div>
+    }
+
+    @if (orcamento(); as orc) {
+      <div class="price-summary-box">
+        <h3 class="price-summary-title">Valor da Reserva</h3>
+        <div class="price-line">
+          <span>Diaria ({{ orc.tipoVaga }})</span>
+          <span>{{ orc.valorDiaria | currency:'BRL':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="price-line">
+          <span>Quantidade</span>
+          <span>{{ orc.qtdDias }} dia(s)</span>
+        </div>
+        <div class="price-divider"></div>
+        <div class="price-line price-line--total">
+          <span>Total no Cartao</span>
+          <span>{{ orc.valorTotalCartao | currency:'BRL':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="price-line price-line--discount">
+          <span>Total no Pix / Dinheiro</span>
+          <span>{{ orc.valorTotalPixDinheiro | currency:'BRL':'symbol':'1.2-2' }}</span>
+        </div>
+        @if (orc.economiaTotal > 0) {
+          <div class="price-line price-line--savings">
+            <span>Voce economiza</span>
+            <span>{{ orc.economiaTotal | currency:'BRL':'symbol':'1.2-2' }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <button
+      class="btn btn-dark btn-block btn-lg"
+      (click)="abrirConfirmacao()"
+      [disabled]="loading() || orcamentoLoading() || !orcamento()"
+    >
+      @if (loading()) {
+        Reservando...
+      } @else {
+        Confirmar Reserva
+      }
+    </button>
+  </div>
+
+  @if (showConfirmacao()) {
+    <div class="modal-overlay" (click)="fecharConfirmacao()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="confirm-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h2 class="modal-title">Confirmar Reserva?</h2>
+        <p class="confirm-text">
+          Ao confirmar, sua reserva sera registrada e voce sera
+          redirecionado para o <strong>WhatsApp</strong> para
+          enviar os dados ao estacionamento.
+        </p>
+
+        <div class="confirm-resumo">
+          <div class="confirm-resumo-row">
+            <span>Nome</span>
+            <span>{{ nome }}</span>
+          </div>
+          <div class="confirm-resumo-row">
+            <span>Telefone</span>
+            <span>{{ telefone }}</span>
+          </div>
+          @if (placa) {
+            <div class="confirm-resumo-row">
+              <span>Placa</span>
+              <span>{{ placa }}</span>
+            </div>
+          }
+          <div class="confirm-resumo-row">
+            <span>Tipo de Vaga</span>
+            <span>{{ tipoVaga }}</span>
+          </div>
+          <div class="confirm-resumo-row">
+            <span>Entrada</span>
+            <span>{{ dataEntradaFormatted }}</span>
+          </div>
+          <div class="confirm-resumo-row">
+            <span>Saida</span>
+            <span>{{ dataSaidaFormatted }}</span>
+          </div>
+          @if (orcamento(); as orc) {
+            <div class="confirm-resumo-row confirm-resumo-total">
+              <span>Valor Total</span>
+              <span>{{ orc.valorTotalCartao | currency:'BRL':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="confirm-resumo-row confirm-resumo-total confirm-resumo-desconto">
+              <span>Valor (Pix/Dinheiro)</span>
+              <span>{{ orc.valorTotalPixDinheiro | currency:'BRL':'symbol':'1.2-2' }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-dark btn-block" (click)="confirmar()">Confirmar e ir para WhatsApp</button>
+          <button class="btn btn-outline btn-block" (click)="fecharConfirmacao()">Voltar</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -38,13 +38,14 @@ export class ReservaOnline {
 
     this.reservaService
       .criarOnline({
-        nomeCliente: this.nomeCliente,
-        telefoneCliente: this.telefoneCliente,
-        cpfCliente: this.cpfCliente || undefined,
-        tipoVaga: this.tipoVaga,
-        dataEntrada: this.dataEntrada,
-        qtdDias: this.qtdDias,
-        observacoes: this.observacoes || undefined,
+          nomeCliente: this.nomeCliente,
+          telefoneCliente: this.telefoneCliente,
+          cpfCliente: this.cpfCliente || undefined,
+          tipoVaga: this.tipoVaga,
+          dataEntrada: this.dataEntrada,
+          qtdDias: this.qtdDias,
+          observacoes: this.observacoes || undefined,
+          dataSaidaPrevista: ''
       })
       .subscribe({
         next: (reserva) => {

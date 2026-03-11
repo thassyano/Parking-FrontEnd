@@ -11,6 +11,7 @@ export class ButtonComponent {
     public message = input.required<string>();
     public class = input.required<BtnClass>();
     public onClick = output<void>();
+    public isDisabled = input<boolean>();
 
     public clicked(): void {
         this.onClick.emit();

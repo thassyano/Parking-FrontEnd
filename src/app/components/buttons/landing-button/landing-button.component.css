@@ -1,0 +1,55 @@
+.ui-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+
+  width: 100%;
+  padding: 16px 24px;
+
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: var(--font);
+
+  border-radius: 16px;
+  border: 1px solid transparent;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ui-button.full {
+  width: 100%;
+}
+
+.ui-button.primary {
+  background: var(--text-dark);
+  color: var(--white);
+  border-color: var(--text-dark);
+}
+
+.ui-button.primary:hover {
+  background: var(--dark-hover);
+  border-color: var(--dark-hover);
+}
+
+.ui-button.outline {
+  background: var(--white);
+  color: var(--text-dark);
+  border: 1.5px solid var(--primary-50);
+}
+
+.ui-button.outline:hover {
+  background: var(--primary-50);
+  border-color: var(--text-muted);
+}
+
+.ui-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+:host ::ng-deep .ui-button img[icon] {
+  width: 22px;
+  height: 22px;
+}

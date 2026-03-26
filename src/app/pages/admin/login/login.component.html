@@ -1,0 +1,50 @@
+<div class="login_page">
+  <div class="login_content">
+    <h1 class="login_main_title">Área Administrativa</h1>
+    <p class="login_main_subtitle">Acesso restrito ao dono</p>
+
+    <div class="login_card">
+      <h2 class="login_section_title">Login</h2>
+
+      <form [formGroup]="loginForm">
+        <div class="form_group">
+          <label class="form_label form_label_icon">
+            <img class="label_img" src="assets/icons/person-dark.icon.svg" alt="" />
+            Usuario
+          </label>
+
+          <input
+            type="text"
+            class="form_control"
+            formControlName="usuario"
+            placeholder="Enter your username"
+          />
+        </div>
+
+        <div class="form_group">
+          <label class="form_label form_label_icon">
+            <img class="label_img" src="assets/icons/lock.icon.svg" alt="" />
+            Senha
+          </label>
+
+          <input
+            type="password"
+            class="form_control"
+            formControlName="senha"
+            placeholder="Enter your password"
+          />
+        </div>
+
+        <app-landing-button
+          [label]="isLoading() ? 'Loading...' : 'Login'"
+          [variant]="'primary'"
+          [fullWidth]="true"
+          [disabled]="isLoading()"
+          (clicked)="onLogin()"
+        ></app-landing-button>
+      </form>
+
+      <p class="login_hint">Demo: adminDev/adminDev123</p>
+    </div>
+  </div>
+</div>

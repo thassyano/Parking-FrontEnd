@@ -1,0 +1,12 @@
+<button
+  type="button"
+  (click)="clicked.emit()"
+  class="ui-button"
+  [class.full]="fullWidth()"
+  [class.primary]="variant() === 'primary'"
+  [class.outline]="variant() === 'outline'"
+  [disabled]="disabled()"
+>
+  <ng-content select="[icon]"></ng-content>
+  {{ label() }}
+</button>

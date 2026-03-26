@@ -1,0 +1,147 @@
+.client_page {
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-50);
+  min-height: 100vh;
+}
+
+.card_container {
+  width: 400px;
+  box-shadow: var(--shadow);
+  border-radius: 16px;
+}
+
+.page_header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.header_title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.header_subtitle {
+  font-size: 0.9rem;
+  color: var(--primary);
+}
+
+.error_alert {
+  background: var(--danger-light);
+  color: var(--danger);
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.availability_card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--primary-50);
+}
+
+.card_content {
+  padding: 20px 20px 0 20px;
+}
+
+.section_title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.availability_form {
+  padding: 20px;
+}
+
+.input_group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.input_label {
+  font-size: 0.85rem;
+  color: var(--text-dark);
+}
+
+.input_field {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--text-muted);
+  font-size: 0.95rem;
+  background: var(--white);
+}
+
+.input_field:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.primary_action {
+  margin-top: 8px;
+}
+
+.modal_overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal_container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.modal_content {
+  background: var(--white);
+  padding: 24px;
+  border-radius: 16px;
+}
+
+.modal_title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-dark);
+}
+
+.availability_success {
+  color: var(--success);
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.availability_error {
+  color: var(--danger);
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.modal_action {
+  margin-top: 12px;
+}
+
+.label_icon {
+  width: 18px;
+}
+
+.label_group {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+}

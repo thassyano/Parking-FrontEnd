@@ -1,7 +1,5 @@
-<header [ngClass]="isAdmin() ? 'admin' : 'usuario'">
-  <div [ngClass]="container()">
-    <h3>{{ title() }}</h3>
+<div class="container header_container">
+    <p class="header_name">{{headerName()}}</p>
 
-    <app-header-button [message]="'Voltar'" (onClick)="navigateHome()"></app-header-button>
-  </div>
-</header>
+    <app-back-btn></app-back-btn>
+</div>

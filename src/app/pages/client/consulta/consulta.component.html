@@ -1,0 +1,97 @@
+<div class="client_page">
+  <div class="page_header">
+    <div class="header-icon">
+      <img src="assets/icons/parking.icon.svg" alt="" />
+    </div>
+    <h1 class="header_title">Estacionamento</h1>
+    <p class="header_subtitle">Consulte disponibilidade</p>
+  </div>
+  @if (errorMessage()) {
+    <div class="error_alert">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="card_container">
+    <div class="availability_card">
+      <div class="card_content">
+        <h2 class="section_title">Consultar Disponibilidade</h2>
+      </div>
+
+      <form
+        class="availability_form"
+        [formGroup]="availabilityForm"
+        (ngSubmit)="checkAvailability()"
+      >
+        <div class="input_group">
+          <div class="label_group">
+            <img class="label_icon" src="assets/icons/calendar.icon.svg" alt="" />
+            <label class="input_label">Data de Entrada</label>
+          </div>
+          <input type="date" class="input_field" formControlName="entryDate" />
+        </div>
+
+        <div class="input_group">
+          <div class="label_group">
+            <img class="label_icon" src="assets/icons/clock.icon.svg" alt="" />
+            <label class="input_label">Horário de Entrada</label>
+          </div>
+          <input type="time" class="input_field" formControlName="entryTime" />
+        </div>
+
+        <div class="input_group">
+          <div class="label_group">
+            <img class="label_icon" src="assets/icons/calendar.icon.svg" alt="" />
+            <label class="input_label">Data de Saída</label>
+          </div>
+          <input type="date" class="input_field" formControlName="exitDate" />
+        </div>
+
+        <div class="input_group">
+          <div class="label_group">
+            <img class="label_icon" src="assets/icons/clock.icon.svg" alt="" />
+            <label class="input_label">Horário de Saida</label>
+          </div>
+          <input type="time" class="input_field" formControlName="exitTime" />
+        </div>
+
+        <div class="primary_action">
+          <app-landing-button
+            [label]="isLoading() ? 'Checking...' : 'Check Availability'"
+            variant="primary"
+            [fullWidth]="true"
+            [disabled]="availabilityForm.invalid || isLoading()"
+            (clicked)="checkAvailability()"
+          >
+          </app-landing-button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@if (isModalVisible()) {
+  <div class="modal_overlay" (click)="closeModal()">
+    <div class="modal_container" (click)="$event.stopPropagation()">
+      <div class="modal_content">
+        <h2 class="modal_title">Resultado de Disponibilidade</h2>
+
+        @if (isAvailable()) {
+          <p class="availability_success">Vagas disponíveis</p>
+        } @else {
+          <p class="availability_error">Sem vagas disponíveis</p>
+        }
+
+        <div class="modal_action">
+          <app-landing-button
+            label="Close"
+            variant="outline"
+            [fullWidth]="true"
+            (clicked)="closeModal()"
+          >
+          </app-landing-button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

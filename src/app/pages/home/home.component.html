@@ -1,0 +1,21 @@
+<div class="landing-page">
+  <div class="landing-content">
+    <h1 class="landing-title">Estacionamento</h1>
+    <p class="landing-subtitle">Sistema de Gestao</p>
+
+    <div class="landing-buttons">
+      <app-landing-button label="Área do Cliente" [fullWidth]="true" (clicked)="goToClient()">
+        <img icon src="assets/icons/person-white.icon.svg" alt="person icon" />
+      </app-landing-button>
+
+      <app-landing-button
+        label="Área Administrativa"
+        variant="outline"
+        [fullWidth]="true"
+        (clicked)="goToAdmin()"
+      >
+        <img icon src="assets/icons/gear.icon.svg" alt="gear icon" />
+      </app-landing-button>
+    </div>
+  </div>
+</div>

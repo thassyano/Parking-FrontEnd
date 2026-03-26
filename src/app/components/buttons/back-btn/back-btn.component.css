@@ -1,0 +1,13 @@
+.back_button {
+  padding: 8px 16px;
+  background-color: var(--primary-dark);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.back_button:hover {
+  background-color: var(--primary);
+}

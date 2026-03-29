@@ -38,11 +38,51 @@
     </div>
 
     <div class="form-group">
-      <label class="form-label form-label-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="#64748b"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
-        Placa do Automovel
-      </label>
-      <input type="text" class="form-control" [(ngModel)]="placa" placeholder="ABC1D23" style="text-transform: uppercase;" />
+      <div class="vehicle-label-row">
+        <label class="form-label form-label-icon" for="placa-0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#64748b"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+          Placa do Automovel
+        </label>
+        <button
+          type="button"
+          class="btn btn-outline btn-sm"
+          (click)="adicionarCarro()"
+        >
+          Adicionar carro
+        </button>
+      </div>
+
+      @for (placaItem of placas; track $index) {
+        <div class="vehicle-row">
+          <div class="vehicle-input-wrapper">
+            @if ($index > 0) {
+              <label class="form-label vehicle-sub-label" for="placa-{{ $index }}">
+                Carro {{ $index + 1 }}
+              </label>
+            }
+            <input
+              id="placa-{{ $index }}"
+              type="text"
+              class="form-control"
+              [ngModel]="placaItem"
+              (ngModelChange)="atualizarPlaca($index, $event)"
+              [placeholder]="$index === 0 ? 'ABC1D23' : 'Placa do carro ' + ($index + 1)"
+              style="text-transform: uppercase;"
+            />
+          </div>
+
+          @if (placas.length > 1) {
+            <button
+              type="button"
+              class="btn btn-outline btn-sm vehicle-remove-btn"
+              (click)="removerCarro($index)"
+              [attr.aria-label]="'Remover carro ' + ($index + 1)"
+            >
+              Remover
+            </button>
+          }
+        </div>
+      }
     </div>
 
     <div class="form-group">
@@ -72,19 +112,23 @@
           <span>Quantidade</span>
           <span>{{ orc.qtdDias }} dia(s)</span>
         </div>
+        <div class="price-line">
+          <span>Carros</span>
+          <span>{{ quantidadeVeiculos }}</span>
+        </div>
         <div class="price-divider"></div>
         <div class="price-line price-line--total">
           <span>Total no Cartao</span>
-          <span>{{ orc.valorTotalCartao | currency:'BRL':'symbol':'1.2-2' }}</span>
+          <span>{{ valorTotalCartao | currency:'BRL':'symbol':'1.2-2' }}</span>
         </div>
         <div class="price-line price-line--discount">
           <span>Total no Pix / Dinheiro</span>
-          <span>{{ orc.valorTotalPixDinheiro | currency:'BRL':'symbol':'1.2-2' }}</span>
+          <span>{{ valorTotalPixDinheiro | currency:'BRL':'symbol':'1.2-2' }}</span>
         </div>
-        @if (orc.economiaTotal > 0) {
+        @if (economiaTotal > 0) {
           <div class="price-line price-line--savings">
             <span>Voce economiza</span>
-            <span>{{ orc.economiaTotal | currency:'BRL':'symbol':'1.2-2' }}</span>
+            <span>{{ economiaTotal | currency:'BRL':'symbol':'1.2-2' }}</span>
           </div>
         }
       </div>
@@ -125,10 +169,14 @@
             <span>Telefone</span>
             <span>{{ telefone }}</span>
           </div>
-          @if (placa) {
+          <div class="confirm-resumo-row">
+            <span>Carros</span>
+            <span>{{ quantidadeVeiculos }}</span>
+          </div>
+          @for (placaItem of placasPreenchidas; track $index) {
             <div class="confirm-resumo-row">
-              <span>Placa</span>
-              <span>{{ placa }}</span>
+              <span>Placa {{ $index + 1 }}</span>
+              <span>{{ placaItem }}</span>
             </div>
           }
           <div class="confirm-resumo-row">
@@ -143,14 +191,14 @@
             <span>Saida</span>
             <span>{{ dataSaidaFormatted }}</span>
           </div>
-          @if (orcamento(); as orc) {
+          @if (orcamento()) {
             <div class="confirm-resumo-row confirm-resumo-total">
               <span>Valor Total</span>
-              <span>{{ orc.valorTotalCartao | currency:'BRL':'symbol':'1.2-2' }}</span>
+              <span>{{ valorTotalCartao | currency:'BRL':'symbol':'1.2-2' }}</span>
             </div>
             <div class="confirm-resumo-row confirm-resumo-total confirm-resumo-desconto">
               <span>Valor (Pix/Dinheiro)</span>
-              <span>{{ orc.valorTotalPixDinheiro | currency:'BRL':'symbol':'1.2-2' }}</span>
+              <span>{{ valorTotalPixDinheiro | currency:'BRL':'symbol':'1.2-2' }}</span>
             </div>
           }
         </div>

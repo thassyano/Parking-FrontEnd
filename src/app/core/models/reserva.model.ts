@@ -34,6 +34,18 @@ export interface CriarReservaOnlineRequest {
   observacoes?: string;
 }
 
+export interface CriarReservaOnlineLoteRequest {
+  nomeCliente: string;
+  telefoneCliente: string;
+  cpfCliente?: string;
+  placasVeiculos: string[];
+  tipoVaga: string;
+  dataEntrada: string;
+  dataSaidaPrevista: string;
+  qtdDias: number;
+  observacoes?: string;
+}
+
 export interface CriarReservaPresencialRequest {
   nomeCliente: string;
   telefoneCliente: string;
@@ -92,6 +104,15 @@ export interface WhatsAppResponse {
   url: string;
   mensagem: string;
   telefoneEstacionamento: string;
+}
+
+export interface ReservaLoteResponse {
+  reservas: Reserva[];
+  quantidadeVeiculos: number;
+  valorTotalCartao: number;
+  valorTotalPixDinheiro: number;
+  economiaTotal: number;
+  whatsApp?: WhatsAppResponse;
 }
 
 export interface ReservaFiltros {

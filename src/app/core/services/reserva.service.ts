@@ -5,12 +5,14 @@ import { environment } from '../environment';
 import {
   Reserva,
   CriarReservaOnlineRequest,
+  CriarReservaOnlineLoteRequest,
   CriarReservaPresencialRequest,
   AssociarPlacaRequest,
   CheckoutRequest,
   CupomEntrada,
   CupomSaida,
   WhatsAppResponse,
+  ReservaLoteResponse,
   ReservaFiltros,
 } from '../models/reserva.model';
 
@@ -37,6 +39,10 @@ export class ReservaService {
 
   criarOnline(data: CriarReservaOnlineRequest): Observable<Reserva> {
     return this.http.post<Reserva>(`${this.url}/online`, data);
+  }
+
+  criarOnlineLote(data: CriarReservaOnlineLoteRequest): Observable<ReservaLoteResponse> {
+    return this.http.post<ReservaLoteResponse>(`${this.url}/online/lote`, data);
   }
 
   criarPresencial(data: CriarReservaPresencialRequest): Observable<Reserva> {

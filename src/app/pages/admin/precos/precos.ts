@@ -21,12 +21,15 @@ export class Precos implements OnInit {
   tipoVaga = 'Coberta';
   valorDiaria = 0;
   descontoPixDinheiro = 0;
+  dataInicio = '';
+  dataFim = '';
   formLoading = signal(false);
 
   constructor(private precoService: PrecoService) {}
 
   ngOnInit() {
     this.carregarPrecos();
+    this.dataInicio = new Date().toISOString().split('T')[0];
   }
 
   carregarPrecos() {
@@ -54,6 +57,15 @@ export class Precos implements OnInit {
       this.erro.set('Valor da diaria deve ser maior que zero');
       return;
     }
+    if (!this.dataInicio) {
+      this.erro.set('Data de inicio e obrigatoria');
+      return;
+    }
+    if (this.dataFim && this.dataFim <= this.dataInicio) {
+      this.erro.set('A data fim deve ser posterior a data de inicio');
+      return;
+    }
+
     this.formLoading.set(true);
     this.erro.set('');
 
@@ -62,6 +74,8 @@ export class Precos implements OnInit {
         tipoVaga: this.tipoVaga,
         valorDiaria: this.valorDiaria,
         descontoPixDinheiro: this.descontoPixDinheiro,
+        dataInicio: this.dataInicio,
+        dataFim: this.dataFim || undefined,
       })
       .subscribe({
         next: () => {
@@ -69,6 +83,8 @@ export class Precos implements OnInit {
           this.showForm.set(false);
           this.valorDiaria = 0;
           this.descontoPixDinheiro = 0;
+          this.dataInicio = new Date().toISOString().split('T')[0];
+          this.dataFim = '';
           this.formLoading.set(false);
           this.carregarPrecos();
         },

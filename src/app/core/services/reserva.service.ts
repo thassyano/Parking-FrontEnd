@@ -7,6 +7,7 @@ import {
   CriarReservaOnlineRequest,
   CriarReservaPresencialRequest,
   CriarReservaLoteOnlineRequest,
+  CriarReservaLotePresencialRequest,
   ReservaLoteResponse,
   AssociarPlacaRequest,
   CheckoutRequest,
@@ -51,6 +52,10 @@ export class ReservaService {
 
   criarPresencial(data: CriarReservaPresencialRequest): Observable<Reserva> {
     return this.http.post<Reserva>(`${this.url}/presencial`, data);
+  }
+
+  criarPresencialLote(data: CriarReservaLotePresencialRequest): Observable<ReservaLoteResponse> {
+    return this.http.post<ReservaLoteResponse>(`${this.url}/presencial/lote`, data);
   }
 
   associarPlaca(id: number, data: AssociarPlacaRequest): Observable<Reserva> {

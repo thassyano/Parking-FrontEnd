@@ -101,6 +101,22 @@ export interface ReservaFiltros {
   tipoVaga?: string;
 }
 
+export interface CarroPresencialLoteRequest {
+  placaVeiculo: string;
+  tipoVaga: string;
+  dataEntrada: string;
+  dataSaidaPrevista: string;
+  qtdDias: number;
+  observacoes?: string;
+}
+
+export interface CriarReservaLotePresencialRequest {
+  nomeCliente: string;
+  telefoneCliente: string;
+  cpfCliente?: string;
+  carros: CarroPresencialLoteRequest[];
+}
+
 export interface CarroLoteRequest {
   placaVeiculo?: string;
   tipoVaga: string;

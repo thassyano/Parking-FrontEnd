@@ -100,3 +100,25 @@ export interface ReservaFiltros {
   status?: string;
   tipoVaga?: string;
 }
+
+export interface CarroLoteRequest {
+  placaVeiculo?: string;
+  tipoVaga: string;
+  dataEntrada: string;
+  dataSaidaPrevista: string;
+  qtdDias: number;
+  observacoes?: string;
+}
+
+export interface CriarReservaLoteOnlineRequest {
+  nomeCliente: string;
+  telefoneCliente: string;
+  cpfCliente?: string;
+  carros: CarroLoteRequest[];
+}
+
+export interface ReservaLoteResponse {
+  reservas: Reserva[];
+  totalReservas: number;
+  valorTotalGeral: number;
+}

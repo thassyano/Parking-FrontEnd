@@ -6,6 +6,8 @@ import {
   Reserva,
   CriarReservaOnlineRequest,
   CriarReservaPresencialRequest,
+  CriarReservaLoteOnlineRequest,
+  ReservaLoteResponse,
   AssociarPlacaRequest,
   CheckoutRequest,
   CupomEntrada,
@@ -37,6 +39,14 @@ export class ReservaService {
 
   criarOnline(data: CriarReservaOnlineRequest): Observable<Reserva> {
     return this.http.post<Reserva>(`${this.url}/online`, data);
+  }
+
+  criarOnlineLote(data: CriarReservaLoteOnlineRequest): Observable<ReservaLoteResponse> {
+    return this.http.post<ReservaLoteResponse>(`${this.url}/online/lote`, data);
+  }
+
+  whatsappLote(ids: number[]): Observable<WhatsAppResponse> {
+    return this.http.post<WhatsAppResponse>(`${this.url}/whatsapp/lote`, ids);
   }
 
   criarPresencial(data: CriarReservaPresencialRequest): Observable<Reserva> {

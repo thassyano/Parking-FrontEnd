@@ -208,7 +208,7 @@
   </div>
 
   @if (cupomEntrada()) {
-    <div class="card cupom-card" style="margin-top: 1rem;">
+    <div class="card cupom-card" [class.cupom-print-active]="showCupomEntradaPrint()" style="margin-top: 1rem;">
       <div class="cupom-header">{{ cupomEntrada()!.nomeEstacionamento }}</div>
       @if (cupomEntrada()!.endereco) {
         <div class="cupom-line">{{ cupomEntrada()!.endereco }}</div>
@@ -227,12 +227,12 @@
       <div class="cupom-line">Total: {{ cupomEntrada()!.valorTotal | currency:'BRL':'symbol':'1.2-2' }}</div>
       <div class="cupom-divider"></div>
       <div class="cupom-line">{{ cupomEntrada()!.mensagem }}</div>
-      <button type="button" class="btn btn-primary" (click)="imprimirCupom()">Imprimir</button>
+      <button type="button" class="btn btn-primary" (click)="imprimirCupomEntrada()">Imprimir</button>
     </div>
   }
 
   @if (cupomSaida()) {
-    <div class="card cupom-card" style="margin-top: 1rem;">
+    <div class="card cupom-card" [class.cupom-print-active]="showCupomSaidaPrint()" style="margin-top: 1rem;">
       <div class="cupom-header">{{ cupomSaida()!.nomeEstacionamento }}</div>
       @if (cupomSaida()!.endereco) {
         <div class="cupom-line">{{ cupomSaida()!.endereco }}</div>
@@ -248,7 +248,7 @@
       <div class="cupom-line">Desconto: {{ cupomSaida()!.descontoAplicado | currency:'BRL':'symbol':'1.2-2' }}</div>
       <div class="cupom-line">Valor Final: {{ cupomSaida()!.valorFinal | currency:'BRL':'symbol':'1.2-2' }}</div>
       <div class="cupom-line">Pagamento: {{ cupomSaida()!.formaPagamento }}</div>
-      <button type="button" class="btn btn-primary" (click)="imprimirCupom()">Imprimir</button>
+      <button type="button" class="btn btn-primary" (click)="imprimirCupomSaida()">Imprimir</button>
     </div>
   }
 }

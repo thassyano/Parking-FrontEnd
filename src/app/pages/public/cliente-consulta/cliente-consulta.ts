@@ -3,7 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DisponibilidadeService } from '../../../core/services/disponibilidade.service';
 import { DisponibilidadePeriodo } from '../../../core/models/disponibilidade.model';
-import { ClienteFlowService } from '../../../core/services/cliente-flow.service';
+import { ClienteFlowService, CarroEntry } from '../../../core/services/cliente-flow.service';
+
+interface CarroAdicional {
+  dataEntrada: string;
+  horaEntrada: string;
+  dataSaida: string;
+  horaSaida: string;
+}
 
 @Component({
   selector: 'app-cliente-consulta',
@@ -19,6 +26,8 @@ export class ClienteConsulta {
   erro = signal('');
   showModal = signal(false);
   disponibilidade = signal<DisponibilidadePeriodo | null>(null);
+
+  carrosAdicionais: CarroAdicional[] = [];
 
   minCoberta = computed(() => {
     const d = this.disponibilidade();
@@ -83,12 +92,29 @@ export class ClienteConsulta {
     return this.minCoberta() > 0 || this.minDescoberta() > 0;
   }
 
-  continuar() {
-    const entradaDate = new Date(`${this.dataEntrada}T00:00`);
-    const saidaDate = new Date(`${this.dataSaida}T00:00`);
-    const diffDays = (saidaDate.getTime() - entradaDate.getTime()) / (1000 * 60 * 60 * 24);
-    const qtdDias = Math.max(1, diffDays);
+  adicionarCarro() {
+    this.carrosAdicionais.push({
+      dataEntrada: this.dataEntrada,
+      horaEntrada: this.horaEntrada,
+      dataSaida: this.dataSaida,
+      horaSaida: this.horaSaida,
+    });
+  }
 
+  removerCarro(index: number) {
+    this.carrosAdicionais.splice(index, 1);
+  }
+
+  private calcularQtdDias(dataEntrada: string, dataSaida: string): number {
+    const entrada = new Date(`${dataEntrada}T00:00`);
+    const saida = new Date(`${dataSaida}T00:00`);
+    return Math.max(1, (saida.getTime() - entrada.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  continuar() {
+    const qtdDias = this.calcularQtdDias(this.dataEntrada, this.dataSaida);
+
+    // Campos legados (primeiro veículo)
     this.clienteFlow.dataEntrada = this.dataEntrada;
     this.clienteFlow.horaEntrada = this.horaEntrada;
     this.clienteFlow.dataSaida = this.dataSaida;
@@ -96,6 +122,33 @@ export class ClienteConsulta {
     this.clienteFlow.qtdDias = qtdDias;
     this.clienteFlow.vagasCobertaDisponiveis = this.minCoberta();
     this.clienteFlow.vagasDescobertaDisponiveis = this.minDescoberta();
+
+    // Monta lista de carros
+    const primeiroCarro: CarroEntry = {
+      dataEntrada: this.dataEntrada,
+      horaEntrada: this.horaEntrada,
+      dataSaida: this.dataSaida,
+      horaSaida: this.horaSaida,
+      qtdDias,
+      tipoVaga: this.minCoberta() > 0 ? 'Coberta' : 'Descoberta',
+      placa: '',
+      vagasCobertaDisponiveis: this.minCoberta(),
+      vagasDescobertaDisponiveis: this.minDescoberta(),
+    };
+
+    const outrosCarros: CarroEntry[] = this.carrosAdicionais.map((c) => ({
+      dataEntrada: c.dataEntrada,
+      horaEntrada: c.horaEntrada,
+      dataSaida: c.dataSaida,
+      horaSaida: c.horaSaida,
+      qtdDias: this.calcularQtdDias(c.dataEntrada, c.dataSaida),
+      tipoVaga: this.minCoberta() > 0 ? 'Coberta' : 'Descoberta',
+      placa: '',
+      vagasCobertaDisponiveis: this.minCoberta(),
+      vagasDescobertaDisponiveis: this.minDescoberta(),
+    }));
+
+    this.clienteFlow.carros = [primeiroCarro, ...outrosCarros];
 
     this.showModal.set(false);
     this.router.navigate(['/cliente/reservar']);

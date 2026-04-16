@@ -494,6 +494,13 @@ textarea.form-control {
   min-height: 80px;
 }
 
+.form-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
 .form-select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23475569' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
@@ -1661,6 +1668,8 @@ textarea.form-control {
   padding: 2rem;
   width: 100%;
   max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-title {
@@ -1880,20 +1889,176 @@ textarea.form-control {
 }
 
 @media print {
+  @page {
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: var(--surface);
+    height: auto;
+    min-height: 0;
+  }
+
+  .admin-wrapper,
+  .admin-main,
+  .admin-content {
+    display: block !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
   .sidebar,
   .admin-topbar,
   .actions-card,
   .page-header,
+  .detail-grid,
+  .card:not(.cupom-print-active),
+  .alert,
+  .loading-spinner,
   .btn {
     display: none !important;
   }
 
-  .admin-main {
-    margin-left: 0;
+  .cupom-card:not(.cupom-print-active) {
+    display: none !important;
   }
 
-  .cupom-card {
-    border: 1px solid #000;
-    max-width: 100%;
+  .cupom-print-active,
+  .cupom-print-active * {
+    visibility: visible !important;
+  }
+
+  .cupom-print-active {
+    background: var(--surface);
+    border: 1px solid var(--text);
+    border-radius: var(--radius);
+    box-shadow: none;
+    display: block !important;
+    margin: 0 auto !important;
+    max-width: 380px;
+    padding: 1.5rem;
+    position: static;
+  }
+}
+
+/* ============================================================
+   MÚLTIPLOS VEÍCULOS — ClienteConsulta + ClienteReserva
+   ============================================================ */
+
+/* Seção de carros adicionais no modal */
+.carros-adicionais-section {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.carro-adicional-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+}
+
+.carro-adicional-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.carro-adicional-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.btn-remover-carro {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.btn-remover-carro:hover {
+  background: #fee2e2;
+}
+
+.carro-adicional-campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 0.75rem;
+}
+
+.carro-adicional-campos .form-group {
+  margin-bottom: 0;
+}
+
+.carro-adicional-campos .form-label {
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.btn-adicionar-carro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-style: dashed;
+  color: var(--primary);
+  border-color: var(--primary);
+  margin-top: 0.25rem;
+}
+
+.btn-adicionar-carro:hover {
+  background: var(--primary-50);
+}
+
+/* Header do card de veículo em ClienteReserva */
+.veiculo-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.veiculo-card-titulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin: 0;
+}
+
+/* Separador no modal de confirmação */
+.confirm-resumo-separador {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--secondary);
+  padding: 0.5rem 0 0.25rem;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 480px) {
+  .carro-adicional-campos {
+    grid-template-columns: 1fr;
   }
 }

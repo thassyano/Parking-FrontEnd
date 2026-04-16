@@ -26,8 +26,14 @@
           />
         </label>
 
-        <app-button [class]="btnClass.ESCURO_P" [message]="'Entrar'"></app-button>
+        <app-button
+          [isDisabled]="isLoading()"
+          [class]="btnClass.ESCURO_P"
+          [message]="'Entrar'"
+        ></app-button>
       </div>
     </form>
   </div>
 </div>
+
+<app-pop-up></app-pop-up>

@@ -38,3 +38,8 @@ button {
   background-color: var(--btn-dark-hover);
   transition: 0.3s;
 }
+
+button:disabled,
+button:disabled:hover {
+  cursor: not-allowed;
+}

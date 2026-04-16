@@ -24,6 +24,8 @@ export class ReservaDetalhe implements OnInit {
   showCheckoutForm = signal(false);
   cupomEntrada = signal<CupomEntrada | null>(null);
   cupomSaida = signal<CupomSaida | null>(null);
+  showCupomEntradaPrint = signal(false);
+  showCupomSaidaPrint = signal(false);
 
   constructor(
     private route: ActivatedRoute,
@@ -135,8 +137,22 @@ export class ReservaDetalhe implements OnInit {
     });
   }
 
-  imprimirCupom() {
-    window.print();
+  imprimirCupomEntrada() {
+    this.showCupomEntradaPrint.set(true);
+
+    setTimeout(() => {
+      window.print();
+      this.showCupomEntradaPrint.set(false);
+    });
+  }
+
+  imprimirCupomSaida() {
+    this.showCupomSaidaPrint.set(true);
+
+    setTimeout(() => {
+      window.print();
+      this.showCupomSaidaPrint.set(false);
+    });
   }
 
   canAssociarPlaca(): boolean {

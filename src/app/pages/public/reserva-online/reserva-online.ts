@@ -14,6 +14,9 @@ export class ReservaOnline {
   cpfCliente = '';
   tipoVaga = 'Coberta';
   dataEntrada = '';
+  horaEntrada = '';
+  dataSaida = '';
+  horaSaida = '';
   qtdDias = 1;
   observacoes = '';
   loading = signal(false);
@@ -25,6 +28,10 @@ export class ReservaOnline {
   ) {
     const hoje = new Date();
     this.dataEntrada = hoje.toISOString().split('T')[0];
+    this.horaEntrada = hoje.toTimeString().slice(0, 5);
+    const saida = new Date(hoje.getTime() + 86400000);
+    this.dataSaida = saida.toISOString().split('T')[0];
+    this.horaSaida = this.horaEntrada;
   }
 
   submeter() {
@@ -38,13 +45,14 @@ export class ReservaOnline {
 
     this.reservaService
       .criarOnline({
-        nomeCliente: this.nomeCliente,
-        telefoneCliente: this.telefoneCliente,
-        cpfCliente: this.cpfCliente || undefined,
-        tipoVaga: this.tipoVaga,
-        dataEntrada: this.dataEntrada,
-        qtdDias: this.qtdDias,
-        observacoes: this.observacoes || undefined,
+          nomeCliente: this.nomeCliente,
+          telefoneCliente: this.telefoneCliente,
+          cpfCliente: this.cpfCliente || undefined,
+          tipoVaga: this.tipoVaga,
+          dataEntrada: this.dataEntrada,
+          qtdDias: this.qtdDias,
+          observacoes: this.observacoes || undefined,
+          dataSaidaPrevista: ''
       })
       .subscribe({
         next: (reserva) => {

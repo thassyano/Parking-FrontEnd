@@ -10,6 +10,7 @@ export interface ReservaCaixa {
   placaVeiculo?: string;
   tipoVaga: string;
   dataEntrada: string;
+  dataPagamento?: string;
   qtdDias: number;
   valorFinal: number;
   formaPagamento?: string;

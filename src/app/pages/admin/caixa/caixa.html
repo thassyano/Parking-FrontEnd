@@ -100,6 +100,7 @@
             <th>Placa</th>
             <th>Tipo Vaga</th>
             <th>Data Entrada</th>
+            <th>Recebido Em</th>
             <th>Qtd Dias</th>
             <th>Valor Final</th>
             <th>Forma Pagamento</th>
@@ -115,6 +116,7 @@
               <td>{{ r.placaVeiculo || '-' }}</td>
               <td>{{ r.tipoVaga }}</td>
               <td>{{ r.dataEntrada | date:'dd/MM/yyyy' }}</td>
+              <td>{{ r.dataPagamento ? (r.dataPagamento | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
               <td>{{ r.qtdDias }}</td>
               <td>{{ r.valorFinal | currency:'BRL':'symbol':'1.2-2' }}</td>
               <td>{{ r.formaPagamento || '-' }}</td>

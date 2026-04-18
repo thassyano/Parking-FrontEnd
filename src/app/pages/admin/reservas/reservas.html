@@ -6,60 +6,64 @@
 </div>
 
 <div class="card">
-  <h3 class="card-title">Filtros</h3>
-  <div class="filters-row">
-    <div class="form-group">
-      <label class="form-label" for="filtroStatus">Status</label>
-      <select
-        id="filtroStatus"
-        class="form-control form-select"
-        [(ngModel)]="filtroStatus"
-        name="filtroStatus"
-      >
-        <option value="">Todos</option>
-        <option value="Pendente">Pendente</option>
-        <option value="Confirmada">Confirmada</option>
-        <option value="CheckinRealizado">Check-in Realizado</option>
-        <option value="CheckoutRealizado">Check-out Realizado</option>
-        <option value="Cancelada">Cancelada</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="filtroTipoVaga">Tipo de Vaga</label>
-      <select
-        id="filtroTipoVaga"
-        class="form-control form-select"
-        [(ngModel)]="filtroTipoVaga"
-        name="filtroTipoVaga"
-      >
-        <option value="">Todos</option>
-        <option value="Coberta">Coberta</option>
-        <option value="Descoberta">Descoberta</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="filtroDataInicio">Data Inicio</label>
-      <input
-        id="filtroDataInicio"
-        type="date"
-        class="form-control"
-        [(ngModel)]="filtroDataInicio"
-        name="filtroDataInicio"
-      />
-    </div>
-    <div class="form-group">
-      <label class="form-label" for="filtroDataFim">Data Fim</label>
-      <input
-        id="filtroDataFim"
-        type="date"
-        class="form-control"
-        [(ngModel)]="filtroDataFim"
-        name="filtroDataFim"
-      />
-    </div>
-    <div class="form-group" style="align-self: flex-end;">
-      <button type="button" class="btn btn-primary" (click)="buscar()">Buscar</button>
-      <button type="button" class="btn btn-secondary btn-outline" (click)="limparFiltros()">Limpar</button>
+  <div class="card-header">
+    <h3 class="card-title">Filtros</h3>
+  </div>
+  <div class="card-body">
+    <div class="filters-row">
+      <div class="form-group">
+        <label class="form-label" for="filtroStatus">Status</label>
+        <select
+          id="filtroStatus"
+          class="form-control form-select"
+          [(ngModel)]="filtroStatus"
+          name="filtroStatus"
+        >
+          <option value="">Todos</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Confirmada">Confirmada</option>
+          <option value="CheckinRealizado">Check-in Realizado</option>
+          <option value="CheckoutRealizado">Check-out Realizado</option>
+          <option value="Cancelada">Cancelada</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="filtroTipoVaga">Tipo de Vaga</label>
+        <select
+          id="filtroTipoVaga"
+          class="form-control form-select"
+          [(ngModel)]="filtroTipoVaga"
+          name="filtroTipoVaga"
+        >
+          <option value="">Todos</option>
+          <option value="Coberta">Coberta</option>
+          <option value="Descoberta">Descoberta</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="filtroDataInicio">Data Início</label>
+        <input
+          id="filtroDataInicio"
+          type="date"
+          class="form-control"
+          [(ngModel)]="filtroDataInicio"
+          name="filtroDataInicio"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="filtroDataFim">Data Fim</label>
+        <input
+          id="filtroDataFim"
+          type="date"
+          class="form-control"
+          [(ngModel)]="filtroDataFim"
+          name="filtroDataFim"
+        />
+      </div>
+      <div class="form-group" style="align-self: flex-end;">
+        <button type="button" class="btn btn-primary" (click)="buscar()">Buscar</button>
+        <button type="button" class="btn btn-secondary btn-outline" (click)="limparFiltros()">Limpar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -86,7 +90,7 @@
             <th>Status</th>
             <th>Pago</th>
             <th>Valor Final</th>
-            <th>Acoes</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -102,7 +106,7 @@
               <td>
                 <span [class]="'badge ' + getStatusClass(r.status)">{{ getStatusLabel(r.status) }}</span>
               </td>
-              <td>{{ r.pago ? 'Sim' : 'Nao' }}</td>
+              <td>{{ r.pago ? 'Sim' : 'Não' }}</td>
               <td>{{ r.valorFinal | currency:'BRL':'symbol':'1.2-2' }}</td>
               <td>
                 <a [routerLink]="['/admin/reservas', r.id]" (click)="$event.stopPropagation()">Ver</a>

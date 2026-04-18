@@ -1,9 +1,9 @@
 <div class="page-header">
-  <h1 class="page-title">Precos</h1>
+  <h1 class="page-title">Preços</h1>
   <div class="page-actions">
-    <button type="button" class="btn btn-secondary" (click)="carregarHistorico()">Historico de Precos</button>
+    <button type="button" class="btn btn-secondary" (click)="carregarHistorico()">Histórico de Preços</button>
     <button type="button" class="btn btn-primary" (click)="showForm.set(!showForm())">
-      {{ showForm() ? 'Cancelar' : 'Novo Preco' }}
+      {{ showForm() ? 'Cancelar' : 'Novo Preço' }}
     </button>
   </div>
 </div>
@@ -19,41 +19,43 @@
 @if (showForm()) {
   <div class="card">
     <div class="card-header">
-      <h2 class="card-title">Novo Preco</h2>
+      <h2 class="card-title">Novo Preço</h2>
     </div>
-    <form (ngSubmit)="criarPreco()">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" for="tipoVaga">Tipo de Vaga</label>
-          <select id="tipoVaga" class="form-select" [(ngModel)]="tipoVaga" name="tipoVaga">
-            <option value="Coberta">Coberta</option>
-            <option value="Descoberta">Descoberta</option>
-          </select>
+    <div class="card-body">
+      <form (ngSubmit)="criarPreco()">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="tipoVaga">Tipo de Vaga</label>
+            <select id="tipoVaga" class="form-select" [(ngModel)]="tipoVaga" name="tipoVaga">
+              <option value="Coberta">Coberta</option>
+              <option value="Descoberta">Descoberta</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="valorDiaria">Valor Diária (R$)</label>
+            <input type="number" id="valorDiaria" class="form-control" [(ngModel)]="valorDiaria" name="valorDiaria" step="0.01" min="0" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="descontoPixDinheiro">Desconto PIX/Dinheiro (R$)</label>
+            <input type="number" id="descontoPixDinheiro" class="form-control" [(ngModel)]="descontoPixDinheiro" name="descontoPixDinheiro" step="0.01" min="0">
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label" for="valorDiaria">Valor Diaria (R$)</label>
-          <input type="number" id="valorDiaria" class="form-control" [(ngModel)]="valorDiaria" name="valorDiaria" step="0.01" min="0" required>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="dataInicio">Vigente a partir de</label>
+            <input type="date" id="dataInicio" class="form-control" [(ngModel)]="dataInicio" name="dataInicio" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="dataFim">Vigente até (opcional)</label>
+            <input type="date" id="dataFim" class="form-control" [(ngModel)]="dataFim" name="dataFim">
+            <span class="form-hint">Deixe em branco para vigência indefinida</span>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label" for="descontoPixDinheiro">Desconto PIX/Dinheiro (R$)</label>
-          <input type="number" id="descontoPixDinheiro" class="form-control" [(ngModel)]="descontoPixDinheiro" name="descontoPixDinheiro" step="0.01" min="0">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" for="dataInicio">Vigente a partir de</label>
-          <input type="date" id="dataInicio" class="form-control" [(ngModel)]="dataInicio" name="dataInicio" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="dataFim">Vigente ate (opcional)</label>
-          <input type="date" id="dataFim" class="form-control" [(ngModel)]="dataFim" name="dataFim">
-          <span class="form-hint">Deixe em branco para vigencia indefinida</span>
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary" [disabled]="formLoading()">
-        {{ formLoading() ? 'Criando...' : 'Criar Preco' }}
-      </button>
-    </form>
+        <button type="submit" class="btn btn-primary" [disabled]="formLoading()">
+          {{ formLoading() ? 'Criando...' : 'Criar Preço' }}
+        </button>
+      </form>
+    </div>
   </div>
 }
 
@@ -66,24 +68,26 @@
         <div class="card-header">
           <h2 class="card-title">{{ preco.tipoVaga }}</h2>
         </div>
-        <div class="price-detail">
-          <span class="price-label">Valor Diaria:</span>
-          <span class="price-value">{{ preco.valorDiaria | currency:'BRL':'symbol':'1.2-2' }}</span>
-        </div>
-        <div class="price-detail">
-          <span class="price-label">Desconto PIX/Dinheiro:</span>
-          <span class="price-value">{{ preco.descontoPixDinheiro | currency:'BRL':'symbol':'1.2-2' }}</span>
-        </div>
-        <div class="price-detail">
-          <span class="price-label">Vigencia:</span>
-          <span class="price-value">
-            {{ preco.dataInicio | date:'dd/MM/yyyy' }}
-            @if (preco.dataFim) {
-              &rarr; {{ preco.dataFim | date:'dd/MM/yyyy' }}
-            } @else {
-              &rarr; Indefinida
-            }
-          </span>
+        <div class="card-body">
+          <div class="price-detail">
+            <span class="price-label">Valor Diária:</span>
+            <span class="price-value">{{ preco.valorDiaria | currency:'BRL':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="price-detail">
+            <span class="price-label">Desconto PIX/Dinheiro:</span>
+            <span class="price-value">{{ preco.descontoPixDinheiro | currency:'BRL':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="price-detail">
+            <span class="price-label">Vigência:</span>
+            <span class="price-value">
+              {{ preco.dataInicio | date:'dd/MM/yyyy' }}
+              @if (preco.dataFim) {
+                &rarr; {{ preco.dataFim | date:'dd/MM/yyyy' }}
+              } @else {
+                &rarr; Indefinida
+              }
+            </span>
+          </div>
         </div>
       </div>
     }
@@ -93,7 +97,7 @@
 @if (showHistorico()) {
   <div class="card">
     <div class="card-header">
-      <h2 class="card-title">Historico de Precos</h2>
+      <h2 class="card-title">Histórico de Preços</h2>
       <button type="button" class="btn btn-outline" (click)="showHistorico.set(false)">Fechar</button>
     </div>
     <div class="table-responsive">
@@ -101,10 +105,10 @@
         <thead>
           <tr>
             <th>Tipo Vaga</th>
-            <th>Valor Diaria</th>
+            <th>Valor Diária</th>
             <th>Desconto PIX/Dinheiro</th>
             <th>Vigente de</th>
-            <th>Vigente ate</th>
+            <th>Vigente até</th>
             <th>Ativo</th>
           </tr>
         </thead>
@@ -117,7 +121,7 @@
               <td>{{ preco.dataInicio | date:'dd/MM/yyyy' }}</td>
               <td>{{ preco.dataFim ? (preco.dataFim | date:'dd/MM/yyyy') : 'Indefinida' }}</td>
               <td>
-                <span class="badge" [class]="preco.ativo ? 'badge--active' : ''">{{ preco.ativo ? 'Sim' : 'Nao' }}</span>
+                <span class="badge" [class]="preco.ativo ? 'badge--active' : ''">{{ preco.ativo ? 'Sim' : 'Não' }}</span>
               </td>
             </tr>
           }

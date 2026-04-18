@@ -11,39 +11,41 @@
   <div class="card-header">
     <h2 class="card-title">Dados do Cliente</h2>
   </div>
-  <div class="form-row">
+  <div class="card-body">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="nomeCliente">Nome do Cliente *</label>
+        <input
+          id="nomeCliente"
+          type="text"
+          class="form-control"
+          [(ngModel)]="nomeCliente"
+          name="nomeCliente"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="telefoneCliente">Telefone *</label>
+        <input
+          id="telefoneCliente"
+          type="tel"
+          class="form-control"
+          [(ngModel)]="telefoneCliente"
+          name="telefoneCliente"
+          required
+        />
+      </div>
+    </div>
     <div class="form-group">
-      <label class="form-label" for="nomeCliente">Nome do Cliente *</label>
+      <label class="form-label" for="cpfCliente">CPF</label>
       <input
-        id="nomeCliente"
+        id="cpfCliente"
         type="text"
         class="form-control"
-        [(ngModel)]="nomeCliente"
-        name="nomeCliente"
-        required
+        [(ngModel)]="cpfCliente"
+        name="cpfCliente"
       />
     </div>
-    <div class="form-group">
-      <label class="form-label" for="telefoneCliente">Telefone *</label>
-      <input
-        id="telefoneCliente"
-        type="tel"
-        class="form-control"
-        [(ngModel)]="telefoneCliente"
-        name="telefoneCliente"
-        required
-      />
-    </div>
-  </div>
-  <div class="form-group">
-    <label class="form-label" for="cpfCliente">CPF</label>
-    <input
-      id="cpfCliente"
-      type="text"
-      class="form-control"
-      [(ngModel)]="cpfCliente"
-      name="cpfCliente"
-    />
   </div>
 </div>
 
@@ -62,6 +64,7 @@
       }
     </div>
 
+    <div class="card-body">
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Placa do Veículo *</label>
@@ -152,6 +155,7 @@
           placeholder="Opcional"
         />
       </div>
+    </div>
     </div>
   </div>
 }

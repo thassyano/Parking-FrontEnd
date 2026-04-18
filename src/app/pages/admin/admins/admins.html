@@ -20,31 +20,33 @@
     <div class="card-header">
       <h2 class="card-title">Novo Administrador</h2>
     </div>
-    <form (ngSubmit)="criarAdmin()">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" for="novoUsuario">Usuario</label>
-          <input type="text" id="novoUsuario" class="form-control" [(ngModel)]="novoUsuario" name="novoUsuario" required>
+    <div class="card-body">
+      <form (ngSubmit)="criarAdmin()">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="novoUsuario">Usuário</label>
+            <input type="text" id="novoUsuario" class="form-control" [(ngModel)]="novoUsuario" name="novoUsuario" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="novaSenha">Senha</label>
+            <input type="password" id="novaSenha" class="form-control" [(ngModel)]="novaSenha" name="novaSenha" required>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label" for="novaSenha">Senha</label>
-          <input type="password" id="novaSenha" class="form-control" [(ngModel)]="novaSenha" name="novaSenha" required>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="novoEmail">Email</label>
+            <input type="email" id="novoEmail" class="form-control" [(ngModel)]="novoEmail" name="novoEmail" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="novoNome">Nome (opcional)</label>
+            <input type="text" id="novoNome" class="form-control" [(ngModel)]="novoNome" name="novoNome">
+          </div>
         </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" for="novoEmail">Email</label>
-          <input type="email" id="novoEmail" class="form-control" [(ngModel)]="novoEmail" name="novoEmail" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="novoNome">Nome (opcional)</label>
-          <input type="text" id="novoNome" class="form-control" [(ngModel)]="novoNome" name="novoNome">
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary" [disabled]="formLoading()">
-        {{ formLoading() ? 'Criando...' : 'Criar Admin' }}
-      </button>
-    </form>
+        <button type="submit" class="btn btn-primary" [disabled]="formLoading()">
+          {{ formLoading() ? 'Criando...' : 'Criar Admin' }}
+        </button>
+      </form>
+    </div>
   </div>
 }
 
@@ -61,12 +63,12 @@
       <table class="table">
         <thead>
           <tr>
-            <th>Usuario</th>
+            <th>Usuário</th>
             <th>Email</th>
             <th>Nome</th>
-            <th>Data Criacao</th>
+            <th>Data de Criação</th>
             <th>Ativo</th>
-            <th>Acoes</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>

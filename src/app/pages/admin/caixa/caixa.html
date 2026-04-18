@@ -8,23 +8,25 @@
 
 <div class="card">
   <div class="card-header">
-    <h2 class="card-title">Periodo</h2>
+    <h2 class="card-title">Período</h2>
   </div>
-  <div class="filters-row">
-    <div class="form-group">
-      <label class="form-label" for="dataInicio">Data Inicio</label>
-      <input type="date" id="dataInicio" class="form-control" [(ngModel)]="dataInicio" name="dataInicio">
+  <div class="card-body">
+    <div class="filters-row">
+      <div class="form-group">
+        <label class="form-label" for="dataInicio">Data Início</label>
+        <input type="date" id="dataInicio" class="form-control" [(ngModel)]="dataInicio" name="dataInicio">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="dataFim">Data Fim</label>
+        <input type="date" id="dataFim" class="form-control" [(ngModel)]="dataFim" name="dataFim">
+      </div>
+      <button type="button" class="btn btn-primary" (click)="consultar()" [disabled]="loading()">
+        {{ loading() ? 'Consultando...' : 'Consultar' }}
+      </button>
+      <button type="button" class="btn btn-success" (click)="exportarExcel()" [disabled]="exportLoading()">
+        {{ exportLoading() ? 'Exportando...' : 'Exportar Excel' }}
+      </button>
     </div>
-    <div class="form-group">
-      <label class="form-label" for="dataFim">Data Fim</label>
-      <input type="date" id="dataFim" class="form-control" [(ngModel)]="dataFim" name="dataFim">
-    </div>
-    <button type="button" class="btn btn-primary" (click)="consultar()" [disabled]="loading()">
-      {{ loading() ? 'Consultando...' : 'Consultar' }}
-    </button>
-    <button type="button" class="btn btn-success" (click)="exportarExcel()" [disabled]="exportLoading()">
-      {{ exportLoading() ? 'Exportando...' : 'Exportar Excel' }}
-    </button>
   </div>
 </div>
 
@@ -36,7 +38,7 @@
   <div class="stats-grid">
     <div class="stat-card">
       <span class="stat-value">{{ res.totalReservas }}</span>
-      <span class="stat-label">Total Reservas</span>
+      <span class="stat-label">Total de Reservas</span>
     </div>
     <div class="stat-card">
       <span class="stat-value">{{ res.reservasPagas }}</span>
@@ -63,7 +65,7 @@
     </div>
     <div class="revenue-card">
       <span class="revenue-value">{{ res.receitaCartao | currency:'BRL':'symbol':'1.2-2' }}</span>
-      <span class="revenue-label">Receita Cartao</span>
+      <span class="revenue-label">Receita Cartão</span>
     </div>
     <div class="revenue-card">
       <span class="revenue-value">{{ res.receitaDinheiro | currency:'BRL':'symbol':'1.2-2' }}</span>
@@ -73,16 +75,18 @@
 
   <div class="card">
     <div class="card-header">
-      <h2 class="card-title">Informacoes Adicionais</h2>
+      <h2 class="card-title">Informações Adicionais</h2>
     </div>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="stat-value">{{ res.vagasCobertas }}</span>
-        <span class="stat-label">Vagas Cobertas</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ res.vagasDescobertas }}</span>
-        <span class="stat-label">Vagas Descobertas</span>
+    <div class="card-body">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-value">{{ res.vagasCobertas }}</span>
+          <span class="stat-label">Vagas Cobertas</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ res.vagasDescobertas }}</span>
+          <span class="stat-label">Vagas Descobertas</span>
+        </div>
       </div>
     </div>
   </div>
@@ -102,7 +106,7 @@
             <th>Data Entrada</th>
             <th>Qtd Dias</th>
             <th>Valor Final</th>
-            <th>Forma Pagamento</th>
+            <th>Forma de Pagamento</th>
             <th>Status</th>
             <th>Pago</th>
           </tr>
@@ -119,7 +123,7 @@
               <td>{{ r.valorFinal | currency:'BRL':'symbol':'1.2-2' }}</td>
               <td>{{ r.formaPagamento || '-' }}</td>
               <td><span class="badge">{{ r.status }}</span></td>
-              <td>{{ r.pago ? 'Sim' : 'Nao' }}</td>
+              <td>{{ r.pago ? 'Sim' : 'Não' }}</td>
             </tr>
           }
         </tbody>

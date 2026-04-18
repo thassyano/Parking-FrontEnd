@@ -22,7 +22,6 @@ export class ConfiguracaoPage implements OnInit {
   totalVagasCoberta = 0;
   totalVagasDescoberta = 0;
   telefoneWhatsApp = '';
-  mensagemWhatsApp = '';
   horasAntecedenciaConfirmacao = 0;
 
   constructor(private configuracaoService: ConfiguracaoService) {}
@@ -43,12 +42,11 @@ export class ConfiguracaoPage implements OnInit {
         this.totalVagasCoberta = data.totalVagasCoberta;
         this.totalVagasDescoberta = data.totalVagasDescoberta;
         this.telefoneWhatsApp = data.telefoneWhatsApp || '';
-        this.mensagemWhatsApp = data.mensagemWhatsApp || '';
         this.horasAntecedenciaConfirmacao = data.horasAntecedenciaConfirmacao;
         this.loading.set(false);
       },
       error: (err) => {
-        this.erro.set(err.error?.message || 'Erro ao carregar configuracao');
+        this.erro.set(err.error?.message || 'Erro ao carregar configuração');
         this.loading.set(false);
       },
     });
@@ -68,13 +66,12 @@ export class ConfiguracaoPage implements OnInit {
         totalVagasCoberta: this.totalVagasCoberta,
         totalVagasDescoberta: this.totalVagasDescoberta,
         telefoneWhatsApp: this.telefoneWhatsApp || undefined,
-        mensagemWhatsApp: this.mensagemWhatsApp || undefined,
         horasAntecedenciaConfirmacao: this.horasAntecedenciaConfirmacao,
       })
       .subscribe({
         next: (data) => {
           this.config.set(data);
-          this.sucesso.set('Configuracao salva com sucesso');
+          this.sucesso.set('Configuração salva com sucesso!');
           this.saving.set(false);
         },
         error: (err) => {

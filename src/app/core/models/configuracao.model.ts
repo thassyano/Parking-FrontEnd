@@ -20,6 +20,5 @@ export interface AtualizarConfiguracaoRequest {
   totalVagasCoberta?: number;
   totalVagasDescoberta?: number;
   telefoneWhatsApp?: string;
-  mensagemWhatsApp?: string;
   horasAntecedenciaConfirmacao?: number;
 }

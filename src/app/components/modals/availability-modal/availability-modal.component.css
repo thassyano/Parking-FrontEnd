@@ -1,0 +1,57 @@
+.modal_overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--dark-background);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal_container {
+  width: 100%;
+  max-width: 460px;
+  background: var(--white);
+  border-radius: 16px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal_title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  text-align: center;
+  margin: 0;
+}
+
+.modal_period {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+.slot_card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--success-light);
+  border-left: 3px solid var(--success);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.slot_label {
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+
+.slot_value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--success);
+}

@@ -1,1 +1,1 @@
-export const BASE_URL: string = 'https://parking-backend-agq7.onrender.com/api'
+export const BASE_URL: string = 'https://localhost:44309/api'

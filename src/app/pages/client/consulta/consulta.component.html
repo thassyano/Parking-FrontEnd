@@ -68,30 +68,8 @@
       </form>
     </div>
   </div>
+
+  @if (isModalVisible()) {
+    <app-availability-modal [data]="availability()!" (closeOutput)="closeModal()" (continueOutput)="continue()"/>
+  }
 </div>
-
-@if (isModalVisible()) {
-  <div class="modal_overlay" (click)="closeModal()">
-    <div class="modal_container" (click)="$event.stopPropagation()">
-      <div class="modal_content">
-        <h2 class="modal_title">Resultado de Disponibilidade</h2>
-
-        @if (isAvailable()) {
-          <p class="availability_success">Vagas disponíveis</p>
-        } @else {
-          <p class="availability_error">Sem vagas disponíveis</p>
-        }
-
-        <div class="modal_action">
-          <app-landing-button
-            label="Close"
-            variant="outline"
-            [fullWidth]="true"
-            (clicked)="closeModal()"
-          >
-          </app-landing-button>
-        </div>
-      </div>
-    </div>
-  </div>
-}

@@ -2,25 +2,42 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
-import { TokenInterface } from '../../models/auth/token.model';
-import { LoginInterface } from '../../models/auth/login.model';
 import { BASE_URL } from '../../../constants/base-url';
+import { LoginInterface } from '../../models/auth/login.model';
+import { TokenInterface } from '../../models/auth/token.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   public token = signal<TokenInterface | null>(null);
-  private http = inject(HttpClient);
-  private router = inject(Router);
-  private baseUrl = signal<string>(`${BASE_URL}/Auth`);
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly baseUrl = signal<string>(`${BASE_URL}/Auth`);
 
   public saveInfo(infos: TokenInterface): void {
-    localStorage.setItem('token', infos.token);
+    localStorage.setItem('token', JSON.stringify(infos));
   }
 
   public getToken(): string | null {
-    return localStorage.getItem('token');
+    const raw = localStorage.getItem('token');
+
+    if (!raw) return null;
+
+    const parsed: TokenInterface = JSON.parse(raw);
+    return parsed.token;
+  }
+
+  public getTokenInfo(): TokenInterface | null {
+    const raw = localStorage.getItem('token');
+
+    if (!raw) return null;
+
+    try {
+      return JSON.parse(raw) as TokenInterface;
+    } catch {
+      return null;
+    }
   }
 
   public hasToken(): boolean {
@@ -29,6 +46,17 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
+    const tokenInfo = this.getTokenInfo();
+
+    if (!tokenInfo) return false;
+
+    const isExpired = new Date(tokenInfo.expiraEm) < new Date();
+
+    if (isExpired) {
+      this.logout();
+      return false;
+    }
+
     return this.hasToken();
   }
 
@@ -60,6 +88,22 @@ export class AuthService {
 
     this.token.set(null);
 
-    this.router.navigateByUrl('/home');
+    this.router.navigateByUrl('');
+  }
+
+  public getUser(): { usuario: string; nome: string; expiraEm: string } | null {
+    const tokenInfo = this.getTokenInfo();
+    
+    if (!tokenInfo) return null;
+
+    try {
+      return {
+        usuario: tokenInfo.usuario,
+        nome: tokenInfo.nome,
+        expiraEm: tokenInfo.expiraEm,
+      };
+    } catch {
+      return null;
+    }
   }
 }

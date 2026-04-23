@@ -1,5 +1,5 @@
 .login_page {
-  min-height: calc(100vh - 52px);
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,5 +89,5 @@
 }
 
 .label_img{
-    width: 20px;
+    width: 16px;
 }

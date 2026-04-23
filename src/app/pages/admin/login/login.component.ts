@@ -1,17 +1,22 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LandingButtonComponent } from '../../../components/buttons/landing-button/landing-button.component';
 import { LoginInterface } from '../../../core/models/auth/login.model';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { HeaderComponent } from "../../../components/header/header.component";
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, LandingButtonComponent],
+  imports: [ReactiveFormsModule, LandingButtonComponent, HeaderComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  ngOnInit(): void {
+    localStorage.removeItem('token');
+  }
+
   protected authService = inject(AuthService);
   private router = inject(Router);
   private errorMessage = signal<string>('');
@@ -43,8 +48,9 @@ export class LoginComponent {
     this.authService.login(credenciais).subscribe({
       next: (resultado) => {
         this.authService.token.set(resultado);
+        this.router.navigateByUrl('/admin/dashboard');
       },
-      error: () => {
+      error: (error) => {
         this.errorMessage.set('Senha ou usuário incorretos.');
         this.isLoading.set(false);
       },

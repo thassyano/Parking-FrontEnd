@@ -1,0 +1,113 @@
+<div class="page-header">
+  <h1 class="page-title">Reservas</h1>
+  <div class="page-actions">
+    <a routerLink="/admin/reserva-presencial" class="btn btn-primary">Criar Reserva</a>
+  </div>
+</div>
+
+<div class="card">
+  <h3 class="card-title">Filtros</h3>
+
+  <form [formGroup]="form" (ngSubmit)="buscar()">
+    <div class="filters-row">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-control form-select" formControlName="status">
+          <option value="">Todos</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Confirmada">Confirmada</option>
+          <option value="CheckinRealizado">Check-in Realizado</option>
+          <option value="CheckoutRealizado">Check-out Realizado</option>
+          <option value="Cancelada">Cancelada</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tipo de Vaga</label>
+        <select class="form-control form-select" formControlName="tipoVaga">
+          <option value="">Todos</option>
+          <option value="Coberta">Coberta</option>
+          <option value="Descoberta">Descoberta</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Data Início</label>
+        <input type="date" class="form-control" formControlName="dataInicio" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Data Fim</label>
+        <input type="date" class="form-control" formControlName="dataFim" />
+      </div>
+
+      <div class="form-group" style="align-self: flex-end">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+        <button type="button" class="btn btn-secondary btn-outline" (click)="limparFiltros()">
+          Limpar
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+@if (loading()) {
+  <div class="loading-spinner">Carregando...</div>
+} @else if (reservas().length === 0) {
+  <div class="card">
+    <div class="empty-state">Nenhuma reserva encontrada.</div>
+  </div>
+} @else {
+  <div class="card">
+    <div class="card-header">
+      <h2 class="table-title">Todas Reservas</h2>
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr class="table_row">
+            <th class="table_head_item">ID</th>
+            <th class="table_head_item">Cliente</th>
+            <th class="table_head_item">Telefone</th>
+            <th class="table_head_item">Placa</th>
+            <th class="table_head_item">Tipo</th>
+            <th class="table_head_item">Entrada</th>
+            <th class="table_head_item">Dias</th>
+            <th class="table_head_item">Status</th>
+            <th class="table_head_item">Pago</th>
+            <th class="table_head_item">Valor Final</th>
+            <th class="table_head_item">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="table_body">
+          @for (r of reservas(); track r.id) {
+            <tr class="table_row" [routerLink]="['/admin/reservas', r.id]" style="cursor: pointer">
+              <td class="table_item">{{ r.id }}</td>
+              <td class="table_item">{{ r.nomeCliente }}</td>
+              <td class="table_item">{{ r.telefoneCliente }}</td>
+              <td class="table_item">{{ r.placaVeiculo || '-' }}</td>
+              <td class="table_item">{{ r.tipoVaga }}</td>
+              <td class="table_item">{{ r.dataEntrada | date: 'dd/MM/yyyy' }}</td>
+              <td class="table_item">{{ r.qtdDias }}</td>
+              <td class="table_item">
+                <span [class]="'badge ' + getStatusClass(r.status)">{{
+                  getStatusLabel(r.status)
+                }}</span>
+              </td>
+              <td class="table_item">{{ r.pago ? 'Sim' : 'Não' }}</td>
+              <td class="table_item">{{ r.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2' }}</td>
+              <td class="table_item">
+                <a
+                  class="table_link"
+                  [routerLink]="['/admin/reservas', r.id]"
+                  (click)="$event.stopPropagation()"
+                  >Ver</a
+                >
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

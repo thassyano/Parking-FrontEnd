@@ -1,0 +1,199 @@
+<div class="container">
+  <div class="reserva_page">
+    <h1 class="page_title">Reservar Vaga</h1>
+
+    <div class="reserva_card">
+      <div class="period_summary">
+        <div class="period_item">
+          <span class="period_label">Entrada</span>
+          <span class="period_value">{{ formattedEntryDateTime()[0] }}</span>
+          <span class="period_value">{{ formattedEntryDateTime()[1] }}</span>
+        </div>
+        <div class="period_item">
+          <span class="period_label">Saída</span>
+          <span class="period_value">{{ formattedExitDateTime()[0] }}</span>
+          <span class="period_value">{{ formattedExitDateTime()[1] }}</span>
+        </div>
+        <div class="period_item">
+          <span class="period_label">Dias</span>
+          <span class="period_value">{{ clientFlow.qtdDias }}</span>
+        </div>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="error_alert">{{ errorMessage() }}</div>
+      }
+
+      <form class="reserva_form" [formGroup]="reservationForm">
+        <div class="input_group">
+          <label class="input_label">
+            <img class="label_icon" src="assets/icons/person-dark.icon.svg" alt="Ícone avatar" />
+            Nome Completo
+          </label>
+          <input
+            type="text"
+            class="input_field"
+            formControlName="customerName"
+            placeholder="Seu nome completo"
+          />
+        </div>
+
+        <div class="input_group">
+          <label class="input_label">
+            <img class="label_icon" src="assets/icons/phone.icon.svg" alt="Ícone avatar" />
+            Telefone
+          </label>
+          <input
+            type="tel"
+            class="input_field"
+            formControlName="customerPhone"
+            placeholder="61999999999"
+          />
+        </div>
+
+        <div class="input_group">
+          <label class="input_label">
+            <img class="label_icon" src="assets/icons/car.icon.svg" alt="Ícone avatar" />
+            Placa do Automóvel
+          </label>
+          <input
+            type="text"
+            class="input_field input_field--uppercase"
+            formControlName="vehiclePlate"
+            placeholder="ABC1D23"
+          />
+        </div>
+
+        <div class="input_group">
+          <label class="input_label">
+            <img class="label_icon" src="assets/icons/garage.icon.svg" alt="Ícone avatar" />
+            Tipo de Vaga
+          </label>
+          <select class="input_field input_select" formControlName="spotType">
+            @if (isCoveredSpotAvailable()) {
+              <option [value]="TipoVaga.Coberta">Coberta</option>
+            }
+            @if (isUncoveredSpotAvailable()) {
+              <option [value]="TipoVaga.Descoberta">Descoberta</option>
+            }
+          </select>
+        </div>
+      </form>
+
+      <div class="budget_card">
+        <h3 class="budget_title">Valor da Reserva</h3>
+
+        <div class="budget_loading" [style.display]="isBudgetLoading() ? 'block' : 'none'">
+          Atualizando preço...
+        </div>
+
+        @if (budget(); as b) {
+          <div class="budget_row">
+            <span>Diária ({{ b.tipoVaga }})</span>
+            <span>{{ b.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+          </div>
+
+          <div class="budget_row">
+            <span>Quantidade</span>
+            <span>{{ b.qtdDias }} dia(s)</span>
+          </div>
+
+          <div class="budget_divider"></div>
+
+          <div class="budget_row budget_row--total">
+            <span>Total no Cartão</span>
+            <span>{{ b.valorTotalCartao | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+          </div>
+
+          <div class="budget_row budget_row--pix">
+            <span>Total Pix / Dinheiro</span>
+            <span>{{ b.valorTotalPixDinheiro | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+          </div>
+
+          @if (b.economiaTotal > 0) {
+            <div class="budget_row budget_row--savings">
+              <span>Você economiza</span>
+              <span>{{ b.economiaTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+            </div>
+          }
+        }
+      </div>
+
+      <button
+        class="btn_primary"
+        (click)="openConfirmation()"
+        [disabled]="isLoading() || isBudgetLoading() || !budget()"
+      >
+        {{ isLoading() ? 'Reservando...' : 'Confirmar Reserva' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+@if (isConfirmationVisible()) {
+  <div class="modal_overlay">
+    <div class="modal_card" (click)="$event.stopPropagation()">
+      <div class="modal_warning_icon">
+        <img class="img_icon" src="assets/icons/alert.icon.svg" alt="" />
+      </div>
+
+      <h2 class="modal_title">Confirmar Reserva?</h2>
+
+      <p class="modal_description">
+        Ao confirmar, sua reserva será registrada e você será redirecionado para o
+        <strong>WhatsApp</strong> para enviar os dados ao estacionamento.
+      </p>
+
+      <div class="confirmation_summary">
+        <div class="confirmation_row">
+          <span>Nome</span>
+          <span>{{ reservationForm.controls.customerName.value }}</span>
+        </div>
+
+        <div class="confirmation_row">
+          <span>Telefone</span>
+          <span>{{ reservationForm.controls.customerPhone.value }}</span>
+        </div>
+
+        @if (reservationForm.controls.vehiclePlate.value) {
+          <div class="confirmation_row">
+            <span>Placa</span>
+            <span>{{ reservationForm.controls.vehiclePlate.value }}</span>
+          </div>
+        }
+
+        <div class="confirmation_row">
+          <span>Tipo de Vaga</span>
+          <span>{{ reservationForm.controls.spotType.value }}</span>
+        </div>
+
+        <div class="confirmation_row">
+          <span>Entrada</span>
+          <span>{{ `${formattedEntryDateTime()[0]} - ${formattedEntryDateTime()[1]}` }}</span>
+        </div>
+
+        <div class="confirmation_row">
+          <span>Saída</span>
+          <span>{{ `${formattedExitDateTime()[0]} - ${formattedExitDateTime()[1]}` }}</span>
+        </div>
+
+        @if (budget(); as b) {
+          <div class="confirmation_row confirmation_row--total">
+            <span>Total Cartão</span>
+            <span>{{ b.valorTotalCartao | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+          </div>
+
+          <div class="confirmation_row confirmation_row--pix">
+            <span>Total Pix / Dinheiro</span>
+            <span>{{ b.valorTotalPixDinheiro | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="modal_actions">
+        <button class="btn_primary" (click)="confirm()">Confirmar e ir para WhatsApp</button>
+        <button class="btn_outline" (click)="closeConfirmation()">Voltar</button>
+      </div>
+    </div>
+  </div>
+}

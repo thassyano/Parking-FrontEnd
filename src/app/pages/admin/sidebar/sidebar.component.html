@@ -1,0 +1,85 @@
+<div class="admin-wrapper">
+  @if (sidebarOpen()) {
+    <div class="sidebar-overlay" (click)="closeSidebar()"></div>
+  }
+  <aside class="sidebar" [class.open]="sidebarOpen()">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <span class="brand-icon">P</span>
+        <span class="brand-text">Parking</span>
+      </div>
+      <button class="sidebar-close" (click)="closeSidebar()">&times;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <a
+        routerLink="/admin/dashboard"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="closeSidebar()"
+        >Dashboard</a
+      >
+      <a
+        routerLink="/admin/reservas"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="closeSidebar()"
+        >Reservas</a
+      >
+      <a
+        routerLink="/admin/reserva-presencial"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="closeSidebar()"
+        >Criar Reserva</a
+      >
+      <a
+        routerLink="/admin/precos"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="closeSidebar()"
+        >Precos</a
+      >
+      <a
+        routerLink="/admin/caixa"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="closeSidebar()"
+        >Caixa</a
+      >
+      <a
+        routerLink="/admin/configuracao"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="closeSidebar()"
+        >Configuracao</a
+      >
+      <a
+        routerLink="/admin/admins"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="closeSidebar()"
+        >Admins</a
+      >
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">{{ userName }}</div>
+      <button class="btn-logout" (click)="logout()">Sair</button>
+    </div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <button class="menu-toggle" (click)="toggleSidebar()">&#9776;</button>
+      <span class="topbar-title">Painel Administrativo</span>
+    </header>
+    <div class="admin-content">
+      <router-outlet />
+    </div>
+  </div>
+</div>

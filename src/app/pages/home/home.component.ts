@@ -8,7 +8,7 @@ import { LandingButtonComponent } from "../../components/buttons/landing-button/
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
-export class HomeComponent {
+export class HomeComponent{
   private router = inject(Router);
 
   protected goToClient(): void {

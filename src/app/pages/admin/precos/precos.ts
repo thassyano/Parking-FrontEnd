@@ -94,4 +94,15 @@ export class Precos implements OnInit {
         },
       });
   }
+
+  getTipoVagaLabel(tipoVaga: string): string {
+    const labels: Record<string, string> = {
+      Coberta: 'Coberta',
+      Descoberta: 'Descoberta',
+      '0': 'Coberta',
+      '1': 'Descoberta',
+    };
+
+    return labels[tipoVaga] || tipoVaga;
+  }
 }

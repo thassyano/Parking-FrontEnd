@@ -17,12 +17,12 @@
 }
 
 @if (showForm()) {
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">Novo Preco</h2>
+  <div class="card reserva-form-card">
+    <div class="card-header reserva-form-card-header">
+      <h2 class="card-title reserva-form-card-title">Novo Preco</h2>
     </div>
-    <form (ngSubmit)="criarPreco()">
-      <div class="form-row">
+    <form class="preco-form-body" (ngSubmit)="criarPreco()">
+      <div class="form-row preco-form-row">
         <div class="form-group">
           <label class="form-label" for="tipoVaga">Tipo de Vaga</label>
           <select id="tipoVaga" class="form-select" [(ngModel)]="tipoVaga" name="tipoVaga">
@@ -32,27 +32,61 @@
         </div>
         <div class="form-group">
           <label class="form-label" for="valorDiaria">Valor Diaria (R$)</label>
-          <input type="number" id="valorDiaria" class="form-control" [(ngModel)]="valorDiaria" name="valorDiaria" step="0.01" min="0" required>
+          <input
+            type="number"
+            id="valorDiaria"
+            class="form-control"
+            [(ngModel)]="valorDiaria"
+            name="valorDiaria"
+            step="0.01"
+            min="0"
+            required
+          />
         </div>
         <div class="form-group">
           <label class="form-label" for="descontoPixDinheiro">Desconto PIX/Dinheiro (R$)</label>
-          <input type="number" id="descontoPixDinheiro" class="form-control" [(ngModel)]="descontoPixDinheiro" name="descontoPixDinheiro" step="0.01" min="0">
+          <input
+            type="number"
+            id="descontoPixDinheiro"
+            class="form-control"
+            [(ngModel)]="descontoPixDinheiro"
+            name="descontoPixDinheiro"
+            step="0.01"
+            min="0"
+          />
         </div>
       </div>
-      <div class="form-row">
+
+      <div class="form-row preco-form-row preco-form-row--last">
         <div class="form-group">
           <label class="form-label" for="dataInicio">Vigente a partir de</label>
-          <input type="date" id="dataInicio" class="form-control" [(ngModel)]="dataInicio" name="dataInicio" required>
+          <input
+            type="date"
+            id="dataInicio"
+            class="form-control"
+            [(ngModel)]="dataInicio"
+            name="dataInicio"
+            required
+          />
         </div>
         <div class="form-group">
           <label class="form-label" for="dataFim">Vigente ate (opcional)</label>
-          <input type="date" id="dataFim" class="form-control" [(ngModel)]="dataFim" name="dataFim">
+          <input
+            type="date"
+            id="dataFim"
+            class="form-control"
+            [(ngModel)]="dataFim"
+            name="dataFim"
+          />
           <span class="form-hint">Deixe em branco para vigencia indefinida</span>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary" [disabled]="formLoading()">
-        {{ formLoading() ? 'Criando...' : 'Criar Preco' }}
-      </button>
+
+      <div class="preco-form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="formLoading()">
+          {{ formLoading() ? 'Criando...' : 'Criar Preco' }}
+        </button>
+      </div>
     </form>
   </div>
 }
@@ -62,28 +96,30 @@
 } @else {
   <div class="price-grid">
     @for (preco of precosAtivos(); track preco.id) {
-      <div class="price-card card">
-        <div class="card-header">
-          <h2 class="card-title">{{ preco.tipoVaga }}</h2>
+      <div class="price-card card reserva-form-card">
+        <div class="card-header reserva-form-card-header">
+          <h2 class="card-title reserva-form-card-title">{{ getTipoVagaLabel(preco.tipoVaga) }}</h2>
         </div>
-        <div class="price-detail">
-          <span class="price-label">Valor Diaria:</span>
-          <span class="price-value">{{ preco.valorDiaria | currency:'BRL':'symbol':'1.2-2' }}</span>
-        </div>
-        <div class="price-detail">
-          <span class="price-label">Desconto PIX/Dinheiro:</span>
-          <span class="price-value">{{ preco.descontoPixDinheiro | currency:'BRL':'symbol':'1.2-2' }}</span>
-        </div>
-        <div class="price-detail">
-          <span class="price-label">Vigencia:</span>
-          <span class="price-value">
-            {{ preco.dataInicio | date:'dd/MM/yyyy' }}
-            @if (preco.dataFim) {
-              &rarr; {{ preco.dataFim | date:'dd/MM/yyyy' }}
-            } @else {
-              &rarr; Indefinida
-            }
-          </span>
+        <div class="price-card-body">
+          <div class="price-detail">
+            <span class="price-label">Valor Diaria:</span>
+            <span class="price-value">{{ preco.valorDiaria | currency:'BRL':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="price-detail">
+            <span class="price-label">Desconto PIX/Dinheiro:</span>
+            <span class="price-value">{{ preco.descontoPixDinheiro | currency:'BRL':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="price-detail">
+            <span class="price-label">Vigencia:</span>
+            <span class="price-value">
+              {{ preco.dataInicio | date:'dd/MM/yyyy' }}
+              @if (preco.dataFim) {
+                &rarr; {{ preco.dataFim | date:'dd/MM/yyyy' }}
+              } @else {
+                &rarr; Indefinida
+              }
+            </span>
+          </div>
         </div>
       </div>
     }
@@ -91,9 +127,9 @@
 }
 
 @if (showHistorico()) {
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">Historico de Precos</h2>
+  <div class="card reserva-form-card">
+    <div class="card-header reserva-form-card-header">
+      <h2 class="card-title reserva-form-card-title">Historico de Precos</h2>
       <button type="button" class="btn btn-outline" (click)="showHistorico.set(false)">Fechar</button>
     </div>
     <div class="table-responsive">
@@ -111,7 +147,7 @@
         <tbody>
           @for (preco of todosPrecos(); track preco.id) {
             <tr>
-              <td>{{ preco.tipoVaga }}</td>
+              <td>{{ getTipoVagaLabel(preco.tipoVaga) }}</td>
               <td>{{ preco.valorDiaria | currency:'BRL':'symbol':'1.2-2' }}</td>
               <td>{{ preco.descontoPixDinheiro | currency:'BRL':'symbol':'1.2-2' }}</td>
               <td>{{ preco.dataInicio | date:'dd/MM/yyyy' }}</td>

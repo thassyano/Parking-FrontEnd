@@ -30,7 +30,6 @@ export class Dashboard implements OnInit {
     });
 
     const hoje = new Date().toISOString().split('T')[0];
-    console.log(".")
     this.disponibilidadeService.consultarDia(hoje).subscribe({
       next: (data) => this.disponibilidade.set(data),
     });
@@ -56,5 +55,29 @@ export class Dashboard implements OnInit {
     return this.reservas()
       .sort((a, b) => new Date(b.dataCriacao).getTime() - new Date(a.dataCriacao).getTime())
       .slice(0, 10);
+  }
+
+  getStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      Pendente: 'Pendente',
+      CheckinRealizado: 'Em Estacionamento',
+      CheckoutRealizado: 'Finalizada',
+      Cancelada: 'Cancelada',
+      Confirmada: 'Confirmada',
+    };
+
+    return labels[status] || status;
+  }
+
+  getStatusClass(status: string): string {
+    const classes: Record<string, string> = {
+      Pendente: 'badge--pendente',
+      CheckinRealizado: 'badge--checkin',
+      CheckoutRealizado: 'badge--checkout',
+      Cancelada: 'badge--cancelada',
+      Confirmada: 'badge--confirmada',
+    };
+
+    return classes[status] || '';
   }
 }

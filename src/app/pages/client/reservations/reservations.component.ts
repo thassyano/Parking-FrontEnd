@@ -53,7 +53,10 @@ export class ReservationsComponent implements OnInit {
       Validators.maxLength(11),
       Validators.pattern(Patterns.phone),
     ]),
-    vehiclePlate: new FormControl<string>('', [Validators.required]),
+    vehiclePlate: new FormControl<string>('', [
+      Validators.required,
+      Validators.pattern(Patterns.vehiclePlate),
+    ]),
     spotType: new FormControl<TipoVaga>(TipoVaga.Coberta, [Validators.required]),
   });
 
@@ -113,8 +116,7 @@ export class ReservationsComponent implements OnInit {
           errors.push('Telefone');
         } else if (this.reservationForm.controls.customerPhone.errors?.['pattern']) {
           errors.push('Telefone (Formato inválido)');
-        }
-        else if (this.reservationForm.controls.customerPhone.errors?.['max']) {
+        } else if (this.reservationForm.controls.customerPhone.errors?.['max']) {
           errors.push('Telefone (Máximo 11 caracteres)');
         }
       }

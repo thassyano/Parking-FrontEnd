@@ -1,0 +1,144 @@
+<div class="page-header">
+  <h1 class="page-title">Fechamento de Caixa</h1>
+</div>
+
+@if (erro()) {
+  <div class="alert alert-danger">{{ erro() }}</div>
+}
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Periodo</h2>
+  </div>
+  <form [formGroup]="filtroForm" (ngSubmit)="consultar()">
+    <div class="filters-row">
+      <div class="form-group">
+        <label class="form-label" for="dataInicio">Data Início</label>
+        <input type="date" id="dataInicio" class="form-control" formControlName="dataInicio" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="dataFim">Data Fim</label>
+        <input type="date" id="dataFim" class="form-control" formControlName="dataFim" />
+      </div>
+      <button type="submit" class="btn btn-primary" [disabled]="loading()">
+        {{ loading() ? 'Consultando...' : 'Consultar' }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-success"
+        (click)="exportarExcel()"
+        [disabled]="exportLoading()"
+      >
+        {{ exportLoading() ? 'Exportando...' : 'Exportar Excel' }}
+      </button>
+    </div>
+  </form>
+</div>
+
+@if (loading()) {
+  <div class="loading-spinner">Carregando...</div>
+}
+
+@if (resultado(); as res) {
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-value">{{ res.totalReservas }}</span>
+      <span class="stat-label">Total Reservas</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ res.reservasPagas }}</span>
+      <span class="stat-label">Reservas Pagas</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ res.reservasCanceladas }}</span>
+      <span class="stat-label">Reservas Canceladas</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ res.reservasPendentes }}</span>
+      <span class="stat-label">Reservas Pendentes</span>
+    </div>
+  </div>
+
+  <div class="revenue-grid">
+    <div class="revenue-card">
+      <span class="revenue-value">{{
+        res.receitaTotal | currency: 'BRL' : 'symbol' : '1.2-2'
+      }}</span>
+      <span class="revenue-label">Receita Total</span>
+    </div>
+    <div class="revenue-card">
+      <span class="revenue-value">{{ res.receitaPix | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+      <span class="revenue-label">Receita PIX</span>
+    </div>
+    <div class="revenue-card">
+      <span class="revenue-value">{{
+        res.receitaCartao | currency: 'BRL' : 'symbol' : '1.2-2'
+      }}</span>
+      <span class="revenue-label">Receita Cartao</span>
+    </div>
+    <div class="revenue-card">
+      <span class="revenue-value">{{
+        res.receitaDinheiro | currency: 'BRL' : 'symbol' : '1.2-2'
+      }}</span>
+      <span class="revenue-label">Receita Dinheiro</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Informacoes Adicionais</h2>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-value">{{ res.vagasCobertas }}</span>
+        <span class="stat-label">Vagas Cobertas</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ res.vagasDescobertas }}</span>
+        <span class="stat-label">Vagas Descobertas</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Reservas</h2>
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID Reserva</th>
+            <th>Cliente</th>
+            <th>Placa</th>
+            <th>Tipo Vaga</th>
+            <th>Data Entrada</th>
+            <th>Qtd Dias</th>
+            <th>Valor Final</th>
+            <th>Forma Pagamento</th>
+            <th>Status</th>
+            <th>Pago</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of res.reservas; track r.reservaId) {
+            <tr>
+              <td>{{ r.reservaId }}</td>
+              <td>{{ r.nomeCliente }}</td>
+              <td>{{ r.placaVeiculo || '-' }}</td>
+              <td>{{ r.tipoVaga }}</td>
+              <td>{{ r.dataEntrada | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ r.qtdDias }}</td>
+              <td>{{ r.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2' }}</td>
+              <td>{{ r.formaPagamento || '-' }}</td>
+              <td>
+                <span class="badge">{{ r.status }}</span>
+              </td>
+              <td>{{ r.pago ? 'Sim' : 'Não' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

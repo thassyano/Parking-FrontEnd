@@ -148,6 +148,11 @@
   color: var(--text-dark);
 }
 
+.btn-outline:disabled {
+  background: var(--medium-background);
+  cursor: not-allowed;
+}
+
 .loading-spinner {
   display: flex;
   justify-content: center;
@@ -243,6 +248,63 @@
 .badge--cancelada {
   background: var(--danger-light);
   color: var(--danger);
+}
+
+.form-group-actions {
+  align-self: flex-end;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 1rem;
+}
+
+.pagination_btn {
+  border: none;
+  background: var(--primary-50);
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.pagination_btn:hover:not(:disabled) {
+  background: var(--primary-light);
+}
+
+.pagination_btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn_img {
+  width: 20px;
+}
+
+.pagination_number {
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.pagination_number:hover {
+  background: var(--primary-50);
+}
+
+.pagination_number.active {
+  background: var(--primary);
+  color: var(--white);
 }
 
 @media (max-width: 640px) {

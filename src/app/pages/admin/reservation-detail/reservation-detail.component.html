@@ -1,0 +1,339 @@
+@if (loading()) {
+  <div class="loading-spinner">Carregando...</div>
+} @else {
+  <div class="page-header">
+    <h1 class="page-title">Reserva #{{ reserva()?.id }}</h1>
+  </div>
+
+  @if (erro()) {
+    <div class="alert alert-danger">{{ erro() }}</div>
+  }
+  @if (sucesso()) {
+    <div class="alert alert-success">{{ sucesso() }}</div>
+  }
+
+  <div class="detail-grid">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Dados da Reserva</h2>
+      </div>
+      <div class="detail-list">
+        <div class="detail-item">
+          <span class="detail-label">Cliente</span>
+          <span class="detail-value">{{ reserva()?.nomeCliente }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Telefone</span>
+          <span class="detail-value">{{ reserva()?.telefoneCliente }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">CPF</span>
+          <span class="detail-value">{{ reserva()?.cpfCliente || '-' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Placa</span>
+          <span class="detail-value">{{ reserva()?.placaVeiculo || 'Sem placa' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Tipo de Vaga</span>
+          <span class="detail-value">{{ reserva()?.tipoVaga }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Data Entrada</span>
+          <span class="detail-value">{{ reserva()?.dataEntrada | date: 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Data Saída Prevista</span>
+          <span class="detail-value">{{ reserva()?.dataSaidaPrevista | date: 'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Quantidade de Dias</span>
+          <span class="detail-value">{{ reserva()?.qtdDias }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Status</span>
+          <span class="detail-value">
+            <span [class]="'badge ' + getStatusClass(reserva()!.status)">
+              {{ getStatusLabel(reserva()!.status) }}
+            </span>
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Origem</span>
+          <span class="detail-value">{{ reserva()?.origem }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Observações</span>
+          <span class="detail-value">{{ reserva()?.observacoes || '-' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Data Criação</span>
+          <span class="detail-value">{{ reserva()?.dataCriacao | date: 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-side">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Financeiro</h2>
+        </div>
+        <div class="detail-list">
+          <div class="detail-item">
+            <span class="detail-label">Valor Diária</span>
+            <span class="detail-value">{{
+              reserva()?.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2'
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Valor Total</span>
+            <span class="detail-value">{{
+              reserva()?.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2'
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Desconto Aplicado</span>
+            <span class="detail-value">{{
+              reserva()?.descontoAplicado | currency: 'BRL' : 'symbol' : '1.2-2'
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Valor Final</span>
+            <span class="detail-value">{{
+              reserva()?.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2'
+            }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Forma de Pagamento</span>
+            <span class="detail-value">{{ reserva()?.formaPagamento || '-' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Pago</span>
+            <span class="detail-value">{{ reserva()?.pago ? 'Sim' : 'Não' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card acoes-card">
+        <div class="card-header">
+          <h2 class="card-title">Ações</h2>
+        </div>
+        <div class="acoes-body">
+          @if (canAssociarPlaca()) {
+            @if (!showPlacaForm()) {
+              <button type="button" class="btn btn-primary" (click)="showPlacaForm.set(true)">
+                Associar Placa
+              </button>
+            } @else {
+              <div class="form-group">
+                <label class="form-label" for="placaVeiculo">Placa do Veiculo</label>
+                <input
+                  id="placaVeiculo"
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="placaVeiculo"
+                  name="placaVeiculo"
+                  placeholder="ABC1D23"
+                />
+              </div>
+              <div class="acoes-form-buttons">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  (click)="associarPlaca()"
+                  [disabled]="!placaVeiculo || actionLoading()"
+                >
+                  @if (actionLoading()) {
+                    Carregando...
+                  } @else {
+                    Confirmar
+                  }
+                </button>
+                <button type="button" class="btn btn-outline" (click)="showPlacaForm.set(false)">
+                  Cancelar
+                </button>
+              </div>
+            }
+          }
+          @if (canCheckin()) {
+            <button
+              type="button"
+              class="btn btn-success"
+              (click)="realizarCheckin()"
+              [disabled]="actionLoading()"
+            >
+              @if (actionLoading()) {
+                Carregando...
+              } @else {
+                Realizar Check-in
+              }
+            </button>
+          }
+          @if (canCheckout()) {
+            @if (!showCheckoutForm()) {
+              <button type="button" class="btn btn-warning" (click)="showCheckoutForm.set(true)">
+                Realizar Check-out
+              </button>
+            } @else {
+              <div class="form-group">
+                <label class="form-label" for="formaPagamento">Forma de Pagamento</label>
+                <select
+                  id="formaPagamento"
+                  class="form-control form-select"
+                  [(ngModel)]="formaPagamento"
+                  name="formaPagamento"
+                >
+                  <option value="Pix">Pix</option>
+                  <option value="Cartao">Cartão</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                </select>
+              </div>
+              <div class="acoes-form-buttons">
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  (click)="realizarCheckout()"
+                  [disabled]="actionLoading()"
+                >
+                  @if (actionLoading()) {
+                    Carregando...
+                  } @else {
+                    Confirmar Check-out
+                  }
+                </button>
+                <button type="button" class="btn btn-outline" (click)="showCheckoutForm.set(false)">
+                  Cancelar
+                </button>
+              </div>
+            }
+          }
+          @if (canCancelar()) {
+            <button
+              type="button"
+              class="btn btn-danger"
+              (click)="cancelarReserva()"
+              [disabled]="actionLoading()"
+            >
+              @if (actionLoading()) {
+                Carregando...
+              } @else {
+                Cancelar Reserva
+              }
+            </button>
+          }
+          <button type="button" class="btn btn-outline" (click)="gerarCupomEntrada()">
+            Cupom Entrada
+          </button>
+          @if (reserva()?.status === 'CheckoutRealizado') {
+            <button type="button" class="btn btn-outline" (click)="gerarCupomSaida()">
+              Cupom Saída
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (cupomEntrada()) {
+    <div
+      class="card cupom-card"
+      [class.cupom-print-active]="showCupomEntradaPrint()"
+      style="margin-top: 1rem"
+    >
+      <div class="cupom-header">{{ cupomEntrada()!.nomeEstacionamento }}</div>
+      @if (cupomEntrada()!.endereco) {
+        <div class="cupom-line">{{ cupomEntrada()!.endereco }}</div>
+      }
+      @if (cupomEntrada()!.contato) {
+        <div class="cupom-line">{{ cupomEntrada()!.contato }}</div>
+      }
+      <div class="cupom-divider"></div>
+      <div class="cupom-line">Cupom de Entrada - #{{ cupomEntrada()!.numero }}</div>
+      <div class="cupom-line">Placa: {{ cupomEntrada()!.placaVeiculo }}</div>
+      <div class="cupom-line">
+        Entrada: {{ cupomEntrada()!.dataHoraEntrada | date: 'dd/MM/yyyy HH:mm' }}
+      </div>
+      <div class="cupom-line">Tipo: {{ cupomEntrada()!.tipoVaga }}</div>
+      <div class="cupom-line">Dias: {{ cupomEntrada()!.qtdDias }}</div>
+      <div class="cupom-line">
+        Saida Prevista: {{ cupomEntrada()!.dataSaidaPrevista | date: 'dd/MM/yyyy' }}
+      </div>
+      <div class="cupom-line">
+        Diaria: {{ cupomEntrada()!.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' }}
+      </div>
+      <div class="cupom-line">
+        Total: {{ cupomEntrada()!.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}
+      </div>
+      <div class="cupom-divider"></div>
+      <div class="cupom-line">{{ cupomEntrada()!.mensagem }}</div>
+      <button type="button" class="btn btn-primary" (click)="imprimirCupomEntrada()">
+        Imprimir
+      </button>
+    </div>
+  }
+
+  @if (cupomSaida()) {
+    <div
+      class="card cupom-card"
+      [class.cupom-print-active]="showCupomSaidaPrint()"
+      style="margin-top: 1rem"
+    >
+      <div class="cupom-header">{{ cupomSaida()!.nomeEstacionamento }}</div>
+      @if (cupomSaida()!.endereco) {
+        <div class="cupom-line">{{ cupomSaida()!.endereco }}</div>
+      }
+      <div class="cupom-divider"></div>
+      <div class="cupom-line">Cupom de Saida - #{{ cupomSaida()!.numero }}</div>
+      <div class="cupom-line">Placa: {{ cupomSaida()!.placaVeiculo }}</div>
+      <div class="cupom-line">
+        Entrada: {{ cupomSaida()!.dataHoraEntrada | date: 'dd/MM/yyyy HH:mm' }}
+      </div>
+      <div class="cupom-line">
+        Saida: {{ cupomSaida()!.dataHoraSaida | date: 'dd/MM/yyyy HH:mm' }}
+      </div>
+      <div class="cupom-line">Dias: {{ cupomSaida()!.qtdDias }}</div>
+      <div class="cupom-line">
+        Diaria: {{ cupomSaida()!.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' }}
+      </div>
+      <div class="cupom-line">
+        Total: {{ cupomSaida()!.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}
+      </div>
+      <div class="cupom-line">
+        Desconto: {{ cupomSaida()!.descontoAplicado | currency: 'BRL' : 'symbol' : '1.2-2' }}
+      </div>
+      <div class="cupom-line">
+        Valor Final: {{ cupomSaida()!.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2' }}
+      </div>
+      <div class="cupom-line">Pagamento: {{ cupomSaida()!.formaPagamento }}</div>
+      <button type="button" class="btn btn-primary" (click)="imprimirCupomSaida()">Imprimir</button>
+    </div>
+  }
+
+  @if (showCancelarModal()) {
+    <div class="modal-overlay" (click)="showCancelarModal.set(false)">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Cancelar Reserva</h3>
+        <p class="modal-text">
+          Tem certeza que deseja cancelar esta reserva? Esta ação não pode ser desfeita.
+        </p>
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="cancelarReserva()"
+            [disabled]="actionLoading()"
+          >
+            @if (actionLoading()) {
+              Carregando...
+            } @else {
+              Sim, cancelar
+            }
+          </button>
+          <button type="button" class="btn btn-outline" (click)="showCancelarModal.set(false)">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+}

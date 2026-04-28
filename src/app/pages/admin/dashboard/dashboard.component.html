@@ -61,8 +61,11 @@
         </thead>
         <tbody class="table_body">
           @for (reserva of reservasRecentes; track reserva.id) {
-            <tr class="table_row" style="cursor: pointer">
-              <!-- [routerLink]="['/admin/reservas', reserva.id]" -->
+            <tr
+              [routerLink]="['/admin/reservas', reserva.id]"
+              class="table_row"
+              style="cursor: pointer"
+            >
               <td class="table_item">{{ reserva.id }}</td>
               <td class="table_item">{{ reserva.nomeCliente }}</td>
               <td class="table_item">{{ reserva.tipoVaga }}</td>
@@ -86,7 +89,9 @@
                   }
                 }
               </td>
-              <td class="table_item">{{ reserva.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2' }}</td>
+              <td class="table_item">
+                {{ reserva.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              </td>
             </tr>
           }
         </tbody>

@@ -41,7 +41,7 @@
         <input type="date" class="form-control" formControlName="dataFim" />
       </div>
 
-      <div class="form-group" style="align-self: flex-end">
+      <div class="form-group form-group-actions">
         <button type="submit" class="btn btn-primary">Buscar</button>
         <button type="button" class="btn btn-secondary btn-outline" (click)="limparFiltros()">
           Limpar
@@ -62,6 +62,7 @@
     <div class="card-header">
       <h2 class="table-title">Todas Reservas</h2>
     </div>
+
     <div class="table-responsive">
       <table class="table">
         <thead>
@@ -79,9 +80,10 @@
             <th class="table_head_item">Ações</th>
           </tr>
         </thead>
+
         <tbody class="table_body">
-          @for (r of reservas(); track r.id) {
-            <tr class="table_row" [routerLink]="['/admin/reservas', r.id]" style="cursor: pointer">
+          @for (r of paginatedReservas(); track r.id) {
+            <tr class="table_row" [routerLink]="['/admin/reservas', r.id]">
               <td class="table_item">{{ r.id }}</td>
               <td class="table_item">{{ r.nomeCliente }}</td>
               <td class="table_item">{{ r.telefoneCliente }}</td>
@@ -90,9 +92,9 @@
               <td class="table_item">{{ r.dataEntrada | date: 'dd/MM/yyyy' }}</td>
               <td class="table_item">{{ r.qtdDias }}</td>
               <td class="table_item">
-                <span [class]="'badge ' + getStatusClass(r.status)">{{
-                  getStatusLabel(r.status)
-                }}</span>
+                <span [class]="'badge ' + getStatusClass(r.status)">
+                  {{ getStatusLabel(r.status) }}
+                </span>
               </td>
               <td class="table_item">{{ r.pago ? 'Sim' : 'Não' }}</td>
               <td class="table_item">{{ r.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2' }}</td>
@@ -101,13 +103,40 @@
                   class="table_link"
                   [routerLink]="['/admin/reservas', r.id]"
                   (click)="$event.stopPropagation()"
-                  >Ver</a
                 >
+                  Ver
+                </a>
               </td>
             </tr>
           }
         </tbody>
       </table>
     </div>
+
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button class="pagination_btn" (click)="prevPage()" [disabled]="currentPage() === 1">
+          <img class="btn_img" src="assets/icons/arrow-left.icon.svg" />
+        </button>
+
+        @for (page of visiblePages(); track page) {
+          <button
+            class="pagination_number"
+            [class.active]="currentPage() === page"
+            (click)="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+        }
+
+        <button
+          class="pagination_btn"
+          (click)="nextPage()"
+          [disabled]="currentPage() === totalPages()"
+        >
+          <img class="btn_img" src="assets/icons/arrow-right.icon.svg" />
+        </button>
+      </div>
+    }
   </div>
 }

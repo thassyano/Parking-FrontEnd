@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './pages/home/home.component';
 import { authGuard } from './core/guards/auth.guard';
+import { HomeComponent } from './pages/home/home.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -55,6 +55,39 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./pages/admin/admin-reservations/admin-reservations.component').then(
                 (m) => m.AdminReservationsComponent,
+              ),
+          },
+          {
+            path: 'reserva-presencial',
+            loadComponent: () =>
+              import('./pages/admin/create-reservations/create-reservations.component').then(
+                (m) => m.CreateReservationsComponent,
+              ),
+          },
+          {
+            path: 'reservas/:id',
+            loadComponent: () =>
+              import('./pages/admin/reservation-detail/reservation-detail.component').then(
+                (m) => m.ReservationDetailComponent,
+              ),
+          },
+          {
+            path: 'caixa',
+            loadComponent: () =>
+              import('./pages/admin/register/register.component').then((m) => m.RegisterComponent),
+          },
+          {
+            path: 'configuracao',
+            loadComponent: () =>
+              import('./pages/admin/configuration/configuration.component').then(
+                (m) => m.ConfigurationComponent,
+              ),
+          },
+          {
+            path: 'admins',
+            loadComponent: () =>
+              import('./pages/admin/accounts/accounts.component').then(
+                (m) => m.AccountsComponent,
               ),
           },
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

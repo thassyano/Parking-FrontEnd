@@ -1,0 +1,109 @@
+<div class="page-header">
+  <h1 class="page-title">Administradores</h1>
+  <div class="page-actions">
+    <button type="button" class="btn btn-primary" (click)="showForm.set(!showForm())">
+      {{ showForm() ? 'Cancelar' : 'Novo Admin' }}
+    </button>
+  </div>
+</div>
+
+@if (erro()) {
+  <div class="alert alert-danger">{{ erro() }}</div>
+}
+
+@if (sucesso()) {
+  <div class="alert alert-success">{{ sucesso() }}</div>
+}
+
+@if (showForm()) {
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Novo Administrador</h2>
+    </div>
+    <form [formGroup]="novoAdminForm" (ngSubmit)="criarAdmin()">
+      <div class="form-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="usuario">Usuário</label>
+            <input type="text" id="usuario" class="form-control" formControlName="usuario" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="senha">Senha</label>
+            <input type="password" id="senha" class="form-control" formControlName="senha" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <input type="email" id="email" class="form-control" formControlName="email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="nome">Nome (opcional)</label>
+            <input type="text" id="nome" class="form-control" formControlName="nome" />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="formLoading()">
+          {{ formLoading() ? 'Criando...' : 'Criar Admin' }}
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+@if (loading()) {
+  <div class="loading-spinner">Carregando...</div>
+} @else if (admins().length === 0) {
+  <div class="empty-state">
+    <p>Nenhum administrador cadastrado.</p>
+  </div>
+} @else {
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Lista de Administradores</h2>
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Usuário</th>
+            <th>Email</th>
+            <th>Nome</th>
+            <th>Data Criação</th>
+            <th>Ativo</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (admin of admins(); track admin.id) {
+            <tr>
+              <td>{{ admin.usuario }}</td>
+              <td>{{ admin.email }}</td>
+              <td>{{ admin.nome || '-' }}</td>
+              <td>{{ admin.dataCriacao | date: 'dd/MM/yyyy' }}</td>
+              <td>
+                <span
+                  class="badge"
+                  [class.badge--active]="admin.ativo"
+                  [class.badge--inactive]="!admin.ativo"
+                >
+                  {{ admin.ativo ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [class.btn-danger]="admin.ativo"
+                  [class.btn-success]="!admin.ativo"
+                  (click)="toggleAtivo(admin)"
+                >
+                  {{ admin.ativo ? 'Desativar' : 'Ativar' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

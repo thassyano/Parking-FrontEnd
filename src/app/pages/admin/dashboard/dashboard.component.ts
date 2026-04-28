@@ -5,10 +5,11 @@ import { DayAvailability } from '../../../core/models/availability/day-availabil
 import { DayAvailabilityService } from '../../../core/services/availability/day-availability.service';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ReservaStatus } from '../../../core/models/enums/reserva-status.enum';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CurrencyPipe, DatePipe],
+  imports: [CurrencyPipe, DatePipe, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })

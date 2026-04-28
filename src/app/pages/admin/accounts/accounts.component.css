@@ -211,7 +211,7 @@
 }
 
 .table th {
-  background: var(--light-background);
+  background: var(--medium-background);
   font-weight: 600;
   color: var(--text-secondary);
   text-align: left;
@@ -230,8 +230,13 @@
   vertical-align: middle;
 }
 
+.table tr {
+  transition: 0.3s ease;
+}
+
 .table tbody tr:hover {
-  background: var(--light-background);
+  background: var(--medium-background);
+  cursor: pointer;
 }
 
 .table tbody tr:last-child td {

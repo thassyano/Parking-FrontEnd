@@ -148,8 +148,13 @@
   color: var(--text-dark);
 }
 
+.table_row {
+  transition: 0.3s ease;
+}
+
 .table .table_body .table_row:hover {
-  background: var(--light-background);
+  background: var(--medium-background);
+  cursor: pointer;
 }
 
 .badge {

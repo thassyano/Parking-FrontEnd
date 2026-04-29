@@ -13,6 +13,11 @@ import {
   WhatsAppResponse,
 } from '../../../../..';
 import { BASE_URL } from '../../../constants/base-url';
+import {
+  CriarReservaLoteOnlineRequest,
+  CriarReservaLotePresencialRequest,
+} from '../../models/reserva/criar-reserva-lote-request.interface';
+import { ReservaLoteResponse } from '../../models/reserva/reserva-lote-response.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -41,8 +46,20 @@ export class ReservaService {
     return this.http.post<Reserva>(`${this.url}/online`, data);
   }
 
+  criarOnlineLote(data: CriarReservaLoteOnlineRequest): Observable<ReservaLoteResponse> {
+    return this.http.post<ReservaLoteResponse>(`${this.url}/online/lote`, data);
+  }
+
+  whatsappLote(ids: number[]): Observable<WhatsAppResponse> {
+    return this.http.post<WhatsAppResponse>(`${this.url}/whatsapp/lote`, ids);
+  }
+
   public criarPresencial(data: CriarReservaPresencialRequest): Observable<Reserva> {
     return this.http.post<Reserva>(`${this.url}/presencial`, data);
+  }
+
+  criarPresencialLote(data: CriarReservaLotePresencialRequest): Observable<ReservaLoteResponse> {
+    return this.http.post<ReservaLoteResponse>(`${this.url}/presencial/lote`, data);
   }
 
   public associarPlaca(id: number, data: AssociarPlacaRequest): Observable<Reserva> {

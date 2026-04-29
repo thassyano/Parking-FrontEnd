@@ -8,4 +8,5 @@ export const DEFAULT_CLIENT_FLOW: ClientFlowInterface = {
   qtdDias: 0,
   vagasCobertaDisponiveis: 0,
   vagasDescobertaDisponiveis: 0,
+  carros: [],
 };

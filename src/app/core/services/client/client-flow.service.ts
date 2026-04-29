@@ -1,6 +1,6 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { ClientFlowInterface } from '../../models/availability/client-flow.model';
+import { Injectable, signal } from '@angular/core';
 import { DEFAULT_CLIENT_FLOW } from '../../../constants/default-client-flow';
+import { ClientFlowInterface } from '../../models/availability/client-flow.model';
 
 @Injectable({
   providedIn: 'root',

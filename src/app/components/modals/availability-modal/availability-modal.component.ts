@@ -1,7 +1,7 @@
-import { Component, computed, input, output } from '@angular/core';
-import { LandingButtonComponent } from '../../buttons/landing-button/landing-button.component';
-import { PeriodAvailability } from '../../../core/models/availability/period-availability.model';
 import { DatePipe } from '@angular/common';
+import { Component, computed, input, output, ViewEncapsulation } from '@angular/core';
+import { PeriodAvailability } from '../../../core/models/availability/period-availability.model';
+import { LandingButtonComponent } from '../../buttons/landing-button/landing-button.component';
 
 @Component({
   selector: 'app-availability-modal',

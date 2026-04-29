@@ -20,6 +20,8 @@
     </div>
 
     @if (hasAvailability()) {
+      <ng-content select="[additionalVehiclesSlot]" />
+
       <app-landing-button
         label="Continuar para Reserva"
         variant="primary"

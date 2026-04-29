@@ -1,1 +1,163 @@
-<p>pricing works!</p>
+<div class="page_header">
+  <h1 class="page_title">Preços</h1>
+  <div class="page_actions">
+    <button type="button" class="btn_outline" (click)="carregarHistorico()">
+      Histórico de Preços
+    </button>
+    <button type="button" class="btn_primary" (click)="toggleForm()">
+      {{ showForm() ? 'Cancelar' : 'Novo Preço' }}
+    </button>
+  </div>
+</div>
+
+@if (erro()) {
+  <div class="alert_danger">{{ erro() }}</div>
+}
+
+@if (sucesso()) {
+  <div class="alert_success">{{ sucesso() }}</div>
+}
+
+@if (showForm()) {
+  <div class="preco_form_card">
+    <h2 class="preco_card_title">Novo Preço</h2>
+
+    <form class="preco_form" [formGroup]="precoForm" (ngSubmit)="criarPreco()">
+      <div class="preco_form_row">
+        <div class="preco_input_group">
+          <label class="preco_input_label">Tipo de Vaga *</label>
+          <select class="preco_input_field preco_input_select" formControlName="tipoVaga">
+            <option class="preco_select_option" value="Coberta">Coberta</option>
+            <option class="preco_select_option" value="Descoberta">Descoberta</option>
+          </select>
+        </div>
+
+        <div class="preco_input_group">
+          <label class="preco_input_label">Valor Diária (R$) *</label>
+          <input
+            type="number"
+            class="preco_input_field"
+            formControlName="valorDiaria"
+            step="0.01"
+            min="0"
+          />
+        </div>
+
+        <div class="preco_input_group">
+          <label class="preco_input_label">Desconto PIX/Dinheiro (R$)</label>
+          <input
+            type="number"
+            class="preco_input_field"
+            formControlName="descontoPixDinheiro"
+            step="0.01"
+            min="0"
+          />
+        </div>
+      </div>
+
+      <div class="preco_form_row">
+        <div class="preco_input_group">
+          <label class="preco_input_label">Vigente a partir de *</label>
+          <input type="date" class="preco_input_field" formControlName="dataInicio" />
+        </div>
+
+        <div class="preco_input_group">
+          <label class="preco_input_label">Vigente até (opcional)</label>
+          <input type="date" class="preco_input_field" formControlName="dataFim" />
+          <span class="preco_input_hint">Deixe em branco para vigência indefinida</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn_primary" [disabled]="formLoading()">
+        {{ formLoading() ? 'Criando...' : 'Criar Preço' }}
+      </button>
+    </form>
+  </div>
+}
+
+@if (loading()) {
+  <div class="preco_loading">Carregando...</div>
+} @else {
+  <div class="price_grid">
+    @for (preco of precosAtivos(); track preco.id) {
+      <div class="price_card">
+        <div class="price_card_header">
+          <h2 class="preco_card_title">{{ preco.tipoVaga }}</h2>
+        </div>
+        <div class="price_detail">
+          <span class="price_label">Valor Diária</span>
+          <span class="price_value">{{
+            preco.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2'
+          }}</span>
+        </div>
+        <div class="price_detail">
+          <span class="price_label">Desconto PIX/Dinheiro</span>
+          <span class="price_value">{{
+            preco.descontoPixDinheiro | currency: 'BRL' : 'symbol' : '1.2-2'
+          }}</span>
+        </div>
+        <div class="price_detail">
+          <span class="price_label">Vigência</span>
+          <span class="price_value">
+            {{ preco.dataInicio | date: 'dd/MM/yyyy' }}
+            @if (preco.dataFim) {
+              → {{ preco.dataFim | date: 'dd/MM/yyyy' }}
+            } @else {
+              → Indefinida
+            }
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@if (showHistorico()) {
+  <div class="preco_form_card">
+    <div class="preco_historico_header">
+      <h2 class="preco_card_title historico_title">Histórico de Preços</h2>
+      <button type="button" class="btn_outline" (click)="showHistorico.set(false)">Fechar</button>
+    </div>
+
+    <div class="preco_table_wrapper">
+      <table class="preco_table">
+        <thead class="preco_table_head">
+          <tr class="preco_table_head_row">
+            <th class="preco_table_th">Tipo Vaga</th>
+            <th class="preco_table_th">Valor Diária</th>
+            <th class="preco_table_th">Desconto PIX/Dinheiro</th>
+            <th class="preco_table_th">Vigente de</th>
+            <th class="preco_table_th">Vigente até</th>
+            <th class="preco_table_th">Ativo</th>
+          </tr>
+        </thead>
+        <tbody class="preco_table_body">
+          @for (preco of historicoOrdenado(); track preco.id) {
+            <tr class="preco_table_row">
+              <td class="preco_table_td">{{ preco.tipoVaga }}</td>
+              <td class="preco_table_td">
+                {{ preco.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              </td>
+              <td class="preco_table_td">
+                {{ preco.descontoPixDinheiro | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              </td>
+              <td class="preco_table_td">{{ preco.dataInicio | date: 'dd/MM/yyyy' }}</td>
+              <td class="preco_table_td">
+                {{ preco.dataFim ? (preco.dataFim | date: 'dd/MM/yyyy') : 'Indefinida' }}
+              </td>
+              <td class="preco_table_td">
+                <span
+                  class="preco_badge"
+                  [class.preco_badge_active]="preco.ativo"
+                  [class.preco_badge_inactive]="!preco.ativo"
+                >
+                  {{ preco.ativo ? 'Sim' : 'Não' }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

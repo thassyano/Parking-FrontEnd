@@ -28,7 +28,7 @@ export class ReservationDetailComponent implements OnInit {
 
   protected placaVeiculo = '';
   protected formaPagamento = 'Pix';
-  
+
   protected showCupomEntradaPrint = signal(false);
   protected showCupomSaidaPrint = signal(false);
 

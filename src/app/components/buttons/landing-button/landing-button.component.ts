@@ -12,6 +12,7 @@ export class LandingButtonComponent {
   public variant = input<LandingPageButtonType>('primary');
   public fullWidth = input<boolean>(false);
   public disabled = input<boolean>(false);
+  public type = input<string>('button');
 
   public clicked = output<void>();
 }

@@ -86,9 +86,12 @@ export const routes: Routes = [
           {
             path: 'admins',
             loadComponent: () =>
-              import('./pages/admin/accounts/accounts.component').then(
-                (m) => m.AccountsComponent,
-              ),
+              import('./pages/admin/accounts/accounts.component').then((m) => m.AccountsComponent),
+          },
+          {
+            path: 'precos',
+            loadComponent: () =>
+              import('./pages/admin/pricing/pricing.component').then((m) => m.PricingComponent),
           },
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
         ],

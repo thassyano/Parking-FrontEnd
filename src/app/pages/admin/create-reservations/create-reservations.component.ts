@@ -48,6 +48,9 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.sub.add(this.form.get('dataEntrada')!.valueChanges.subscribe(() => this.calcularDias()));
     this.sub.add(this.form.get('dataSaida')!.valueChanges.subscribe(() => this.calcularDias()));
+
+    this.sub.add(this.form.get('horaEntrada')!.valueChanges.subscribe(() => {}));
+    this.sub.add(this.form.get('horaSaida')!.valueChanges.subscribe(() => {}));
   }
 
   ngOnDestroy(): void {
@@ -115,19 +118,41 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
 
   protected fieldError(campo: string): string {
     const ctrl = this.form.get(campo);
+
+    if (campo === 'horaSaida') {
+      if (ctrl == null) return '';
+
+      const dataEntrada = this.form.get('dataEntrada')?.value;
+      const horaEntrada = this.form.get('horaEntrada')?.value;
+      const dataSaida = this.form.get('dataSaida')?.value;
+      const horaSaida = ctrl.value;
+
+      if (!dataEntrada || !horaEntrada || !dataSaida || !horaSaida) return '';
+
+      const entrada = new Date(`${dataEntrada}T${horaEntrada}`);
+      const saida = new Date(`${dataSaida}T${horaSaida}`);
+
+      if (saida <= entrada) {
+        return 'Saída não pode ser anterior nem junto à entrada.';
+      }
+    }
+
     if (!ctrl || !ctrl.invalid || !ctrl.touched) return '';
 
     if (ctrl.hasError('required')) return 'Campo obrigatório.';
+
     if (ctrl.hasError('maxlength')) {
       const max = ctrl.getError('maxlength').requiredLength;
       return `Máximo de ${max} caracteres.`;
     }
+
     if (ctrl.hasError('pattern')) {
       if (campo === 'telefoneCliente')
         return 'Informe um telefone válido com DDD (ex: 31912345678).';
       if (campo === 'placaVeiculo')
         return 'Placa inválida. Use o formato antigo (ABC1234) ou Mercosul (ABC1D23).';
     }
+
     if (ctrl.hasError('min')) return 'A quantidade mínima é 1 dia.';
 
     return 'Campo inválido.';

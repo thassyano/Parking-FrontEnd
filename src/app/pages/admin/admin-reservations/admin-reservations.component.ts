@@ -6,10 +6,11 @@ import { ReservaFiltros } from '../../../core/models/reserva/reserva-filtros.mod
 import { Reserva } from '../../../core/models/reserva/reserva.model';
 import { ReservaService } from '../../../core/services/reserva/reserva.service';
 import { scrollToTop } from '../../../core/utils/viewport/scroll-to-top';
+import { ReservationInfoComponent } from '../../../components/reservation-info/reservation-info.component';
 
 @Component({
   selector: 'app-admin-reservations',
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, DatePipe],
+  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, DatePipe, ReservationInfoComponent],
   templateUrl: './admin-reservations.component.html',
   styleUrl: './admin-reservations.component.css',
 })

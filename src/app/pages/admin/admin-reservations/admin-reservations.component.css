@@ -79,7 +79,7 @@
   font-family: inherit;
   color: var(--text-dark);
   background: var(--white);
-  border: 1px solid var(--white-darker);
+  border: 1px solid var(--border-dark);
   border-radius: 8px;
   outline: none;
   transition: 0.2s;
@@ -141,7 +141,7 @@
 .btn-outline {
   background: transparent;
   color: var(--text-secondary);
-  border-color: var(--white-darker);
+  border:2px solid var(--border-dark);
 }
 
 .btn-outline:hover {

@@ -6,10 +6,11 @@ import { DayAvailabilityService } from '../../../core/services/availability/day-
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ReservaStatus } from '../../../core/models/enums/reserva-status.enum';
 import { RouterLink } from '@angular/router';
+import { ReservationInfoComponent } from "../../../components/reservation-info/reservation-info.component";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CurrencyPipe, DatePipe, RouterLink],
+  imports: [CurrencyPipe, DatePipe, RouterLink, ReservationInfoComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
@@ -17,7 +18,7 @@ export class DashboardComponent {
   private reservaService = inject(ReservaService);
   private disponibilidadeService = inject(DayAvailabilityService);
 
-  private reservas = signal<Reserva[]>([]);
+  protected reservas = signal<Reserva[]>([]);
   protected disponibilidade = signal<DayAvailability | null>(null);
   protected isLoading = signal(true);
 
@@ -37,22 +38,6 @@ export class DashboardComponent {
         this.disponibilidade.set(data);
       },
     });
-  }
-
-  protected get pendentes(): number {
-    return this.reservas().filter((r) => r.status === ReservaStatus.Pendente).length;
-  }
-
-  protected get checkinRealizados(): number {
-    return this.reservas().filter((r) => r.status === ReservaStatus.CheckinRealizado).length;
-  }
-
-  protected get checkoutRealizados(): number {
-    return this.reservas().filter((r) => r.status === ReservaStatus.CheckoutRealizado).length;
-  }
-
-  protected get canceladas(): number {
-    return this.reservas().filter((r) => r.status === ReservaStatus.Cancelada).length;
   }
 
   protected get reservasRecentes(): Reserva[] {

@@ -72,7 +72,7 @@
   border: 1.5px solid var(--text-muted);
   cursor: pointer;
   transition: all var(--transition);
-  background: var(--secondary);
+  background: var(--primary-marine);
   color: var(--white-darker);
 }
 

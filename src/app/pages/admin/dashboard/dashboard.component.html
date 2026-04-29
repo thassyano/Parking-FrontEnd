@@ -5,24 +5,7 @@
 @if (isLoading()) {
   <div class="loading-spinner">Carregando...</div>
 } @else {
-  <div class="stats-grid">
-    <div class="stat-card stat-card--warning">
-      <span class="stat-value">{{ pendentes }}</span>
-      <span class="stat-label">Pendentes</span>
-    </div>
-    <div class="stat-card stat-card--info">
-      <span class="stat-value">{{ checkinRealizados }}</span>
-      <span class="stat-label">Em Estacionamento</span>
-    </div>
-    <div class="stat-card stat-card--success">
-      <span class="stat-value">{{ checkoutRealizados }}</span>
-      <span class="stat-label">Finalizados</span>
-    </div>
-    <div class="stat-card stat-card--danger">
-      <span class="stat-value">{{ canceladas }}</span>
-      <span class="stat-label">Canceladas</span>
-    </div>
-  </div>
+  <app-reservation-info [reservas]="reservas()"></app-reservation-info>
 
   @if (disponibilidade()) {
     <div class="availability-grid">
@@ -61,10 +44,7 @@
         </thead>
         <tbody class="table_body">
           @for (reserva of reservasRecentes; track reserva.id) {
-            <tr
-              [routerLink]="['/admin/reservas', reserva.id]"
-              class="table_row"
-            >
+            <tr [routerLink]="['/admin/reservas', reserva.id]" class="table_row">
               <td class="table_item">{{ reserva.id }}</td>
               <td class="table_item">{{ reserva.nomeCliente }}</td>
               <td class="table_item">{{ reserva.tipoVaga }}</td>

@@ -1,9 +1,10 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ReservaService } from '../../../core/services/reserva/reserva.service';
 import { Subscription } from 'rxjs';
 import { Patterns } from '../../../core/utils/patterns/form-patterns';
+import { CarroPresencialLoteRequest } from '../../../core/models/reserva/carros/carro-lote-request.interface';
 
 @Component({
   selector: 'app-create-reservations',
@@ -32,99 +33,153 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
       Validators.pattern(Patterns.phone),
     ]),
     cpfCliente: new FormControl(''),
-    placaVeiculo: new FormControl('', [
-      Validators.required,
-      Validators.pattern(Patterns.vehiclePlate),
-    ]),
-    tipoVaga: new FormControl('Coberta', Validators.required),
-    dataEntrada: new FormControl(this.hoje.toISOString().split('T')[0], Validators.required),
-    horaEntrada: new FormControl(this.hoje.toTimeString().slice(0, 5), Validators.required),
-    dataSaida: new FormControl(this.amanha.toISOString().split('T')[0], Validators.required),
-    horaSaida: new FormControl(this.hoje.toTimeString().slice(0, 5), Validators.required),
-    qtdDias: new FormControl(1, Validators.min(1)),
-    observacoes: new FormControl(''),
+    veiculos: new FormArray([this.criarVeiculoGroup()]),
   });
 
-  ngOnInit(): void {
-    this.sub.add(this.form.get('dataEntrada')!.valueChanges.subscribe(() => this.calcularDias()));
-    this.sub.add(this.form.get('dataSaida')!.valueChanges.subscribe(() => this.calcularDias()));
+  get veiculosArray(): FormArray {
+    return this.form.get('veiculos') as FormArray;
+  }
 
-    this.sub.add(this.form.get('horaEntrada')!.valueChanges.subscribe(() => {}));
-    this.sub.add(this.form.get('horaSaida')!.valueChanges.subscribe(() => {}));
+  veiculoGroup(index: number): FormGroup {
+    return this.veiculosArray.at(index) as FormGroup;
+  }
+
+  private criarVeiculoGroup(): FormGroup {
+    const dataEntrada = this.hoje.toISOString().split('T')[0];
+    const horaEntrada = this.hoje.toTimeString().slice(0, 5);
+    const dataSaida = this.amanha.toISOString().split('T')[0];
+
+    const group = new FormGroup({
+      placaVeiculo: new FormControl('', [
+        Validators.required,
+        Validators.pattern(Patterns.vehiclePlate),
+      ]),
+      tipoVaga: new FormControl('Coberta', Validators.required),
+      dataEntrada: new FormControl(dataEntrada, Validators.required),
+      horaEntrada: new FormControl(horaEntrada, Validators.required),
+      dataSaida: new FormControl(dataSaida, Validators.required),
+      horaSaida: new FormControl(horaEntrada, Validators.required),
+      qtdDias: new FormControl(1, Validators.min(1)),
+      observacoes: new FormControl(''),
+    });
+
+    return group;
+  }
+
+  ngOnInit(): void {
+    this.veiculosArray.controls.forEach((_, i) => this.inscreverCalculoDias(i));
   }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
 
-  private calcularDias(): void {
-    const entrada = this.form.get('dataEntrada')!.value;
-    const saida = this.form.get('dataSaida')!.value;
+  private inscreverCalculoDias(index: number): void {
+    const group = this.veiculoGroup(index);
+    this.sub.add(group.get('dataEntrada')!.valueChanges.subscribe(() => this.calcularDias(index)));
+    this.sub.add(group.get('dataSaida')!.valueChanges.subscribe(() => this.calcularDias(index)));
+  }
+
+  private calcularDias(index: number): void {
+    const group = this.veiculoGroup(index);
+    const entrada = group.get('dataEntrada')!.value;
+    const saida = group.get('dataSaida')!.value;
 
     if (!entrada || !saida) return;
 
     const diff = new Date(saida).getTime() - new Date(entrada).getTime();
     const dias = Math.ceil(diff / this.MS_POR_DIA);
+    group.get('qtdDias')!.setValue(dias > 0 ? dias : 0, { emitEvent: false });
+  }
 
-    this.form.get('qtdDias')!.setValue(dias > 0 ? dias : 0);
+  protected adicionarVeiculo(): void {
+    const index = this.veiculosArray.length;
+    this.veiculosArray.push(this.criarVeiculoGroup());
+    this.inscreverCalculoDias(index);
+  }
+
+  protected removerVeiculo(index: number): void {
+    if (this.veiculosArray.length > 1) {
+      this.veiculosArray.removeAt(index);
+    }
   }
 
   protected submeter(): void {
     if (this.form.invalid) {
-      this.erro.set('Preencha todos os campos obrigatorios');
+      this.form.markAllAsTouched();
+      this.erro.set('Preencha todos os campos obrigatórios');
       return;
     }
 
     this.loading.set(true);
     this.erro.set('');
 
-    const {
-      nomeCliente,
-      telefoneCliente,
-      cpfCliente,
-      placaVeiculo,
-      tipoVaga,
-      dataEntrada,
-      horaEntrada,
-      dataSaida,
-      horaSaida,
-      qtdDias,
-      observacoes,
-    } = this.form.value;
+    const { nomeCliente, telefoneCliente, cpfCliente, veiculos } = this.form.value;
 
-    this.reservaService
-      .criarPresencial({
-        nomeCliente: nomeCliente!,
-        telefoneCliente: telefoneCliente!,
-        cpfCliente: cpfCliente || undefined,
-        placaVeiculo: placaVeiculo!,
-        tipoVaga: tipoVaga!,
-        dataEntrada: `${dataEntrada}T${horaEntrada || '00:00'}`,
-        dataSaidaPrevista: `${dataSaida}T${horaSaida || '00:00'}`,
-        qtdDias: qtdDias!,
-        observacoes: observacoes || undefined,
-      })
-      .subscribe({
-        next: (reserva) => {
-          console.log(reserva);
-          this.router.navigate(['/admin/reservas', reserva.id]);
-        },
-        error: (err) => {
-          this.erro.set(err.error?.message || 'Erro ao criar reserva');
-          this.loading.set(false);
-        },
-      });
+    if (veiculos!.length === 1) {
+      const v = veiculos![0];
+      this.reservaService
+        .criarPresencial({
+          nomeCliente: nomeCliente!,
+          telefoneCliente: telefoneCliente!,
+          cpfCliente: cpfCliente || undefined,
+          placaVeiculo: v.placaVeiculo!.toUpperCase(),
+          tipoVaga: v.tipoVaga!,
+          dataEntrada: `${v.dataEntrada}T${v.horaEntrada || '00:00'}`,
+          dataSaidaPrevista: `${v.dataSaida}T${v.horaSaida || '00:00'}`,
+          qtdDias: v.qtdDias!,
+          observacoes: v.observacoes || undefined,
+        })
+        .subscribe({
+          next: (reserva) => this.router.navigate(['/admin/reservas', reserva.id]),
+          error: (err) => {
+            this.erro.set(err.error?.message || 'Erro ao criar reserva');
+            this.loading.set(false);
+          },
+        });
+    } else {
+      const carros: CarroPresencialLoteRequest[] = veiculos!.map((v) => ({
+        placaVeiculo: v.placaVeiculo!.toUpperCase(),
+        tipoVaga: v.tipoVaga!,
+        dataEntrada: `${v.dataEntrada}T${v.horaEntrada || '00:00'}`,
+        dataSaidaPrevista: `${v.dataSaida}T${v.horaSaida || '00:00'}`,
+        qtdDias: v.qtdDias!,
+        observacoes: v.observacoes || undefined,
+      }));
+
+      this.reservaService
+        .criarPresencialLote({
+          nomeCliente: nomeCliente!,
+          telefoneCliente: telefoneCliente!,
+          cpfCliente: cpfCliente || undefined,
+          carros,
+        })
+        .subscribe({
+          next: () => this.router.navigate(['/admin/reservas']),
+          error: (err) => {
+            this.erro.set(err.error?.message || 'Erro ao criar reservas');
+            this.loading.set(false);
+          },
+        });
+    }
   }
 
-  protected fieldError(campo: string): string {
-    const ctrl = this.form.get(campo);
+  protected fieldError(campo: string, veiculoIndex?: number): string {
+    let ctrl;
 
-    if (campo === 'horaSaida') {
+    if (veiculoIndex !== undefined) {
+      ctrl = this.veiculoGroup(veiculoIndex).get(campo);
+    } else {
+      ctrl = this.form.get(campo);
+    }
+
+    if (campo === 'horaSaida' && veiculoIndex !== undefined) {
       if (ctrl == null) return '';
 
-      const dataEntrada = this.form.get('dataEntrada')?.value;
-      const horaEntrada = this.form.get('horaEntrada')?.value;
-      const dataSaida = this.form.get('dataSaida')?.value;
+      const group = this.veiculoGroup(veiculoIndex);
+      const dataEntrada = group.get('dataEntrada')?.value;
+      const horaEntrada = group.get('horaEntrada')?.value;
+      const dataSaida = group.get('dataSaida')?.value;
       const horaSaida = ctrl.value;
 
       if (!dataEntrada || !horaEntrada || !dataSaida || !horaSaida) return '';
@@ -132,9 +187,7 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
       const entrada = new Date(`${dataEntrada}T${horaEntrada}`);
       const saida = new Date(`${dataSaida}T${horaSaida}`);
 
-      if (saida <= entrada) {
-        return 'Saída não pode ser anterior nem junto à entrada.';
-      }
+      if (saida <= entrada) return 'Saída não pode ser anterior nem junto à entrada.';
     }
 
     if (!ctrl || !ctrl.invalid || !ctrl.touched) return '';

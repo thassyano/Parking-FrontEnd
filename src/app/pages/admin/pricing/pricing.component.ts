@@ -92,6 +92,15 @@ export class PricingComponent implements OnInit {
       },
       error: (err) => this.dispararErro(err.error?.message || 'Erro ao carregar histórico'),
     });
+
+    if (this.showForm()) {
+      setTimeout(() => {
+        document.getElementById('historico_header')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 200);
+    }
   }
 
   public criarPreco(): void {

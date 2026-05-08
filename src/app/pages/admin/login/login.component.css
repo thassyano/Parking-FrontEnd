@@ -88,6 +88,25 @@
   color: var(--text-muted);
 }
 
-.label_img{
-    width: 16px;
+.form_control--error {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(195, 74, 74, 0.15);
+}
+
+.form_error {
+  margin-top: 0.375rem;
+  font-size: 0.8rem;
+  color: var(--danger);
+}
+
+.form_error--global {
+  margin-bottom: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  background: var(--danger-light);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.label_img {
+  width: 16px;
 }

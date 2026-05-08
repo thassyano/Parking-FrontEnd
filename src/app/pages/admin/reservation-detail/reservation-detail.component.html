@@ -44,7 +44,9 @@
         </div>
         <div class="detail-item">
           <span class="detail-label">Data Saída Prevista</span>
-          <span class="detail-value">{{ reserva()?.dataSaidaPrevista | date: 'dd/MM/yyyy HH:mm' }}</span>
+          <span class="detail-value">{{
+            reserva()?.dataSaidaPrevista | date: 'dd/MM/yyyy HH:mm'
+          }}</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Quantidade de Dias</span>
@@ -234,80 +236,84 @@
     </div>
   </div>
 
-  @if (cupomEntrada()) {
-    <div
-      class="card cupom-card"
-      [class.cupom-print-active]="showCupomEntradaPrint()"
-      style="margin-top: 1rem"
-    >
-      <div class="cupom-header">{{ cupomEntrada()!.nomeEstacionamento }}</div>
-      @if (cupomEntrada()!.endereco) {
-        <div class="cupom-line">{{ cupomEntrada()!.endereco }}</div>
-      }
-      @if (cupomEntrada()!.contato) {
-        <div class="cupom-line">{{ cupomEntrada()!.contato }}</div>
-      }
-      <div class="cupom-divider"></div>
-      <div class="cupom-line">Cupom de Entrada - #{{ cupomEntrada()!.numero }}</div>
-      <div class="cupom-line">Placa: {{ cupomEntrada()!.placaVeiculo }}</div>
-      <div class="cupom-line">
-        Entrada: {{ cupomEntrada()!.dataHoraEntrada | date: 'dd/MM/yyyy HH:mm' }}
+  <div class="cupom_container">
+    @if (cupomEntrada()) {
+      <div
+        class="card cupom-card"
+        [class.cupom-print-active]="showCupomEntradaPrint()"
+        style="margin-top: 1rem"
+      >
+        <div class="cupom-header">{{ cupomEntrada()!.nomeEstacionamento }}</div>
+        @if (cupomEntrada()!.endereco) {
+          <div class="cupom-line">{{ cupomEntrada()!.endereco }}</div>
+        }
+        @if (cupomEntrada()!.contato) {
+          <div class="cupom-line">{{ cupomEntrada()!.contato }}</div>
+        }
+        <div class="cupom-divider"></div>
+        <div class="cupom-line">Cupom de Entrada - #{{ cupomEntrada()!.numero }}</div>
+        <div class="cupom-line">Placa: {{ cupomEntrada()!.placaVeiculo }}</div>
+        <div class="cupom-line">
+          Entrada: {{ cupomEntrada()!.dataHoraEntrada | date: 'dd/MM/yyyy HH:mm' }}
+        </div>
+        <div class="cupom-line">Tipo: {{ cupomEntrada()!.tipoVaga }}</div>
+        <div class="cupom-line">Dias: {{ cupomEntrada()!.qtdDias }}</div>
+        <div class="cupom-line">
+          Saida Prevista: {{ cupomEntrada()!.dataSaidaPrevista | date: 'dd/MM/yyyy' }}
+        </div>
+        <div class="cupom-line">
+          Diaria: {{ cupomEntrada()!.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' }}
+        </div>
+        <div class="cupom-line">
+          Total: {{ cupomEntrada()!.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}
+        </div>
+        <div class="cupom-divider"></div>
+        <div class="cupom-line">{{ cupomEntrada()!.mensagem }}</div>
+        <button type="button" class="btn btn-primary" (click)="imprimirCupomEntrada()">
+          Imprimir
+        </button>
       </div>
-      <div class="cupom-line">Tipo: {{ cupomEntrada()!.tipoVaga }}</div>
-      <div class="cupom-line">Dias: {{ cupomEntrada()!.qtdDias }}</div>
-      <div class="cupom-line">
-        Saida Prevista: {{ cupomEntrada()!.dataSaidaPrevista | date: 'dd/MM/yyyy' }}
-      </div>
-      <div class="cupom-line">
-        Diaria: {{ cupomEntrada()!.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' }}
-      </div>
-      <div class="cupom-line">
-        Total: {{ cupomEntrada()!.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}
-      </div>
-      <div class="cupom-divider"></div>
-      <div class="cupom-line">{{ cupomEntrada()!.mensagem }}</div>
-      <button type="button" class="btn btn-primary" (click)="imprimirCupomEntrada()">
-        Imprimir
-      </button>
-    </div>
-  }
+    }
 
-  @if (cupomSaida()) {
-    <div
-      class="card cupom-card"
-      [class.cupom-print-active]="showCupomSaidaPrint()"
-      style="margin-top: 1rem"
-    >
-      <div class="cupom-header">{{ cupomSaida()!.nomeEstacionamento }}</div>
-      @if (cupomSaida()!.endereco) {
-        <div class="cupom-line">{{ cupomSaida()!.endereco }}</div>
-      }
-      <div class="cupom-divider"></div>
-      <div class="cupom-line">Cupom de Saida - #{{ cupomSaida()!.numero }}</div>
-      <div class="cupom-line">Placa: {{ cupomSaida()!.placaVeiculo }}</div>
-      <div class="cupom-line">
-        Entrada: {{ cupomSaida()!.dataHoraEntrada | date: 'dd/MM/yyyy HH:mm' }}
+    @if (cupomSaida()) {
+      <div
+        class="card cupom-card"
+        [class.cupom-print-active]="showCupomSaidaPrint()"
+        style="margin-top: 1rem"
+      >
+        <div class="cupom-header">{{ cupomSaida()!.nomeEstacionamento }}</div>
+        @if (cupomSaida()!.endereco) {
+          <div class="cupom-line">{{ cupomSaida()!.endereco }}</div>
+        }
+        <div class="cupom-divider"></div>
+        <div class="cupom-line">Cupom de Saída - #{{ cupomSaida()!.numero }}</div>
+        <div class="cupom-line">Placa: {{ cupomSaida()!.placaVeiculo }}</div>
+        <div class="cupom-line">
+          Entrada: {{ cupomSaida()!.dataHoraEntrada | date: 'dd/MM/yyyy HH:mm' }}
+        </div>
+        <div class="cupom-line">
+          Saida: {{ cupomSaida()!.dataHoraSaida | date: 'dd/MM/yyyy HH:mm' }}
+        </div>
+        <div class="cupom-line">Dias: {{ cupomSaida()!.qtdDias }}</div>
+        <div class="cupom-line">
+          Diaria: {{ cupomSaida()!.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' }}
+        </div>
+        <div class="cupom-line">
+          Total: {{ cupomSaida()!.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}
+        </div>
+        <div class="cupom-line">
+          Desconto: {{ cupomSaida()!.descontoAplicado | currency: 'BRL' : 'symbol' : '1.2-2' }}
+        </div>
+        <div class="cupom-line">
+          Valor Final: {{ cupomSaida()!.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2' }}
+        </div>
+        <div class="cupom-line">Pagamento: {{ cupomSaida()!.formaPagamento }}</div>
+        <button type="button" class="btn btn-primary" (click)="imprimirCupomSaida()">
+          Imprimir
+        </button>
       </div>
-      <div class="cupom-line">
-        Saida: {{ cupomSaida()!.dataHoraSaida | date: 'dd/MM/yyyy HH:mm' }}
-      </div>
-      <div class="cupom-line">Dias: {{ cupomSaida()!.qtdDias }}</div>
-      <div class="cupom-line">
-        Diaria: {{ cupomSaida()!.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' }}
-      </div>
-      <div class="cupom-line">
-        Total: {{ cupomSaida()!.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}
-      </div>
-      <div class="cupom-line">
-        Desconto: {{ cupomSaida()!.descontoAplicado | currency: 'BRL' : 'symbol' : '1.2-2' }}
-      </div>
-      <div class="cupom-line">
-        Valor Final: {{ cupomSaida()!.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2' }}
-      </div>
-      <div class="cupom-line">Pagamento: {{ cupomSaida()!.formaPagamento }}</div>
-      <button type="button" class="btn btn-primary" (click)="imprimirCupomSaida()">Imprimir</button>
-    </div>
-  }
+    }
+  </div>
 
   @if (showCancelarModal()) {
     <div class="modal-overlay" (click)="showCancelarModal.set(false)">

@@ -2,157 +2,186 @@
   <h1 class="page-title">Nova Reserva Presencial</h1>
 </div>
 
-<div class="card">
-  <form [formGroup]="form" (ngSubmit)="submeter()">
-    <div class="form-group">
-      <label class="form-label" for="nomeCliente">Nome do Cliente *</label>
-      <input
-        id="nomeCliente"
-        type="text"
-        class="form-control"
-        formControlName="nomeCliente"
-        (blur)="form.get('nomeCliente')!.markAsTouched()"
-      />
-      @if (fieldError('nomeCliente')) {
-        <span class="form-error">{{ fieldError('nomeCliente') }}</span>
-      }
+@if (erro()) {
+  <div class="alert alert-danger">{{ erro() }}</div>
+}
+
+<form [formGroup]="form" (ngSubmit)="submeter()">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Dados do Cliente</h2>
     </div>
 
-    <div class="form-group">
-      <label class="form-label" for="telefoneCliente">Telefone (sem hífen) *</label>
-      <input
-        id="telefoneCliente"
-        type="tel"
-        class="form-control"
-        formControlName="telefoneCliente"
-        (blur)="form.get('telefoneCliente')!.markAsTouched()"
-      />
-      @if (fieldError('telefoneCliente')) {
-        <span class="form-error">{{ fieldError('telefoneCliente') }}</span>
-      }
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="nomeCliente">Nome do Cliente *</label>
+        <input
+          id="nomeCliente"
+          type="text"
+          class="form-control"
+          formControlName="nomeCliente"
+          (blur)="form.get('nomeCliente')!.markAsTouched()"
+        />
+        @if (fieldError('nomeCliente')) {
+          <span class="form-error">{{ fieldError('nomeCliente') }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="telefoneCliente">Telefone (sem hífen) *</label>
+        <input
+          id="telefoneCliente"
+          type="tel"
+          class="form-control"
+          formControlName="telefoneCliente"
+          (blur)="form.get('telefoneCliente')!.markAsTouched()"
+        />
+        @if (fieldError('telefoneCliente')) {
+          <span class="form-error">{{ fieldError('telefoneCliente') }}</span>
+        }
+      </div>
     </div>
 
     <div class="form-group">
       <label class="form-label" for="cpfCliente">CPF</label>
       <input id="cpfCliente" type="text" class="form-control" formControlName="cpfCliente" />
     </div>
+  </div>
 
-    <div class="form-group">
-      <label class="form-label" for="placaVeiculo">Placa do Veículo *</label>
-      <input
-        id="placaVeiculo"
-        type="text"
-        class="form-control"
-        formControlName="placaVeiculo"
-        placeholder="ABC1D23"
-        (blur)="form.get('placaVeiculo')!.markAsTouched()"
-      />
-      @if (fieldError('placaVeiculo')) {
-        <span class="form-error">{{ fieldError('placaVeiculo') }}</span>
-      }
-    </div>
+  <div formArrayName="veiculos">
+    @for (veiculo of veiculosArray.controls; track $index) {
+      <div class="card" [formGroupName]="$index">
+        <div class="card-header">
+          <h2 class="card-title">Veículo {{ $index + 1 }}</h2>
+          @if (veiculosArray.length > 1) {
+            <button
+              type="button"
+              class="btn btn-outline btn-sm btn-danger-outline"
+              (click)="removerVeiculo($index)"
+            >
+              Remover
+            </button>
+          }
+        </div>
 
-    <div class="form-group">
-      <label class="form-label" for="tipoVaga">Tipo de Vaga *</label>
-      <select id="tipoVaga" class="form-control form-select" formControlName="tipoVaga">
-        <option value="Coberta">Coberta</option>
-        <option value="Descoberta">Descoberta</option>
-      </select>
-    </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Placa do Veículo *</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="placaVeiculo"
+              placeholder="ABC1D23"
+              (blur)="veiculoGroup($index).get('placaVeiculo')!.markAsTouched()"
+            />
+            @if (fieldError('placaVeiculo', $index)) {
+              <span class="form-error">{{ fieldError('placaVeiculo', $index) }}</span>
+            }
+          </div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label" for="dataEntrada">Data de Entrada *</label>
-        <input
-          id="dataEntrada"
-          type="date"
-          class="form-control"
-          formControlName="dataEntrada"
-          (blur)="form.get('dataEntrada')!.markAsTouched()"
-        />
-        @if (fieldError('dataEntrada')) {
-          <span class="form-error">{{ fieldError('dataEntrada') }}</span>
-        }
+          <div class="form-group">
+            <label class="form-label">Tipo de Vaga *</label>
+            <select class="form-control form-select" formControlName="tipoVaga">
+              <option value="Coberta">Coberta</option>
+              <option value="Descoberta">Descoberta</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Data de Entrada *</label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="dataEntrada"
+              (blur)="veiculoGroup($index).get('dataEntrada')!.markAsTouched()"
+            />
+            @if (fieldError('dataEntrada', $index)) {
+              <span class="form-error">{{ fieldError('dataEntrada', $index) }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Hora de Entrada *</label>
+            <input
+              type="time"
+              class="form-control"
+              formControlName="horaEntrada"
+              (blur)="veiculoGroup($index).get('horaEntrada')!.markAsTouched()"
+            />
+            @if (fieldError('horaEntrada', $index)) {
+              <span class="form-error">{{ fieldError('horaEntrada', $index) }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Data de Saída Prevista *</label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="dataSaida"
+              (blur)="veiculoGroup($index).get('dataSaida')!.markAsTouched()"
+            />
+            @if (fieldError('dataSaida', $index)) {
+              <span class="form-error">{{ fieldError('dataSaida', $index) }}</span>
+            }
+            @if (fieldError('horaSaida', $index)) {
+              <span class="form-error">{{ fieldError('horaSaida', $index) }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Hora de Saída Prevista *</label>
+            <input
+              type="time"
+              class="form-control"
+              formControlName="horaSaida"
+              (blur)="veiculoGroup($index).get('horaSaida')!.markAsTouched()"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Quantidade de Dias</label>
+            <input
+              type="number"
+              class="form-control"
+              formControlName="qtdDias"
+              (blur)="veiculoGroup($index).get('qtdDias')!.markAsTouched()"
+            />
+            @if (fieldError('qtdDias', $index)) {
+              <span class="form-error">{{ fieldError('qtdDias', $index) }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Observações</label>
+            <textarea class="form-control form-textarea" formControlName="observacoes"></textarea>
+          </div>
+        </div>
       </div>
-
-      <div class="form-group">
-        <label class="form-label" for="horaEntrada">Hora de Entrada *</label>
-        <input
-          id="horaEntrada"
-          type="time"
-          class="form-control"
-          formControlName="horaEntrada"
-          (blur)="form.get('horaEntrada')!.markAsTouched()"
-        />
-        @if (fieldError('horaEntrada')) {
-          <span class="form-error">{{ fieldError('horaEntrada') }}</span>
-        }
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label" for="dataSaida">Data de Saída Prevista *</label>
-        <input
-          id="dataSaida"
-          type="date"
-          class="form-control"
-          formControlName="dataSaida"
-          (blur)="form.get('dataSaida')!.markAsTouched()"
-        />
-        @if (fieldError('dataSaida')) {
-          <span class="form-error">{{ fieldError('dataSaida') }}</span>
-        }
-        @if (fieldError('horaSaida')) {
-          <span class="form-error">{{ fieldError('horaSaida') }}</span>
-        }
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="horaSaida">Hora de Saída Prevista *</label>
-        <input
-          id="horaSaida"
-          type="time"
-          class="form-control"
-          formControlName="horaSaida"
-          (blur)="form.get('horaSaida')!.markAsTouched()"
-        />
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="qtdDias">Quantidade de Dias</label>
-      <input
-        id="qtdDias"
-        type="number"
-        class="form-control"
-        formControlName="qtdDias"
-        (blur)="form.get('qtdDias')!.markAsTouched()"
-      />
-      @if (fieldError('qtdDias')) {
-        <span class="form-error">{{ fieldError('qtdDias') }}</span>
-      }
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="observacoes">Observações</label>
-      <textarea
-        id="observacoes"
-        class="form-control form-textarea"
-        formControlName="observacoes"
-      ></textarea>
-    </div>
-
-    @if (erro()) {
-      <div class="alert alert-danger">{{ erro() }}</div>
     }
+  </div>
 
-    <button type="submit" class="btn btn-primary btn-lg" [disabled]="loading()">
+  <div class="card" style="padding: 1rem">
+    <button type="button" class="btn btn-outline btn-add" (click)="adicionarVeiculo()">
+      + Adicionar outro veículo
+    </button>
+  </div>
+
+  <div class="card" style="padding: 1rem">
+    <button type="submit" class="btn btn-primary btn-lg btn-block" [disabled]="loading()">
       @if (loading()) {
-        Carregando...
+        Registrando...
+      } @else if (veiculosArray.length > 1) {
+        Registrar {{ veiculosArray.length }} Entradas
       } @else {
         Registrar Entrada
       }
     </button>
-  </form>
-</div>
+  </div>
+</form>

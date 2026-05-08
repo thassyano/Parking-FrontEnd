@@ -8,7 +8,7 @@
     <div class="login_card">
       <h2 class="login_section_title">Login</h2>
 
-      <form [formGroup]="loginForm" (onSubmit)="onLogin()">
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
         <div class="form_group">
           <label class="form_label form_label_icon">
             <img class="label_img" src="assets/icons/person-dark.icon.svg" alt="" />
@@ -18,9 +18,20 @@
           <input
             type="text"
             class="form_control"
+            [class.form_control--error]="
+              loginForm.get('usuario')?.invalid && loginForm.get('usuario')?.touched
+            "
             formControlName="usuario"
             placeholder="Digite seu usuário"
           />
+
+          @if (loginForm.get('usuario')?.touched) {
+            @if (loginForm.get('usuario')?.hasError('required')) {
+              <p class="form_error">Usuário é obrigatório.</p>
+            } @else if (loginForm.get('usuario')?.hasError('maxlength')) {
+              <p class="form_error">Usuário deve ter no máximo 50 caracteres.</p>
+            }
+          }
         </div>
 
         <div class="form_group">
@@ -32,10 +43,27 @@
           <input
             type="password"
             class="form_control"
+            [class.form_control--error]="
+              loginForm.get('senha')?.invalid && loginForm.get('senha')?.touched
+            "
             formControlName="senha"
             placeholder="Digite sua senha"
           />
+
+          @if (loginForm.get('senha')?.touched) {
+            @if (loginForm.get('senha')?.hasError('required')) {
+              <p class="form_error">Senha é obrigatória.</p>
+            } @else if (loginForm.get('senha')?.hasError('minlength')) {
+              <p class="form_error">Senha deve ter no mínimo 6 caracteres.</p>
+            } @else if (loginForm.get('senha')?.hasError('maxlength')) {
+              <p class="form_error">Senha deve ter no máximo 30 caracteres.</p>
+            }
+          }
         </div>
+
+        @if (errorMessage()) {
+          <p class="form_error form_error--global">{{ errorMessage() }}</p>
+        }
 
         <app-landing-button
           [type]="'submit'"

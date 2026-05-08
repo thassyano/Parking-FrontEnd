@@ -7,15 +7,14 @@
     <p class="header_subtitle">Consulte disponibilidade</p>
   </div>
 
-  @if (errorMessage()) {
-    <div class="error_alert">
-      {{ errorMessage() }}
-    </div>
-  }
-
   <div class="card_container">
     <div class="availability_card">
       <div class="card_content">
+        @if (errorMessage()) {
+          <div class="error_alert">
+            {{ errorMessage() }}
+          </div>
+        }
         <h2 class="section_title">Consultar Disponibilidade</h2>
       </div>
 
@@ -58,7 +57,7 @@
 
         <div class="primary_action">
           <app-landing-button
-            [label]="isLoading() ? 'Checking...' : 'Check Availability'"
+            [label]="isLoading() ? 'Buscando...' : 'Ver Disponibilidade'"
             variant="primary"
             [fullWidth]="true"
             [disabled]="availabilityForm.invalid || isLoading()"

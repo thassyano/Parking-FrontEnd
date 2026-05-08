@@ -53,7 +53,7 @@ export class ConsultaComponent {
   );
 
   public checkAvailability(): void {
-    if (this.availabilityForm.invalid || this.isLoading()) {
+    if (this.availabilityForm.invalid) {
       this.errorMessage.set('Preencha as datas de entrada e saída');
       return;
     }

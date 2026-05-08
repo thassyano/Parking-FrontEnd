@@ -65,3 +65,68 @@
 html {
   scroll-behavior: smooth;
 }
+
+@media print {
+  * {
+    font-family: 'Courier New', Courier, monospace;
+    margin-bottom: 2px;
+    font-size: 18px;
+  }
+  
+  @page {
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: var(--surface);
+    height: auto;
+    min-height: 0;
+  }
+
+  .admin-wrapper,
+  .admin-main,
+  .admin-content {
+    display: block !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .sidebar,
+  .admin-topbar,
+  .actions-card,
+  .page-header,
+  .detail-grid,
+  .card:not(.cupom-print-active),
+  .alert,
+  .loading-spinner,
+  .btn {
+    display: none !important;
+  }
+
+  .cupom-card:not(.cupom-print-active) {
+    display: none !important;
+  }
+
+  .cupom-print-active,
+  .cupom-print-active * {
+    visibility: visible !important;
+  }
+
+  .cupom-print-active {
+    background: var(--surface);
+    border: 1px solid var(--text);
+    border-radius: var(--radius);
+    box-shadow: none;
+    display: block !important;
+    margin: 0 auto !important;
+    max-width: 380px;
+    padding: 1.5rem;
+    position: static;
+  }
+}

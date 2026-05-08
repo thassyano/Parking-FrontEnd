@@ -2,14 +2,14 @@
   width: 100%;
   margin: 0 auto;
   padding: 32px 20px;
+  padding-top: calc(32px + 64px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   background: var(--primary-50);
   min-height: 100vh;
+  box-sizing: border-box;
 }
-
 .card_container {
   width: 400px;
   box-shadow: var(--shadow);

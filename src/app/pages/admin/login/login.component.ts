@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { LandingButtonComponent } from '../../../components/buttons/landing-button/landing-button.component';
 import { LoginInterface } from '../../../core/models/auth/login.model';
 import { AuthService } from '../../../core/services/auth/auth.service';
-import { HeaderComponent } from "../../../components/header/header.component";
+import { HeaderComponent } from '../../../components/header/header.component';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
 
   protected authService = inject(AuthService);
   private router = inject(Router);
-  private errorMessage = signal<string>('');
+  protected errorMessage = signal<string>('');
 
   protected isLoading = signal<boolean>(false);
 
@@ -35,6 +35,9 @@ export class LoginComponent implements OnInit {
   public onLogin(): void {
     if (this.loginForm.invalid) {
       this.errorMessage.set('Senha ou usuário incorretos.');
+      setTimeout(() => {
+        this.errorMessage.set('');
+      }, 6000);
       return;
     }
 
@@ -51,7 +54,10 @@ export class LoginComponent implements OnInit {
         this.router.navigateByUrl('/admin/dashboard');
       },
       error: (error) => {
-        this.errorMessage.set('Senha ou usuário incorretos.');
+        this.errorMessage.set("Usuário ou senha inválidos");
+        setTimeout(() => {
+          this.errorMessage.set('');
+        }, 6000);
         this.isLoading.set(false);
       },
       complete: () => {

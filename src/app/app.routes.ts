@@ -53,7 +53,7 @@ export const routes: Routes = [
           {
             path: 'reservas',
             loadComponent: () =>
-              import('./pages/admin/admin-reservations/admin-reservations.component').then(
+              import('./pages/admin/reservations/admin-reservations.component').then(
                 (m) => m.AdminReservationsComponent,
               ),
           },

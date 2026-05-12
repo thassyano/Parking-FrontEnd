@@ -186,7 +186,7 @@
 .acoes-body {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: center;
   gap: 0.5rem;
   padding: 1.25rem 1.5rem;
   height: 100%;

@@ -141,7 +141,7 @@
 .btn-outline {
   background: transparent;
   color: var(--text-secondary);
-  border:2px solid var(--border-dark);
+  border: 2px solid var(--border-dark);
 }
 
 .btn-outline:hover {
@@ -218,8 +218,8 @@
   padding: 1rem 1rem;
 }
 
-.table_row{
-    transition: 0.3s ease;
+.table_row {
+  transition: 0.3s ease;
 }
 
 .table .table_body .table_row:hover {
@@ -311,6 +311,53 @@
 .pagination_number.active {
   background: var(--primary);
   color: var(--white);
+}
+
+.pagination_jump {
+  display: flex;
+  align-items: center;
+  margin-left: 4px;
+  gap: 4px;
+}
+
+.pagination_jump_input {
+  width: 80px;
+  padding: 5px 8px;
+  font-size: 0.875rem;
+  border: 1px solid var(--border-dark);
+  border-radius: 6px;
+  outline: none;
+  text-align: center;
+  color: var(--text-dark);
+  background: var(--white);
+  transition: 0.2s;
+}
+
+.pagination_jump_input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.pagination_jump_input::-webkit-inner-spin-button,
+.pagination_jump_input::-webkit-outer-spin-button {
+  appearance: none;
+}
+
+.pagination_jump_btn {
+  width: 48px;
+  padding: 5px 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--primary-50);
+  color: var(--primary-dark);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pagination_jump_btn:hover {
+  background: var(--primary-light);
 }
 
 @media (max-width: 640px) {

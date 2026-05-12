@@ -43,6 +43,45 @@
         <input type="date" class="form-control" formControlName="dataFim" />
       </div>
 
+      <div class="form-group">
+        <label class="form-label">ID</label>
+        <input type="text" class="form-control" formControlName="id" placeholder="Ex: 42" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Telefone</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="telefone"
+          placeholder="Ex: 61999..."
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Cliente</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="nome"
+          placeholder="Nome do cliente"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Placa</label>
+        <input type="text" class="form-control" formControlName="placa" placeholder="Ex: ABC1D23" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Pago</label>
+        <select class="form-control form-select" formControlName="pago">
+          <option value="">Todos</option>
+          <option value="sim">Sim</option>
+          <option value="nao">Não</option>
+        </select>
+      </div>
+
       <div class="form-group form-group-actions">
         <button type="submit" class="btn btn-primary">Buscar</button>
         <button type="button" class="btn btn-secondary btn-outline" (click)="limparFiltros()">
@@ -55,7 +94,7 @@
 
 @if (loading()) {
   <div class="loading-spinner">Carregando...</div>
-} @else if (reservas().length === 0) {
+} @else if (filteredReservas().length === 0) {
   <div class="card">
     <div class="empty-state">Nenhuma reserva encontrada.</div>
   </div>
@@ -138,6 +177,25 @@
         >
           <img class="btn_img" src="assets/icons/arrow-right.icon.svg" />
         </button>
+
+        <div class="pagination_jump">
+          <input
+            #jumpInput
+            class="pagination_jump_input"
+            type="number"
+            [min]="1"
+            [max]="totalPages()"
+            placeholder="Ir p/ pág."
+            (keydown.enter)="goToPageInput(jumpInput.value); jumpInput.value = ''"
+            (blur)="goToPageInput(jumpInput.value); jumpInput.value = ''"
+          />
+          <button
+            class="pagination_jump_btn"
+            (click)="goToPageInput(jumpInput.value); jumpInput.value = ''"
+          >
+            Ir
+          </button>
+        </div>
       </div>
     }
   </div>

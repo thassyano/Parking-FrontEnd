@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { BASE_URL } from '../../../constants/base-url';
+import { environment } from '../../environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Preco } from '../../models/precos/preco.model';
@@ -9,7 +9,7 @@ import { CriarPrecoRequest } from '../../models/precos/criar-preco-request.model
   providedIn: 'root',
 })
 export class PrecoService {
-  private readonly url = signal(`${BASE_URL}/precos`);
+  private readonly url = signal(`${environment.apiUrl}/precos`);
   private http = inject(HttpClient);
 
   public listarTodos(): Observable<Preco[]> {

@@ -3,10 +3,10 @@
     <h2 class="modal_title">Disponibilidade no Período</h2>
 
     <p class="modal_period">
-      {{ data().dataInicio | date: 'dd/MM/yyyy' }} a {{ data().dataFim | date: 'dd/MM/yyyy' }} ({{
+      {{ data().dataInicio | date: 'dd/MM/yyyy' }} a {{ data().dataFim | date: 'dd/MM/yyyy' }} - {{
         totalDays()
       }}
-      dia(s))
+      diária(s)
     </p>
 
     <div class="slot_card">
@@ -23,7 +23,11 @@
       <ng-content select="[additionalVehiclesSlot]" />
 
       <app-landing-button
-        label="Continuar para Reserva"
+        [label]="
+          additionalVehiclesCount() > 0
+            ? 'Continuar com ' + (additionalVehiclesCount() + 1) + ' veículos'
+            : 'Continuar para Reserva'
+        "
         variant="primary"
         [fullWidth]="true"
         (clicked)="emitContinue()"

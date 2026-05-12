@@ -12,7 +12,7 @@ import {
   ReservaFiltros,
   WhatsAppResponse,
 } from '../../../../..';
-import { BASE_URL } from '../../../constants/base-url';
+import { environment } from '../../environment';
 import {
   CriarReservaLoteOnlineRequest,
   CriarReservaLotePresencialRequest,
@@ -23,7 +23,7 @@ import { ReservaLoteResponse } from '../../models/reserva/reserva-lote-response.
   providedIn: 'root',
 })
 export class ReservaService {
-  private readonly url = `${BASE_URL}/reservas`;
+  private readonly url = `${environment.apiUrl}/reservas`;
 
   private http = inject(HttpClient);
 

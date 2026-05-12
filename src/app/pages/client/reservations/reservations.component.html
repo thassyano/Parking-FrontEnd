@@ -20,7 +20,11 @@
             class="input_field"
             formControlName="customerName"
             placeholder="Seu nome completo"
+            (blur)="reservationForm.get('customerName')!.markAsTouched()"
           />
+          @if (fieldError('customerName')) {
+            <span class="field_error">{{ fieldError('customerName') }}</span>
+          }
         </div>
 
         <div class="input_group">
@@ -32,8 +36,12 @@
             type="tel"
             class="input_field"
             formControlName="customerPhone"
-            placeholder="61999999999"
+            placeholder="(ddd) 999999999"
+            (blur)="reservationForm.get('customerPhone')!.markAsTouched()"
           />
+          @if (fieldError('customerPhone')) {
+            <span class="field_error">{{ fieldError('customerPhone') }}</span>
+          }
         </div>
       </form>
     </div>
@@ -70,10 +78,14 @@
           <input
             type="text"
             class="input_field input_field--uppercase"
-            [value]="carroPlaca()[$index]"
+            [value]="placasForm.at($index).value"
             (input)="updatePlaca($index, $any($event.target).value)"
+            (blur)="placasForm.at($index).markAsTouched()"
             placeholder="ABC1D23"
           />
+          @if (placaError($index)) {
+            <span class="field_error">{{ placaError($index) }}</span>
+          }
         </div>
 
         <div class="input_group">
@@ -195,10 +207,10 @@
         @for (carro of carros(); track $index) {
           <div class="confirmation_separator">Veículo {{ $index + 1 }}</div>
 
-          @if (carroPlaca()[$index]) {
+          @if (placasForm.at($index).value) {
             <div class="confirmation_row">
               <span>Placa</span>
-              <span>{{ carroPlaca()[$index] }}</span>
+              <span>{{ placasForm.at($index).value }}</span>
             </div>
           }
           <div class="confirmation_row">

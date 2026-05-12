@@ -1,1 +1,0 @@
-export const BASE_URL: string = 'https://localhost:44309/api'

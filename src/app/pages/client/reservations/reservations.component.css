@@ -25,6 +25,12 @@
   font-size: 0.875rem;
 }
 
+.field_error {
+  font-size: 0.8rem;
+  color: var(--danger);
+  padding: 2px 4px;
+}
+
 .reserva_card {
   background: var(--white);
   border: 1px solid var(--medium-background);
@@ -34,6 +40,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
+  margin-bottom: 16px;
 }
 
 .period_summary {
@@ -44,6 +51,7 @@
   background: var(--primary-50);
   border: 1px solid var(--primary-light);
   border-radius: 10px;
+  gap: 0.75rem;
 }
 
 .period_item {
@@ -345,7 +353,6 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1rem;
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--medium-background);
 }
@@ -360,4 +367,60 @@
   padding: 0.5rem 0 0.25rem;
   border-top: 1px solid var(--secondary-dark);
   margin-top: 1rem;
+}
+
+@media (max-width: 640px) {
+  .reserva_container {
+    padding-top: 60px;
+  }
+
+  .reserva_page {
+    padding: 1.4rem 0;
+  }
+
+  .reserva_card {
+    padding: 1.1rem;
+  }
+
+  .period_summary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .period_item {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .budget_card {
+    padding: 1rem;
+  }
+
+  .budget_row {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .modal_card {
+    padding: 1.2rem;
+    max-width: 100%;
+  }
+
+  .modal_overlay {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .reserva_page {
+    padding: 1rem 0;
+  }
+
+  .reserva_card {
+    gap: 0.9rem;
+  }
+
+  .page_title {
+    font-size: 1.3rem;
+  }
 }

@@ -1,14 +1,14 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BASE_URL } from '../../../constants/base-url';
+import { environment } from '../../environment';
 import { DayAvailability } from '../../models/availability/day-availability.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DayAvailabilityService {
-  private readonly baseUrl = signal<string>(`${BASE_URL}/disponibilidade`);
+  private readonly baseUrl = signal<string>(`${environment.apiUrl}/disponibilidade`);
   private http = inject(HttpClient);
 
   consultarDia(data: string): Observable<DayAvailability> {

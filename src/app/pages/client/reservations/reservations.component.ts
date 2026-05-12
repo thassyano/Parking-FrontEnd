@@ -1,6 +1,6 @@
 import { CurrencyPipe, ViewportScroller } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { CarroEntry } from '../../../core/models/availability/client-flow.model';
@@ -36,7 +36,9 @@ export class ReservationsComponent implements OnInit {
 
   public carros = signal<CarroEntry[]>([]);
   public carroTipoVaga = signal<TipoVaga[]>([]);
-  public carroPlaca = signal<string[]>([]);
+
+  public readonly placasForm = new FormArray<FormControl<string>>([]);
+
   public orcamentos = signal<(OrcamentoResponse | null)[]>([]);
 
   public readonly totalCartao = computed(() =>
@@ -94,7 +96,16 @@ export class ReservationsComponent implements OnInit {
     this.carroTipoVaga.set(
       carros.map((c) => (c.vagasCobertaDisponiveis > 0 ? TipoVaga.Coberta : TipoVaga.Descoberta)),
     );
-    this.carroPlaca.set(carros.map(() => ''));
+
+    carros.forEach(() =>
+      this.placasForm.push(
+        new FormControl<string>('', {
+          nonNullable: true,
+          validators: [Validators.required, Validators.pattern(Patterns.vehiclePlate)],
+        }),
+      ),
+    );
+
     this.orcamentos.set(carros.map(() => null));
 
     this.calcularTodosOrcamentos();
@@ -153,9 +164,17 @@ export class ReservationsComponent implements OnInit {
   }
 
   public updatePlaca(index: number, value: string): void {
-    const placas = [...this.carroPlaca()];
-    placas[index] = value.toUpperCase();
-    this.carroPlaca.set(placas);
+    this.placasForm.at(index).setValue(value.toUpperCase());
+    this.placasForm.at(index).markAsTouched();
+  }
+
+  public placaError(index: number): string {
+    const ctrl = this.placasForm.at(index);
+    if (!ctrl || !ctrl.invalid || !ctrl.touched) return '';
+    if (ctrl.hasError('required')) return 'Placa obrigatória.';
+    if (ctrl.hasError('pattern'))
+      return 'Placa inválida. Use o formato antigo (ABC1234) ou Mercosul (ABC1D23).';
+    return 'Placa inválida.';
   }
 
   public updateTipoVaga(index: number, value: TipoVaga): void {
@@ -168,83 +187,36 @@ export class ReservationsComponent implements OnInit {
   public openConfirmation(): void {
     if (this.reservationForm.invalid) {
       this.reservationForm.markAllAsTouched();
-
-      const errors: string[] = [];
-
-      if (this.reservationForm.controls.customerName.invalid) {
-        errors.push('Nome');
-      }
-
-      if (this.reservationForm.controls.customerPhone.invalid) {
-        if (this.reservationForm.controls.customerPhone.errors?.['required']) {
-          errors.push('Telefone');
-        } else if (this.reservationForm.controls.customerPhone.errors?.['pattern']) {
-          errors.push('Telefone (Formato inválido)');
-        } else if (this.reservationForm.controls.customerPhone.errors?.['maxlength']) {
-          errors.push('Telefone (Máximo 11 caracteres)');
-        }
-      }
-
-      this.errorMessage.set(
-        errors.length ? `Preencha os campos: ${errors.join(', ')}` : 'Formulário inválido',
-      );
-
+      this.errorMessage.set('Preencha os campos obrigatórios corretamente.');
       scrollToTop(this.scroller);
       return;
     }
 
-    const placaRegex = new RegExp(Patterns.vehiclePlate);
+    this.placasForm.markAllAsTouched();
 
-    const placasInvalidas: number[] = [];
-    const placasVazias: number[] = [];
+    if (this.placasForm.invalid) {
+      this.errorMessage.set('Corrija as placas antes de continuar.');
+      scrollToTop(this.scroller);
+      return;
+    }
+
     const placasDuplicadas: number[] = [];
-
     const mapa = new Map<string, number[]>();
 
-    this.carroPlaca().forEach((placa, i) => {
-      if (!placa) {
-        placasVazias.push(i + 1);
-        return;
-      }
-
-      const normalizada = placa.toUpperCase();
-
-      if (!placaRegex.test(normalizada)) {
-        placasInvalidas.push(i + 1);
-        return;
-      }
-
-      if (!mapa.has(normalizada)) {
-        mapa.set(normalizada, []);
-      }
-
+    this.placasForm.controls.forEach((ctrl, i) => {
+      const normalizada = ctrl.value.toUpperCase();
+      if (!mapa.has(normalizada)) mapa.set(normalizada, []);
       mapa.get(normalizada)!.push(i + 1);
     });
 
     mapa.forEach((indices) => {
-      if (indices.length > 1) {
-        placasDuplicadas.push(...indices);
-      }
+      if (indices.length > 1) placasDuplicadas.push(...indices);
     });
 
-    if (placasVazias.length || placasInvalidas.length || placasDuplicadas.length) {
-      const erros: string[] = [];
-
-      if (placasVazias.length) {
-        erros.push(`Placa obrigatória no(s) veículo(s): ${placasVazias.join(', ')}`);
-      }
-
-      if (placasInvalidas.length) {
-        erros.push(`Placa inválida no(s) veículo(s): ${placasInvalidas.join(', ')}`);
-      }
-
-      if (placasDuplicadas.length) {
-        erros.push(
-          `Placas duplicadas no(s) veículo(s): ${[...new Set(placasDuplicadas)].join(', ')}`,
-        );
-      }
-
-      this.errorMessage.set(erros.join(' | '));
+    if (placasDuplicadas.length) {
+      this.errorMessage.set(
+        `Placas duplicadas no(s) veículo(s): ${[...new Set(placasDuplicadas)].join(', ')}`,
+      );
       scrollToTop(this.scroller);
       return;
     }
@@ -274,7 +246,7 @@ export class ReservationsComponent implements OnInit {
         .criarOnline({
           nomeCliente: customerName!,
           telefoneCliente: customerPhone!,
-          placaVeiculo: this.carroPlaca()[0] || undefined,
+          placaVeiculo: this.placasForm.at(0).value || undefined,
           tipoVaga: this.carroTipoVaga()[0],
           dataEntrada: `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`,
           dataSaidaPrevista: `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`,
@@ -306,7 +278,7 @@ export class ReservationsComponent implements OnInit {
           nomeCliente: customerName!,
           telefoneCliente: customerPhone!,
           carros: carros.map((carro, i) => ({
-            placaVeiculo: this.carroPlaca()[i] || undefined,
+            placaVeiculo: this.placasForm.at(i).value || undefined,
             tipoVaga: this.carroTipoVaga()[i],
             dataEntrada: `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`,
             dataSaidaPrevista: `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`,
@@ -341,5 +313,23 @@ export class ReservationsComponent implements OnInit {
     if (!date) return '';
     const [year, month, day] = date.includes('-') ? date.split('-') : date.split('/').reverse();
     return time ? `${day}/${month}/${year} ${time}` : `${day}/${month}/${year}`;
+  }
+
+  public fieldError(campo: string): string {
+    const ctrl = this.reservationForm.get(campo);
+    if (!ctrl || !ctrl.invalid || !ctrl.touched) return '';
+
+    if (ctrl.hasError('required')) return 'Campo obrigatório.';
+
+    if (ctrl.hasError('maxlength')) {
+      const max = ctrl.getError('maxlength').requiredLength;
+      return `Máximo de ${max} caracteres.`;
+    }
+
+    if (ctrl.hasError('pattern')) {
+      if (campo === 'customerPhone') return 'Informe um telefone válido com DDD (ex: 31912345678).';
+    }
+
+    return 'Campo inválido.';
   }
 }

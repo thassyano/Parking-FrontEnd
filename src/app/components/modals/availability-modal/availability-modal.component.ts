@@ -14,6 +14,8 @@ export class AvailabilityModalComponent {
   public closeOutput = output<void>();
   public continueOutput = output<void>();
 
+  public additionalVehiclesCount = input<number>(0);
+
   public guaranteedCoveredSpots = computed(() =>
     this.data().dias.reduce(
       (guaranteed, day) => Math.min(guaranteed, day.vagasCobertaDisponiveis),

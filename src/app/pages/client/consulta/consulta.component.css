@@ -11,7 +11,8 @@
   box-sizing: border-box;
 }
 .card_container {
-  width: 400px;
+  width: 100%;
+  max-width: 440px;
   box-shadow: var(--shadow);
   border-radius: 16px;
 }
@@ -80,6 +81,7 @@
   border: 1px solid var(--text-muted);
   font-size: 0.95rem;
   background: var(--white);
+  min-width: 0;
 }
 
 .input_field:focus {
@@ -210,6 +212,55 @@
 
 .add_vehicle_btn:hover {
   background: var(--primary-50);
+}
+
+@media (max-width: 640px) {
+  .client_page {
+    padding: 24px 16px 20px;
+  }
+
+  .page_header {
+    margin-bottom: 18px;
+  }
+
+  .header_title {
+    font-size: 1.2rem;
+  }
+
+  .header_subtitle {
+    font-size: 0.85rem;
+  }
+
+  .card_container {
+    max-width: 100%;
+  }
+
+  .card_content {
+    padding: 18px 16px 0 16px;
+  }
+
+  .availability_form {
+    padding: 16px;
+  }
+
+  .label_group {
+    gap: 6px;
+    padding: 0;
+    flex-wrap: wrap;
+  }
+
+  .vehicle_card {
+    padding: 0.75rem 0.9rem;
+  }
+
+  .vehicle_card_header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .vehicle_fields {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 480px) {

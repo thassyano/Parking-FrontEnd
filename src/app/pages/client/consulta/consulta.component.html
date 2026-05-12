@@ -71,6 +71,7 @@
 
   @if (isModalVisible()) {
     <app-availability-modal
+      [additionalVehiclesCount]="additionalVehicles.length"
       [data]="availability()!"
       (closeOutput)="closeModal()"
       (continueOutput)="continue()"

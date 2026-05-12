@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
-import { BASE_URL } from '../../../constants/base-url';
+import { environment } from '../../environment';
 import { LoginInterface } from '../../models/auth/login.model';
 import { TokenInterface } from '../../models/auth/token.model';
 
@@ -13,7 +13,7 @@ export class AuthService {
   public token = signal<TokenInterface | null>(null);
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  private readonly baseUrl = signal<string>(`${BASE_URL}/Auth`);
+  private readonly baseUrl = signal<string>(`${environment.apiUrl}/Auth`);
 
   public saveInfo(infos: TokenInterface): void {
     localStorage.setItem('token', JSON.stringify(infos));
@@ -93,7 +93,7 @@ export class AuthService {
 
   public getUser(): { usuario: string; nome: string; expiraEm: string } | null {
     const tokenInfo = this.getTokenInfo();
-    
+
     if (!tokenInfo) return null;
 
     try {

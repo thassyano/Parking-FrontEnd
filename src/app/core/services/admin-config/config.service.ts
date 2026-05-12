@@ -3,14 +3,14 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AtualizarConfiguracaoRequest } from '../../models/admin-config/atualizar-configuracao-request.model';
 import { Configuracao } from '../../models/admin-config/configuracao.model';
-import { BASE_URL } from '../../../constants/base-url';
+import { environment } from '../../environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ConfigService {
   private http = inject(HttpClient);
-  private url = `${BASE_URL}/configuracao`;
+  private url = `${environment.apiUrl}/configuracao`;
 
   obter(): Observable<Configuracao> {
     return this.http.get<Configuracao>(this.url);

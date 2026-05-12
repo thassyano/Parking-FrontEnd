@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { BASE_URL } from '../../../constants/base-url';
+import { environment } from '../../environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { FechamentoCaixaRequest } from '../../models/register/fechamento-caixa-request.model';
@@ -9,7 +9,7 @@ import { FechamentoCaixaResponse } from '../../models/register/fechamento-caixa-
   providedIn: 'root',
 })
 export class RegisterService {
-  private readonly url = `${BASE_URL}/caixa`;
+  private readonly url = `${environment.apiUrl}/caixa`;
   private readonly http = inject(HttpClient);
 
   fechamento(data: FechamentoCaixaRequest): Observable<FechamentoCaixaResponse> {

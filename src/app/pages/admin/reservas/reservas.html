@@ -38,6 +38,18 @@
       </select>
     </div>
     <div class="form-group">
+      <label class="form-label" for="filtroPlacaVeiculo">Placa</label>
+      <input
+        id="filtroPlacaVeiculo"
+        type="text"
+        class="form-control"
+        [(ngModel)]="filtroPlacaVeiculo"
+        name="filtroPlacaVeiculo"
+        placeholder="ABC1234"
+        style="text-transform: uppercase;"
+      />
+    </div>
+    <div class="form-group">
       <label class="form-label" for="filtroDataInicio">Data Inicio</label>
       <input
         id="filtroDataInicio"

@@ -30,6 +30,7 @@ export class ReservaService {
       if (filtros.dataFim) params = params.set('dataFim', filtros.dataFim);
       if (filtros.status) params = params.set('status', filtros.status);
       if (filtros.tipoVaga) params = params.set('tipoVaga', filtros.tipoVaga);
+      if (filtros.placaVeiculo) params = params.set('placaVeiculo', filtros.placaVeiculo);
     }
     return this.http.get<Reserva[]>(this.url, { params });
   }

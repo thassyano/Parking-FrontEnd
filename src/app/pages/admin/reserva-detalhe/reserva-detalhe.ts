@@ -4,6 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { ReservaService } from '../../../core/services/reserva.service';
 import { Reserva, CupomEntrada, CupomSaida } from '../../../core/models/reserva.model';
 import { CurrencyPipe, DatePipe } from '@angular/common';
+import {
+  extractApiError,
+  isPlacaValida,
+  sanitizePlacaInput,
+} from '../../../shared/utils/reservation-inputs';
 
 @Component({
   selector: 'app-reserva-detalhe',
@@ -18,6 +23,7 @@ export class ReservaDetalhe implements OnInit {
   sucesso = signal('');
 
   placaVeiculo = '';
+  placaVeiculoErro = '';
   formaPagamento = 'Pix';
 
   showPlacaForm = signal(false);
@@ -55,10 +61,34 @@ export class ReservaDetalhe implements OnInit {
     });
   }
 
+  onPlacaChange(value: string) {
+    const result = sanitizePlacaInput(value);
+    this.placaVeiculo = result.value;
+    this.placaVeiculoErro = result.hadInvalidChars
+      ? 'A placa do veiculo deve conter apenas letras e numeros, com no maximo 7 caracteres.'
+      : '';
+  }
+
   associarPlaca() {
-    if (!this.placaVeiculo) return;
+    const result = sanitizePlacaInput(this.placaVeiculo);
+    this.placaVeiculo = result.value;
+
+    if (!this.placaVeiculo) {
+      this.erro.set('Informe a placa do veiculo');
+      return;
+    }
+
+    if (!isPlacaValida(this.placaVeiculo)) {
+      this.placaVeiculoErro =
+        'A placa do veiculo deve conter apenas letras e numeros, com no maximo 7 caracteres.';
+      this.erro.set(this.placaVeiculoErro);
+      return;
+    }
+
+    this.placaVeiculoErro = '';
     this.actionLoading.set(true);
     this.erro.set('');
+
     this.reservaService.associarPlaca(this.reservaId, { placaVeiculo: this.placaVeiculo }).subscribe({
       next: (data) => {
         this.reserva.set(data);
@@ -67,7 +97,7 @@ export class ReservaDetalhe implements OnInit {
         this.actionLoading.set(false);
       },
       error: (err) => {
-        this.erro.set(err.error?.message || 'Erro ao associar placa');
+        this.erro.set(extractApiError(err, 'Erro ao associar placa'));
         this.actionLoading.set(false);
       },
     });
@@ -83,7 +113,7 @@ export class ReservaDetalhe implements OnInit {
         this.actionLoading.set(false);
       },
       error: (err) => {
-        this.erro.set(err.error?.message || 'Erro ao realizar check-in');
+        this.erro.set(extractApiError(err, 'Erro ao realizar check-in'));
         this.actionLoading.set(false);
       },
     });
@@ -100,7 +130,7 @@ export class ReservaDetalhe implements OnInit {
         this.actionLoading.set(false);
       },
       error: (err) => {
-        this.erro.set(err.error?.message || 'Erro ao realizar check-out');
+        this.erro.set(extractApiError(err, 'Erro ao realizar check-out'));
         this.actionLoading.set(false);
       },
     });
@@ -117,7 +147,7 @@ export class ReservaDetalhe implements OnInit {
         this.actionLoading.set(false);
       },
       error: (err) => {
-        this.erro.set(err.error?.message || 'Erro ao cancelar reserva');
+        this.erro.set(extractApiError(err, 'Erro ao cancelar reserva'));
         this.actionLoading.set(false);
       },
     });
@@ -126,14 +156,14 @@ export class ReservaDetalhe implements OnInit {
   gerarCupomEntrada() {
     this.reservaService.cupomEntrada(this.reservaId).subscribe({
       next: (data) => this.cupomEntrada.set(data),
-      error: (err) => this.erro.set(err.error?.message || 'Erro ao gerar cupom'),
+      error: (err) => this.erro.set(extractApiError(err, 'Erro ao gerar cupom')),
     });
   }
 
   gerarCupomSaida() {
     this.reservaService.cupomSaida(this.reservaId).subscribe({
       next: (data) => this.cupomSaida.set(data),
-      error: (err) => this.erro.set(err.error?.message || 'Erro ao gerar cupom'),
+      error: (err) => this.erro.set(extractApiError(err, 'Erro ao gerar cupom')),
     });
   }
 

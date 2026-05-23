@@ -5,7 +5,6 @@
     <div class="alert alert-danger" style="max-width: 480px; margin: 0 auto 1rem;">{{ erro() }}</div>
   }
 
-  <!-- Dados do responsável (compartilhados) -->
   <div class="cliente-card">
     <h2 class="cliente-card-title">Dados do Responsavel</h2>
 
@@ -14,7 +13,17 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="#64748b"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         Nome Completo
       </label>
-      <input type="text" class="form-control" [(ngModel)]="nome" placeholder="Seu nome completo" />
+      <input
+        type="text"
+        class="form-control"
+        [class.form-control--invalid]="!!nomeErro"
+        [(ngModel)]="nome"
+        (ngModelChange)="onNomeChange($event)"
+        placeholder="Seu nome completo"
+      />
+      @if (nomeErro) {
+        <span class="form-error">{{ nomeErro }}</span>
+      }
     </div>
 
     <div class="form-group">
@@ -22,11 +31,22 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="#64748b"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
         Telefone
       </label>
-      <input type="tel" class="form-control" [(ngModel)]="telefone" placeholder="61999999999" />
+      <input
+        type="tel"
+        class="form-control"
+        [class.form-control--invalid]="!!telefoneErro"
+        [(ngModel)]="telefone"
+        (ngModelChange)="onTelefoneChange($event)"
+        placeholder="(XX) xxxxx-xxxx"
+        maxlength="14"
+        inputmode="numeric"
+      />
+      @if (telefoneErro) {
+        <span class="form-error">{{ telefoneErro }}</span>
+      }
     </div>
   </div>
 
-  <!-- Card por veículo -->
   @for (carro of flow.carros; track $index) {
     <div class="cliente-card">
       <div class="veiculo-card-header">
@@ -57,10 +77,15 @@
         <input
           type="text"
           class="form-control"
+          [class.form-control--invalid]="!!placasErro[$index]"
           [(ngModel)]="carroPlaca[$index]"
+          (ngModelChange)="onPlacaChange($index, $event)"
           placeholder="ABC1D23"
-          style="text-transform: uppercase;"
+          maxlength="7"
         />
+        @if (placasErro[$index]) {
+          <span class="form-error">{{ placasErro[$index] }}</span>
+        }
       </div>
 
       <div class="form-group">
@@ -114,10 +139,9 @@
     </div>
   }
 
-  <!-- Total geral (apenas quando há múltiplos veículos) -->
   @if (flow.carros.length > 1 && !orcamentosLoading() && todosOrcamentosCarregados()) {
     <div class="cliente-card">
-      <h2 class="cliente-card-title">Total Geral — {{ flow.carros.length }} Veiculos</h2>
+      <h2 class="cliente-card-title">Total Geral - {{ flow.carros.length }} Veiculos</h2>
       <div class="price-summary-box">
         <div class="price-line price-line--total">
           <span>Total no Cartao</span>

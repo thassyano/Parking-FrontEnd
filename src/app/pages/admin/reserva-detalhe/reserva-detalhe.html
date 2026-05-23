@@ -124,10 +124,16 @@
                   id="placaVeiculo"
                   type="text"
                   class="form-control"
+                  [class.form-control--invalid]="!!placaVeiculoErro"
                   [(ngModel)]="placaVeiculo"
+                  (ngModelChange)="onPlacaChange($event)"
                   name="placaVeiculo"
                   placeholder="ABC1D23"
+                  maxlength="7"
                 />
+                @if (placaVeiculoErro) {
+                  <span class="form-error">{{ placaVeiculoErro }}</span>
+                }
                 <button
                   type="button"
                   class="btn btn-primary"

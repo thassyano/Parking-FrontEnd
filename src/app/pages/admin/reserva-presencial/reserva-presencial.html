@@ -6,7 +6,6 @@
   <div class="alert alert-danger">{{ erro() }}</div>
 }
 
-<!-- Dados do cliente (compartilhados) -->
 <div class="card">
   <div class="card-header">
     <h2 class="card-title">Dados do Cliente</h2>
@@ -18,10 +17,15 @@
         id="nomeCliente"
         type="text"
         class="form-control"
+        [class.form-control--invalid]="!!nomeClienteErro"
         [(ngModel)]="nomeCliente"
+        (ngModelChange)="onNomeClienteChange($event)"
         name="nomeCliente"
         required
       />
+      @if (nomeClienteErro) {
+        <span class="form-error">{{ nomeClienteErro }}</span>
+      }
     </div>
     <div class="form-group">
       <label class="form-label" for="telefoneCliente">Telefone *</label>
@@ -29,10 +33,18 @@
         id="telefoneCliente"
         type="tel"
         class="form-control"
+        [class.form-control--invalid]="!!telefoneClienteErro"
         [(ngModel)]="telefoneCliente"
+        (ngModelChange)="onTelefoneClienteChange($event)"
         name="telefoneCliente"
+        placeholder="(11) 91234-5678"
+        maxlength="14"
+        inputmode="numeric"
         required
       />
+      @if (telefoneClienteErro) {
+        <span class="form-error">{{ telefoneClienteErro }}</span>
+      }
     </div>
   </div>
   <div class="form-group">
@@ -40,6 +52,7 @@
     <input
       id="cpfCliente"
       type="text"
+      placeholder="123.456.789-00"
       class="form-control"
       [(ngModel)]="cpfCliente"
       name="cpfCliente"
@@ -47,13 +60,12 @@
   </div>
 </div>
 
-<!-- Card por veículo -->
 @for (veiculo of veiculos; track $index) {
   <div class="card">
     <div class="card-header">
       <h2 class="card-title">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:0.4rem;vertical-align:middle"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
-        Veículo {{ $index + 1 }}
+        Veiculo {{ $index + 1 }}
       </h2>
       @if (veiculos.length > 1) {
         <button type="button" class="btn btn-outline btn-sm btn-danger-outline" (click)="removerVeiculo($index)">
@@ -64,16 +76,21 @@
 
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Placa do Veículo *</label>
+        <label class="form-label">Placa do Veiculo *</label>
         <input
           type="text"
           class="form-control"
+          [class.form-control--invalid]="!!placasErro[$index]"
           [(ngModel)]="veiculo.placaVeiculo"
+          (ngModelChange)="onPlacaChange($index, $event)"
           [name]="'placa_' + $index"
           placeholder="ABC1D23"
-          style="text-transform: uppercase;"
+          maxlength="7"
           required
         />
+        @if (placasErro[$index]) {
+          <span class="form-error">{{ placasErro[$index] }}</span>
+        }
       </div>
       <div class="form-group">
         <label class="form-label">Tipo de Vaga</label>
@@ -95,6 +112,7 @@
           type="date"
           class="form-control"
           [(ngModel)]="veiculo.dataEntrada"
+          (ngModelChange)="onPeriodoChange($index)"
           [name]="'dataEntrada_' + $index"
           required
         />
@@ -105,6 +123,7 @@
           type="time"
           class="form-control"
           [(ngModel)]="veiculo.horaEntrada"
+          (ngModelChange)="onPeriodoChange($index)"
           [name]="'horaEntrada_' + $index"
         />
       </div>
@@ -112,20 +131,22 @@
 
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Data de Saída Prevista</label>
+        <label class="form-label">Data de Saida Prevista</label>
         <input
           type="date"
           class="form-control"
           [(ngModel)]="veiculo.dataSaida"
+          (ngModelChange)="onPeriodoChange($index)"
           [name]="'dataSaida_' + $index"
         />
       </div>
       <div class="form-group">
-        <label class="form-label">Hora de Saída Prevista</label>
+        <label class="form-label">Hora de Saida Prevista</label>
         <input
           type="time"
           class="form-control"
           [(ngModel)]="veiculo.horaSaida"
+          (ngModelChange)="onPeriodoChange($index)"
           [name]="'horaSaida_' + $index"
         />
       </div>
@@ -140,6 +161,7 @@
           [(ngModel)]="veiculo.qtdDias"
           [name]="'qtdDias_' + $index"
           min="1"
+          readonly
         />
       </div>
       <div class="form-group">
@@ -149,22 +171,20 @@
           class="form-control"
           [(ngModel)]="veiculo.observacoes"
           [name]="'obs_' + $index"
-          placeholder="Opcional"
+          placeholder="Ex: veículo autorizado por João, vaga próxima à portaria..."
         />
       </div>
     </div>
   </div>
 }
 
-<!-- Botão adicionar veículo -->
 <div class="card" style="padding: 1rem;">
   <button type="button" class="btn btn-outline btn-block btn-adicionar-carro" (click)="adicionarVeiculo()">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-    Adicionar outro veículo
+    Adicionar outro veiculo
   </button>
 </div>
 
-<!-- Registrar -->
 <div class="card" style="padding: 1rem;">
   <button
     type="button"

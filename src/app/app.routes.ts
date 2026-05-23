@@ -5,6 +5,7 @@ import { ClienteLayout } from './shared/components/cliente-layout/cliente-layout
 import { Home } from './pages/public/home/home';
 import { ClienteConsulta } from './pages/public/cliente-consulta/cliente-consulta';
 import { ClienteReserva } from './pages/public/cliente-reserva/cliente-reserva';
+import { ConfirmarReserva } from './pages/public/confirmar-reserva/confirmar-reserva';
 import { Login } from './pages/admin/login/login';
 import { Dashboard } from './pages/admin/dashboard/dashboard';
 import { Reservas } from './pages/admin/reservas/reservas';
@@ -17,6 +18,7 @@ import { Admins } from './pages/admin/admins/admins';
 
 export const routes: Routes = [
   { path: '', component: Home },
+  { path: 'confirmar', component: ConfirmarReserva },
   {
     path: 'cliente',
     component: ClienteLayout,

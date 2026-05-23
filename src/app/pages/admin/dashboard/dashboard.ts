@@ -30,7 +30,6 @@ export class Dashboard implements OnInit {
     });
 
     const hoje = new Date().toISOString().split('T')[0];
-    console.log(".")
     this.disponibilidadeService.consultarDia(hoje).subscribe({
       next: (data) => this.disponibilidade.set(data),
     });

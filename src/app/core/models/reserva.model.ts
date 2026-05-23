@@ -20,6 +20,9 @@ export interface Reserva {
   dataCheckout?: string;
   observacoes?: string;
   dataCriacao: string;
+  confirmadaPeloCliente: boolean;
+  mensagemConfirmacaoEnviada: boolean;
+  dataEnvioConfirmacao?: string;
 }
 
 export interface CriarReservaOnlineRequest {

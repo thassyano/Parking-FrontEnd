@@ -85,4 +85,19 @@ export class ReservaService {
   whatsapp(id: number): Observable<WhatsAppResponse> {
     return this.http.get<WhatsAppResponse>(`${this.url}/${id}/whatsapp`);
   }
+
+  confirmarPorToken(token: string): Observable<ConfirmacaoReservaResponse> {
+    return this.http.get<ConfirmacaoReservaResponse>(`${this.url}/confirmar/${token}`);
+  }
+}
+
+export interface ConfirmacaoReservaResponse {
+  message: string;
+  confirmada: boolean;
+  reservaId: number;
+  nomeCliente: string;
+  dataEntrada: string;
+  tipoVaga?: string;
+  placa?: string;
+  status?: string;
 }

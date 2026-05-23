@@ -489,6 +489,19 @@ img {
   color: var(--text-muted);
 }
 
+.form-control--invalid {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.form-error {
+  display: block;
+  margin-top: 0.35rem;
+  color: #b91c1c;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
 textarea.form-control {
   resize: vertical;
   min-height: 80px;

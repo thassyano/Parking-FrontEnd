@@ -16,6 +16,7 @@ export class Reservas implements OnInit {
 
   filtroStatus = '';
   filtroTipoVaga = '';
+  filtroPlacaVeiculo = '';
   filtroDataInicio = '';
   filtroDataFim = '';
 
@@ -30,6 +31,7 @@ export class Reservas implements OnInit {
     const filtros: ReservaFiltros = {};
     if (this.filtroStatus) filtros.status = this.filtroStatus;
     if (this.filtroTipoVaga) filtros.tipoVaga = this.filtroTipoVaga;
+    if (this.filtroPlacaVeiculo) filtros.placaVeiculo = this.filtroPlacaVeiculo.trim().toUpperCase();
     if (this.filtroDataInicio) filtros.dataInicio = this.filtroDataInicio;
     if (this.filtroDataFim) filtros.dataFim = this.filtroDataFim;
 
@@ -45,6 +47,7 @@ export class Reservas implements OnInit {
   limparFiltros() {
     this.filtroStatus = '';
     this.filtroTipoVaga = '';
+    this.filtroPlacaVeiculo = '';
     this.filtroDataInicio = '';
     this.filtroDataFim = '';
     this.buscar();

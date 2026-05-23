@@ -21,6 +21,7 @@
         [(ngModel)]="nomeCliente"
         (ngModelChange)="onNomeClienteChange($event)"
         name="nomeCliente"
+        maxlength="200"
         required
       />
       @if (nomeClienteErro) {
@@ -54,9 +55,16 @@
       type="text"
       placeholder="123.456.789-00"
       class="form-control"
+      [class.form-control--invalid]="!!cpfClienteErro"
       [(ngModel)]="cpfCliente"
+      (ngModelChange)="onCpfClienteChange($event)"
       name="cpfCliente"
+      maxlength="14"
+      inputmode="numeric"
     />
+    @if (cpfClienteErro) {
+      <span class="form-error">{{ cpfClienteErro }}</span>
+    }
   </div>
 </div>
 

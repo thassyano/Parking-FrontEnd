@@ -3,15 +3,20 @@ export interface SanitizedInputResult {
   hadInvalidChars: boolean;
 }
 
+export const NOME_CLIENTE_MINIMO = 2;
+export const NOME_CLIENTE_MAXIMO = 200;
+
 const nomeRegex = /^[\p{L}\s]+$/u;
 const telefoneRegex = /^\(\d{2}\)\s\d{9}$/;
 const placaRegex = /^[A-Z0-9]{1,7}$/;
+const cpfRegex = /^\d{11}$/;
 
 export function sanitizeNomeClienteInput(value: string): SanitizedInputResult {
   const sanitized = value
     .replace(/[^\p{L}\s]/gu, '')
     .replace(/\s+/g, ' ')
-    .replace(/^\s+/, '');
+    .replace(/^\s+/, '')
+    .slice(0, NOME_CLIENTE_MAXIMO);
 
   return {
     value: sanitized,
@@ -46,9 +51,39 @@ export function sanitizePlacaInput(value: string): SanitizedInputResult {
   };
 }
 
+export function sanitizeCPFInput(value: string): SanitizedInputResult {
+  const digitos = value.replace(/\D/g, '').slice(0, 11);
+  let formatted = '';
+
+  if (digitos.length > 0) {
+    formatted = digitos.slice(0, 3);
+  }
+
+  if (digitos.length >= 4) {
+    formatted += `.${digitos.slice(3, 6)}`;
+  }
+
+  if (digitos.length >= 7) {
+    formatted += `.${digitos.slice(6, 9)}`;
+  }
+
+  if (digitos.length >= 10) {
+    formatted += `-${digitos.slice(9, 11)}`;
+  }
+
+  return {
+    value: formatted,
+    hadInvalidChars: value.replace(/[.\-]/g, '') !== digitos,
+  };
+}
+
 export function isNomeClienteValido(value: string): boolean {
   const normalized = value.trim().replace(/\s+/g, ' ');
-  return normalized.length > 0 && nomeRegex.test(normalized);
+  return (
+    normalized.length >= NOME_CLIENTE_MINIMO
+    && normalized.length <= NOME_CLIENTE_MAXIMO
+    && nomeRegex.test(normalized)
+  );
 }
 
 export function isTelefoneValido(value: string): boolean {
@@ -57,6 +92,35 @@ export function isTelefoneValido(value: string): boolean {
 
 export function isPlacaValida(value: string): boolean {
   return placaRegex.test(value);
+}
+
+export function normalizeCPFForSubmit(value: string): string {
+  return value.replace(/\D/g, '');
+}
+
+export function isCPFValido(value: string): boolean {
+  const cpf = normalizeCPFForSubmit(value);
+
+  if (!cpfRegex.test(cpf)) {
+    return false;
+  }
+
+  if (/^(\d)\1{10}$/.test(cpf)) {
+    return false;
+  }
+
+  const digitos = cpf.split('').map(Number);
+
+  const primeiroDigito = calcularDigitoCPF(digitos.slice(0, 9), 10);
+  const segundoDigito = calcularDigitoCPF(digitos.slice(0, 10), 11);
+
+  return primeiroDigito === digitos[9] && segundoDigito === digitos[10];
+}
+
+function calcularDigitoCPF(digitos: number[], pesoInicial: number): number {
+  const soma = digitos.reduce((acc, digito, index) => acc + digito * (pesoInicial - index), 0);
+  const resto = (soma * 10) % 11;
+  return resto === 10 ? 0 : resto;
 }
 
 export function extractApiError(error: unknown, fallback: string): string {

@@ -5,9 +5,14 @@ import { ReservaService } from '../../../core/services/reserva.service';
 import { CarroPresencialLoteRequest } from '../../../core/models/reserva.model';
 import {
   extractApiError,
+  isCPFValido,
   isNomeClienteValido,
   isPlacaValida,
   isTelefoneValido,
+  NOME_CLIENTE_MAXIMO,
+  NOME_CLIENTE_MINIMO,
+  normalizeCPFForSubmit,
+  sanitizeCPFInput,
   sanitizeNomeClienteInput,
   sanitizePlacaInput,
   sanitizeTelefoneInput,
@@ -35,6 +40,7 @@ export class ReservaPresencial {
   cpfCliente = '';
   nomeClienteErro = '';
   telefoneClienteErro = '';
+  cpfClienteErro = '';
   placasErro: string[] = [];
   loading = signal(false);
   erro = signal('');
@@ -83,13 +89,42 @@ export class ReservaPresencial {
   onNomeClienteChange(value: string) {
     const result = sanitizeNomeClienteInput(value);
     this.nomeCliente = result.value;
-    this.nomeClienteErro = result.hadInvalidChars ? 'Nome do cliente deve conter apenas letras.' : '';
+    const nomeNormalizado = this.nomeCliente.trim().replace(/\s+/g, ' ');
+
+    if (result.hadInvalidChars) {
+      this.nomeClienteErro = 'Nome do cliente deve conter apenas letras.';
+      return;
+    }
+
+    if (nomeNormalizado.length === 1) {
+      this.nomeClienteErro = `Nome do cliente deve ter pelo menos ${NOME_CLIENTE_MINIMO} letras.`;
+      return;
+    }
+
+    if (nomeNormalizado.length > NOME_CLIENTE_MAXIMO) {
+      this.nomeClienteErro = `Nome do cliente deve ter no maximo ${NOME_CLIENTE_MAXIMO} caracteres.`;
+      return;
+    }
+
+    this.nomeClienteErro = '';
   }
 
   onTelefoneClienteChange(value: string) {
     const result = sanitizeTelefoneInput(value);
     this.telefoneCliente = result.value;
     this.telefoneClienteErro = result.hadInvalidChars ? 'Telefone deve estar no formato (00) 000000000.' : '';
+  }
+
+  onCpfClienteChange(value: string) {
+    const result = sanitizeCPFInput(value);
+    this.cpfCliente = result.value;
+
+    if (!this.cpfCliente) {
+      this.cpfClienteErro = '';
+      return;
+    }
+
+    this.cpfClienteErro = isCPFValido(this.cpfCliente) ? '' : 'CPF informado e invalido.';
   }
 
   onPlacaChange(index: number, value: string) {
@@ -126,7 +161,10 @@ export class ReservaPresencial {
     }
 
     if (!isNomeClienteValido(this.nomeCliente)) {
-      this.nomeClienteErro = 'Nome do cliente deve conter apenas letras.';
+      const nomeNormalizado = this.nomeCliente.trim().replace(/\s+/g, ' ');
+      this.nomeClienteErro = nomeNormalizado.length < NOME_CLIENTE_MINIMO
+        ? `Nome do cliente deve ter pelo menos ${NOME_CLIENTE_MINIMO} letras.`
+        : `Nome do cliente deve ter no maximo ${NOME_CLIENTE_MAXIMO} caracteres e conter apenas letras.`;
       this.erro.set(this.nomeClienteErro);
       return false;
     }
@@ -190,6 +228,25 @@ export class ReservaPresencial {
     return true;
   }
 
+  private validarCpfCliente(): boolean {
+    if (!this.cpfCliente) {
+      this.cpfClienteErro = '';
+      return true;
+    }
+
+    const result = sanitizeCPFInput(this.cpfCliente);
+    this.cpfCliente = result.value;
+
+    if (!isCPFValido(this.cpfCliente)) {
+      this.cpfClienteErro = 'CPF informado e invalido.';
+      this.erro.set(this.cpfClienteErro);
+      return false;
+    }
+
+    this.cpfClienteErro = '';
+    return true;
+  }
+
   private combinarDataHora(data: string, hora: string): Date {
     return new Date(`${data}T${hora || '00:00'}`);
   }
@@ -217,7 +274,7 @@ export class ReservaPresencial {
   submeter() {
     this.erro.set('');
 
-    if (!this.validarNomeCliente() || !this.validarTelefoneCliente()) {
+    if (!this.validarNomeCliente() || !this.validarTelefoneCliente() || !this.validarCpfCliente()) {
       return;
     }
 
@@ -235,7 +292,7 @@ export class ReservaPresencial {
         .criarPresencial({
           nomeCliente: this.nomeCliente,
           telefoneCliente: this.telefoneCliente,
-          cpfCliente: this.cpfCliente || undefined,
+          cpfCliente: this.cpfCliente ? normalizeCPFForSubmit(this.cpfCliente) : undefined,
           placaVeiculo: v.placaVeiculo,
           tipoVaga: v.tipoVaga,
           dataEntrada: `${v.dataEntrada}T${v.horaEntrada || '00:00'}`,
@@ -264,7 +321,7 @@ export class ReservaPresencial {
         .criarPresencialLote({
           nomeCliente: this.nomeCliente,
           telefoneCliente: this.telefoneCliente,
-          cpfCliente: this.cpfCliente || undefined,
+          cpfCliente: this.cpfCliente ? normalizeCPFForSubmit(this.cpfCliente) : undefined,
           carros,
         })
         .subscribe({

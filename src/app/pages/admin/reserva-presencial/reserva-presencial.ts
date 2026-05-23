@@ -86,6 +86,14 @@ export class ReservaPresencial {
         this.erro.set(`Informe a data de entrada do veículo ${i + 1}`);
         return;
       }
+      if(v.dataEntrada > v.dataSaida) {
+        this.erro.set(`A data de saída prevista deve ser posterior à data de entrada do veículo ${i + 1}`);
+        return;
+      }
+      if(v.qtdDias <= 0){
+        this.erro.set(`A quantidade de dias deve ser maior que 0`);
+        return;
+      }
     }
 
     this.loading.set(true);

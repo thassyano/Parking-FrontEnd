@@ -100,6 +100,10 @@ export class ReservaPresencial {
       : '';
   }
 
+  onPeriodoChange(index: number) {
+    this.recalcularQtdDias(index);
+  }
+
   isNomeClienteInvalido(): boolean {
     return !!this.nomeCliente && !isNomeClienteValido(this.nomeCliente);
   }
@@ -181,16 +185,33 @@ export class ReservaPresencial {
       return false;
     }
 
-    if (veiculo.qtdDias <= 0) {
-      this.erro.set('A quantidade de dias deve ser maior que 0');
-      return false;
-    }
+    veiculo.qtdDias = this.calcularQtdDias(dataHoraEntrada, dataHoraSaida);
 
     return true;
   }
 
   private combinarDataHora(data: string, hora: string): Date {
     return new Date(`${data}T${hora || '00:00'}`);
+  }
+
+  private recalcularQtdDias(index: number) {
+    const veiculo = this.veiculos[index];
+    if (!veiculo?.dataEntrada || !veiculo?.dataSaida) {
+      return;
+    }
+
+    const dataHoraEntrada = this.combinarDataHora(veiculo.dataEntrada, veiculo.horaEntrada);
+    const dataHoraSaida = this.combinarDataHora(veiculo.dataSaida, veiculo.horaSaida);
+
+    if (dataHoraSaida > dataHoraEntrada) {
+      veiculo.qtdDias = this.calcularQtdDias(dataHoraEntrada, dataHoraSaida);
+    }
+  }
+
+  private calcularQtdDias(dataHoraEntrada: Date, dataHoraSaida: Date): number {
+    const diferencaMs = dataHoraSaida.getTime() - dataHoraEntrada.getTime();
+    const dias = diferencaMs / (1000 * 60 * 60 * 24);
+    return Math.max(1, Math.ceil(dias));
   }
 
   submeter() {

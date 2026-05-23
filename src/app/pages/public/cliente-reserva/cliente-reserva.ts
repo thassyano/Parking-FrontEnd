@@ -7,6 +7,15 @@ import { ClienteFlowService } from '../../../core/services/cliente-flow.service'
 import { OrcamentoService } from '../../../core/services/orcamento.service';
 import { ReservaService } from '../../../core/services/reserva.service';
 import { OrcamentoResponse } from '../../../core/models/orcamento.model';
+import {
+  extractApiError,
+  isNomeClienteValido,
+  isPlacaValida,
+  isTelefoneValido,
+  sanitizeNomeClienteInput,
+  sanitizePlacaInput,
+  sanitizeTelefoneInput,
+} from '../../../shared/utils/reservation-inputs';
 
 @Component({
   selector: 'app-cliente-reserva',
@@ -16,12 +25,14 @@ import { OrcamentoResponse } from '../../../core/models/orcamento.model';
 export class ClienteReserva implements OnInit {
   nome = '';
   telefone = '';
+  nomeErro = '';
+  telefoneErro = '';
+  placasErro: string[] = [];
   loading = signal(false);
   orcamentosLoading = signal(false);
   erro = signal('');
   showConfirmacao = signal(false);
 
-  // Dados por veículo (índice espelha flow.carros)
   carroTipoVaga: string[] = [];
   carroPlaca: string[] = [];
   orcamentos = signal<(OrcamentoResponse | null)[]>([]);
@@ -35,12 +46,11 @@ export class ClienteReserva implements OnInit {
 
   ngOnInit() {
     if (!this.flow.carros.length) {
-      // Compatibilidade: se vieram pelos campos legados sem carros, redireciona
       if (!this.flow.dataEntrada) {
         this.router.navigate(['/cliente']);
         return;
       }
-      // Reconstrói carros a partir dos campos legados
+
       this.flow.carros = [
         {
           dataEntrada: this.flow.dataEntrada,
@@ -60,6 +70,7 @@ export class ClienteReserva implements OnInit {
       c.vagasCobertaDisponiveis > 0 ? 'Coberta' : 'Descoberta',
     );
     this.carroPlaca = this.flow.carros.map(() => '');
+    this.placasErro = this.flow.carros.map(() => '');
     this.orcamentos.set(this.flow.carros.map(() => null));
 
     this.calcularTodosOrcamentos();
@@ -81,7 +92,7 @@ export class ClienteReserva implements OnInit {
         this.orcamentosLoading.set(false);
       },
       error: (err) => {
-        this.erro.set(err.error?.message || 'Erro ao calcular precos');
+        this.erro.set(extractApiError(err, 'Erro ao calcular precos'));
         this.orcamentosLoading.set(false);
       },
     });
@@ -102,9 +113,29 @@ export class ClienteReserva implements OnInit {
           this.orcamentos.set(lista);
         },
         error: (err) => {
-          this.erro.set(err.error?.message || 'Erro ao calcular preco');
+          this.erro.set(extractApiError(err, 'Erro ao calcular preco'));
         },
       });
+  }
+
+  onNomeChange(value: string) {
+    const result = sanitizeNomeClienteInput(value);
+    this.nome = result.value;
+    this.nomeErro = result.hadInvalidChars ? 'Nome do cliente deve conter apenas letras.' : '';
+  }
+
+  onTelefoneChange(value: string) {
+    const result = sanitizeTelefoneInput(value);
+    this.telefone = result.value;
+    this.telefoneErro = result.hadInvalidChars ? 'Telefone deve estar no formato (00) 000000000.' : '';
+  }
+
+  onPlacaChange(index: number, value: string) {
+    const result = sanitizePlacaInput(value);
+    this.carroPlaca[index] = result.value;
+    this.placasErro[index] = result.hadInvalidChars
+      ? 'A placa do veiculo deve conter apenas letras e numeros, com no maximo 7 caracteres.'
+      : '';
   }
 
   cobertaDisponivel(index: number): boolean {
@@ -138,12 +169,74 @@ export class ClienteReserva implements OnInit {
     return this.orcamentos().every((o) => o !== null);
   }
 
+  private validarNome(): boolean {
+    const result = sanitizeNomeClienteInput(this.nome);
+    this.nome = result.value.trim().replace(/\s+/g, ' ');
+
+    if (!this.nome) {
+      this.erro.set('Preencha o nome do cliente');
+      return false;
+    }
+
+    if (!isNomeClienteValido(this.nome)) {
+      this.nomeErro = 'Nome do cliente deve conter apenas letras.';
+      this.erro.set(this.nomeErro);
+      return false;
+    }
+
+    this.nomeErro = '';
+    return true;
+  }
+
+  private validarTelefone(): boolean {
+    const result = sanitizeTelefoneInput(this.telefone);
+    this.telefone = result.value;
+
+    if (!this.telefone) {
+      this.erro.set('Preencha o telefone');
+      return false;
+    }
+
+    if (!isTelefoneValido(this.telefone)) {
+      this.telefoneErro = 'Telefone deve estar no formato (00) 000000000.';
+      this.erro.set(this.telefoneErro);
+      return false;
+    }
+
+    this.telefoneErro = '';
+    return true;
+  }
+
+  private validarPlacas(): boolean {
+    for (let i = 0; i < this.carroPlaca.length; i++) {
+      const result = sanitizePlacaInput(this.carroPlaca[i] ?? '');
+      this.carroPlaca[i] = result.value;
+
+      if (!this.carroPlaca[i]) {
+        this.erro.set(`Informe a placa do veiculo ${i + 1}`);
+        return false;
+      }
+
+      if (!isPlacaValida(this.carroPlaca[i])) {
+        this.placasErro[i] =
+          'A placa do veiculo deve conter apenas letras e numeros, com no maximo 7 caracteres.';
+        this.erro.set(this.placasErro[i]);
+        return false;
+      }
+
+      this.placasErro[i] = '';
+    }
+
+    return true;
+  }
+
   abrirConfirmacao() {
-    if (!this.nome || !this.telefone) {
-      this.erro.set('Preencha nome e telefone');
+    this.erro.set('');
+
+    if (!this.validarNome() || !this.validarTelefone() || !this.validarPlacas()) {
       return;
     }
-    this.erro.set('');
+
     this.showConfirmacao.set(true);
   }
 
@@ -164,7 +257,7 @@ export class ClienteReserva implements OnInit {
         .criarOnline({
           nomeCliente: this.nome,
           telefoneCliente: this.telefone,
-          placaVeiculo: this.carroPlaca[0] || undefined,
+          placaVeiculo: this.carroPlaca[0],
           tipoVaga: this.carroTipoVaga[0],
           dataEntrada: `${carro.dataEntrada}T${carro.horaEntrada || '00:00'}`,
           dataSaidaPrevista: `${carro.dataSaida}T${carro.horaSaida || '00:00'}`,
@@ -184,7 +277,7 @@ export class ClienteReserva implements OnInit {
             });
           },
           error: (err) => {
-            this.erro.set(err.error?.message || 'Erro ao criar reserva');
+            this.erro.set(extractApiError(err, 'Erro ao criar reserva'));
             this.loading.set(false);
           },
         });
@@ -194,7 +287,7 @@ export class ClienteReserva implements OnInit {
           nomeCliente: this.nome,
           telefoneCliente: this.telefone,
           carros: carros.map((carro, i) => ({
-            placaVeiculo: this.carroPlaca[i] || undefined,
+            placaVeiculo: this.carroPlaca[i],
             tipoVaga: this.carroTipoVaga[i],
             dataEntrada: `${carro.dataEntrada}T${carro.horaEntrada || '00:00'}`,
             dataSaidaPrevista: `${carro.dataSaida}T${carro.horaSaida || '00:00'}`,
@@ -216,7 +309,7 @@ export class ClienteReserva implements OnInit {
             });
           },
           error: (err) => {
-            this.erro.set(err.error?.message || 'Erro ao criar reservas');
+            this.erro.set(extractApiError(err, 'Erro ao criar reservas'));
             this.loading.set(false);
           },
         });

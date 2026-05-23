@@ -99,6 +99,7 @@ export interface ReservaFiltros {
   dataFim?: string;
   status?: string;
   tipoVaga?: string;
+  placaVeiculo?: string;
 }
 
 export interface CarroPresencialLoteRequest {

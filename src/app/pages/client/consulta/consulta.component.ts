@@ -113,7 +113,7 @@ export class ConsultaComponent {
 
     this.clientFlow.save();
     this.closeModal();
-    this.router.navigate(['/client/reservar']);
+    this.router.navigate(['/cliente/reservar']);
   }
 
   private tomorrow(): Date {

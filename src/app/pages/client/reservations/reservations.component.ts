@@ -72,7 +72,7 @@ export class ReservationsComponent implements OnInit {
     const flow = this.clientFlow;
 
     if (!flow.dataEntrada) {
-      this.router.navigate(['/client']);
+      this.router.navigate(['/cliente']);
       return;
     }
 

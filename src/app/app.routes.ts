@@ -5,7 +5,7 @@ import { HomeComponent } from './pages/home/home.component';
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   {
-    path: 'client',
+    path: 'cliente',
     loadComponent: () =>
       import('./pages/client/client-layout/client-layout.component').then(
         (module) => module.ClientLayoutComponent,
@@ -98,4 +98,5 @@ export const routes: Routes = [
       },
     ],
   },
+  { path: '**', redirectTo: '' },
 ];

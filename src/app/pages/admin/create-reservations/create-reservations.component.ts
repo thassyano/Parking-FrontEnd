@@ -5,6 +5,8 @@ import { ReservaService } from '../../../core/services/reserva/reserva.service';
 import { Subscription } from 'rxjs';
 import { Patterns } from '../../../core/utils/patterns/form-patterns';
 import { CarroPresencialLoteRequest } from '../../../core/models/reserva/carros/carro-lote-request.interface';
+import { scrollToTop } from '../../../core/utils/viewport/scroll-to-top';
+import { ViewportScroller } from '@angular/common';
 
 @Component({
   selector: 'app-create-reservations',
@@ -22,6 +24,7 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
   private amanha = new Date(this.hoje.getTime() + this.MS_POR_DIA);
   private sub = new Subscription();
 
+  private readonly scroller = inject(ViewportScroller);
   private reservaService = inject(ReservaService);
   private router = inject(Router);
 
@@ -108,6 +111,27 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.erro.set('Preencha todos os campos obrigatórios');
+      return;
+    }
+
+    const placas = this.veiculosArray.controls.map(
+      (_, i) => this.veiculoGroup(i).get('placaVeiculo')!.value?.toUpperCase() ?? '',
+    );
+
+    const mapa = new Map<string, number[]>();
+    placas.forEach((placa, i) => {
+      if (!mapa.has(placa)) mapa.set(placa, []);
+      mapa.get(placa)!.push(i + 1);
+    });
+
+    const duplicadas: number[] = [];
+    mapa.forEach((indices) => {
+      if (indices.length > 1) duplicadas.push(...indices);
+    });
+
+    if (duplicadas.length) {
+      this.erro.set(`Placas duplicadas no(s) veículo(s): ${[...new Set(duplicadas)].join(', ')}`);
+      scrollToTop(this.scroller);
       return;
     }
 

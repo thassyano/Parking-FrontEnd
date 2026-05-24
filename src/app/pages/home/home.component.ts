@@ -12,7 +12,7 @@ export class HomeComponent{
   private router = inject(Router);
 
   protected goToClient(): void {
-    this.router.navigateByUrl('/client');
+    this.router.navigateByUrl('/cliente');
   }
 
   protected goToAdmin(): void {

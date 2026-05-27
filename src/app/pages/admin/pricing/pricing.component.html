@@ -18,6 +18,43 @@
   <div class="alert_success">{{ sucesso() }}</div>
 }
 
+@if (loading()) {
+  <div class="preco_loading">Carregando...</div>
+} @else {
+  <div class="price_grid">
+    @for (preco of precosAtivos(); track preco.id) {
+      <div class="price_card">
+        <div class="price_card_header">
+          <h2 class="preco_card_title">{{ preco.tipoVaga }}</h2>
+        </div>
+        <div class="price_detail">
+          <span class="price_label">Valor Diária</span>
+          <span class="price_value">{{
+            preco.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2'
+          }}</span>
+        </div>
+        <div class="price_detail">
+          <span class="price_label">Desconto PIX/Dinheiro</span>
+          <span class="price_value">{{
+            preco.descontoPixDinheiro | currency: 'BRL' : 'symbol' : '1.2-2'
+          }}</span>
+        </div>
+        <div class="price_detail">
+          <span class="price_label">Vigência</span>
+          <span class="price_value">
+            {{ preco.dataInicio | date: 'dd/MM/yyyy' }}
+            @if (preco.dataFim) {
+              → {{ preco.dataFim | date: 'dd/MM/yyyy' }}
+            } @else {
+              → Indefinida
+            }
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+}
+
 @if (showForm()) {
   <div class="preco_form_card">
     <h2 class="preco_card_title">Novo Preço</h2>
@@ -72,43 +109,6 @@
         {{ formLoading() ? 'Criando...' : 'Criar Preço' }}
       </button>
     </form>
-  </div>
-}
-
-@if (loading()) {
-  <div class="preco_loading">Carregando...</div>
-} @else {
-  <div class="price_grid">
-    @for (preco of precosAtivos(); track preco.id) {
-      <div class="price_card">
-        <div class="price_card_header">
-          <h2 class="preco_card_title">{{ preco.tipoVaga }}</h2>
-        </div>
-        <div class="price_detail">
-          <span class="price_label">Valor Diária</span>
-          <span class="price_value">{{
-            preco.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2'
-          }}</span>
-        </div>
-        <div class="price_detail">
-          <span class="price_label">Desconto PIX/Dinheiro</span>
-          <span class="price_value">{{
-            preco.descontoPixDinheiro | currency: 'BRL' : 'symbol' : '1.2-2'
-          }}</span>
-        </div>
-        <div class="price_detail">
-          <span class="price_label">Vigência</span>
-          <span class="price_value">
-            {{ preco.dataInicio | date: 'dd/MM/yyyy' }}
-            @if (preco.dataFim) {
-              → {{ preco.dataFim | date: 'dd/MM/yyyy' }}
-            } @else {
-              → Indefinida
-            }
-          </span>
-        </div>
-      </div>
-    }
   </div>
 }
 

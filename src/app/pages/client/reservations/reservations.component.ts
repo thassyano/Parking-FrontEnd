@@ -137,6 +137,7 @@ export class ReservationsComponent implements OnInit {
       },
       error: (err) => {
         scrollToTop(this.scroller);
+        console.log(err);
         this.errorMessage.set(err.error?.message ?? 'Erro ao calcular preços');
         this.isBudgetLoading.set(false);
       },

@@ -20,6 +20,7 @@
           type="text"
           class="form-control"
           formControlName="nomeCliente"
+          (input)="onNomeClienteChange($event)"
           (blur)="form.get('nomeCliente')!.markAsTouched()"
         />
         @if (fieldError('nomeCliente')) {
@@ -34,6 +35,7 @@
           type="tel"
           class="form-control"
           formControlName="telefoneCliente"
+          (input)="onTelefoneClienteChange($event)"
           (blur)="form.get('telefoneCliente')!.markAsTouched()"
         />
         @if (fieldError('telefoneCliente')) {
@@ -44,7 +46,17 @@
 
     <div class="form-group">
       <label class="form-label" for="cpfCliente">CPF</label>
-      <input id="cpfCliente" type="text" class="form-control" formControlName="cpfCliente" />
+      <input
+        id="cpfCliente"
+        type="text"
+        class="form-control"
+        formControlName="cpfCliente"
+        (input)="onCpfClienteChange($event)"
+        (blur)="form.get('cpfCliente')!.markAsTouched()"
+      />
+      @if (fieldError('cpfCliente')) {
+        <span class="form-error">{{ fieldError('cpfCliente') }}</span>
+      }
     </div>
   </div>
 
@@ -72,6 +84,7 @@
               class="form-control"
               formControlName="placaVeiculo"
               placeholder="ABC1D23"
+              (input)="onPlacaChange($event, $index)"
               (blur)="veiculoGroup($index).get('placaVeiculo')!.markAsTouched()"
             />
             @if (fieldError('placaVeiculo', $index)) {
@@ -128,9 +141,6 @@
             @if (fieldError('dataSaida', $index)) {
               <span class="form-error">{{ fieldError('dataSaida', $index) }}</span>
             }
-            @if (fieldError('horaSaida', $index)) {
-              <span class="form-error">{{ fieldError('horaSaida', $index) }}</span>
-            }
           </div>
 
           <div class="form-group">
@@ -141,21 +151,16 @@
               formControlName="horaSaida"
               (blur)="veiculoGroup($index).get('horaSaida')!.markAsTouched()"
             />
+            @if (fieldError('horaSaida', $index)) {
+              <span class="form-error">{{ fieldError('horaSaida', $index) }}</span>
+            }
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Quantidade de Dias</label>
-            <input
-              type="number"
-              class="form-control"
-              formControlName="qtdDias"
-              (blur)="veiculoGroup($index).get('qtdDias')!.markAsTouched()"
-            />
-            @if (fieldError('qtdDias', $index)) {
-              <span class="form-error">{{ fieldError('qtdDias', $index) }}</span>
-            }
+            <input type="number" class="form-control" formControlName="qtdDias" readonly />
           </div>
 
           <div class="form-group">

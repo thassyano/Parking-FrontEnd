@@ -20,11 +20,11 @@
   border-radius: 12px;
   box-shadow: var(--shadow);
   margin-bottom: 1.5rem;
+  padding: 0 16px;
 }
 
 .card-header {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--white-darker);
   display: flex;
   align-items: center;
   justify-content: space-between;

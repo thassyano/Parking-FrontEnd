@@ -43,8 +43,16 @@ export class PricingComponent implements OnInit {
     dataFim: new FormControl<string>(''),
   });
 
+  private getLocalDate(): string {
+    const hoje = new Date();
+
+    const timezoneOffset = hoje.getTimezoneOffset() * 60000;
+
+    return new Date(hoje.getTime() - timezoneOffset).toISOString().split('T')[0];
+  }
+
   ngOnInit(): void {
-    this.precoForm.controls.dataInicio.setValue(new Date().toISOString().split('T')[0]);
+    this.precoForm.controls.dataInicio.setValue(this.getLocalDate());
     this.carregarPrecos();
   }
 
@@ -181,7 +189,7 @@ export class PricingComponent implements OnInit {
       tipoVaga: 'Coberta',
       valorDiaria: 0,
       descontoPixDinheiro: 0,
-      dataInicio: new Date().toISOString().split('T')[0],
+      dataInicio: this.getLocalDate(),
       dataFim: '',
     });
   }

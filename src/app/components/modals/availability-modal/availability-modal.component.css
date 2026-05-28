@@ -1,0 +1,102 @@
+.modal_overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--dark-background);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal_container {
+  max-height: 80vh;
+  width: 100%;
+  max-width: 460px;
+  background: var(--white);
+  border-radius: 16px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.modal_container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal_container::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 16px 0;
+}
+
+.modal_container::-webkit-scrollbar-thumb {
+  background: var(--text-muted-dark);
+  border-radius: 50px;
+}
+
+.modal_container::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted-dark);
+}
+
+.modal_title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  text-align: center;
+  margin: 0;
+}
+
+.modal_period {
+  font-size: 0.85rem;
+  color: var(--text-muted-dark);
+  text-align: center;
+  margin: 0;
+}
+
+.slot_card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--success-light-one);
+  border-left: 3px solid var(--success);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.slot_label {
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+
+.slot_value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--success);
+}
+
+@media (max-width: 640px) {
+  .modal_overlay {
+    padding: 14px;
+  }
+
+  .modal_container {
+    max-width: 100%;
+    padding: 22px 18px;
+  }
+
+  .modal_title {
+    font-size: 1.1rem;
+  }
+
+  .modal_period {
+    font-size: 0.8rem;
+  }
+
+  .slot_card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}

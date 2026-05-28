@@ -1,0 +1,44 @@
+<div class="modal_overlay" (click)="emitClose()">
+  <div class="modal_container" (click)="$event.stopPropagation()">
+    <h2 class="modal_title">Disponibilidade no Período</h2>
+
+    <p class="modal_period">
+      {{ data().dataInicio | date: 'dd/MM/yyyy' }} a {{ data().dataFim | date: 'dd/MM/yyyy' }} - {{
+        totalDays()
+      }}
+      diária(s)
+    </p>
+
+    <div class="slot_card">
+      <span class="slot_label">Vagas Cobertas</span>
+      <span class="slot_value">{{ guaranteedCoveredSpots() }} disponíveis</span>
+    </div>
+
+    <div class="slot_card">
+      <span class="slot_label">Vagas Descobertas</span>
+      <span class="slot_value">{{ guaranteedUncoveredSpots() }} disponíveis</span>
+    </div>
+
+    @if (hasAvailability()) {
+      <ng-content select="[additionalVehiclesSlot]" />
+
+      <app-landing-button
+        [label]="
+          additionalVehiclesCount() > 0
+            ? 'Continuar com ' + (additionalVehiclesCount() + 1) + ' veículos'
+            : 'Continuar para Reserva'
+        "
+        variant="primary"
+        [fullWidth]="true"
+        (clicked)="emitContinue()"
+      />
+    }
+
+    <app-landing-button
+      label="Cancelar"
+      variant="outline"
+      [fullWidth]="true"
+      (clicked)="emitClose()"
+    />
+  </div>
+</div>

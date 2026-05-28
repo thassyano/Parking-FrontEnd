@@ -1,4 +1,4 @@
-const production = true; // false para desenvolvimento local
+const production = false; // false para desenvolvimento local
 
 export const environment = {
   production,

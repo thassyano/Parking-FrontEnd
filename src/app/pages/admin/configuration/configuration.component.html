@@ -1,0 +1,118 @@
+<div class="page-header">
+  <h1 class="page-title">Configuração do Estacionamento</h1>
+</div>
+
+@if (erro()) {
+  <div class="alert alert-danger">{{ erro() }}</div>
+}
+
+@if (sucesso()) {
+  <div class="alert alert-success">{{ sucesso() }}</div>
+}
+
+@if (loading()) {
+  <div class="loading-spinner">Carregando...</div>
+} @else {
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Configurações</h2>
+    </div>
+    <form [formGroup]="configForm" (ngSubmit)="salvar()">
+      <div class="form-section">
+        <h3 class="form-section-title">Dados Gerais</h3>
+        <div class="form-group">
+          <label class="form-label" for="nomeEstacionamento">Nome do Estacionamento</label>
+          <input
+            type="text"
+            id="nomeEstacionamento"
+            class="form-control"
+            formControlName="nomeEstacionamento"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="endereco">Endereço</label>
+          <input type="text" id="endereco" class="form-control" formControlName="endereco" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="contato">Contato</label>
+            <input type="text" id="contato" class="form-control" formControlName="contato" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cnpj">CNPJ</label>
+            <input type="text" id="cnpj" class="form-control" formControlName="cnpj" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3 class="form-section-title">Vagas</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="totalVagasCoberta">Total Vagas Cobertas</label>
+            <input
+              type="number"
+              id="totalVagasCoberta"
+              class="form-control"
+              formControlName="totalVagasCoberta"
+              min="0"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="totalVagasDescoberta">Total Vagas Descobertas</label>
+            <input
+              type="number"
+              id="totalVagasDescoberta"
+              class="form-control"
+              formControlName="totalVagasDescoberta"
+              min="0"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3 class="form-section-title">WhatsApp</h3>
+        <div class="form-group">
+          <label class="form-label" for="telefoneWhatsApp">Telefone WhatsApp</label>
+          <input
+            type="text"
+            id="telefoneWhatsApp"
+            class="form-control"
+            formControlName="telefoneWhatsApp"
+            placeholder="5511999999999"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="mensagemWhatsApp">Mensagem WhatsApp</label>
+          <textarea
+            id="mensagemWhatsApp"
+            class="form-control"
+            formControlName="mensagemWhatsApp"
+            rows="4"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3 class="form-section-title">Reservas</h3>
+        <div class="form-group">
+          <label class="form-label" for="horasAntecedenciaConfirmacao">
+            Horas de Antecedencia para Confirmacao
+          </label>
+          <input
+            type="number"
+            id="horasAntecedenciaConfirmacao"
+            class="form-control"
+            formControlName="horasAntecedenciaConfirmacao"
+            min="0"
+          />
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg" [disabled]="saving()">
+        {{ saving() ? 'Salvando...' : 'Salvar Configuração' }}
+      </button>
+    </form>
+  </div>
+}

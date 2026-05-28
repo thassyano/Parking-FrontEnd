@@ -1,0 +1,270 @@
+.client_page {
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 20px;
+  padding-top: calc(32px + 64px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--primary-50);
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+.card_container {
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow);
+  border-radius: 16px;
+}
+
+.page_header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.header_title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.header_subtitle {
+  font-size: 0.9rem;
+  color: var(--primary);
+}
+
+.error_alert {
+  background: var(--danger-light);
+  color: var(--danger);
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.availability_card {
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--primary-50);
+}
+
+.card_content {
+  padding: 20px 20px 0 20px;
+}
+
+.section_title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.availability_form {
+  padding: 20px;
+}
+
+.input_group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.input_label {
+  font-size: 0.85rem;
+  color: var(--text-dark);
+}
+
+.input_field {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--text-muted);
+  font-size: 0.95rem;
+  background: var(--white);
+  min-width: 0;
+}
+
+.input_field:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.primary_action {
+  margin-top: 8px;
+}
+
+.availability_success {
+  color: var(--success);
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.availability_error {
+  color: var(--danger);
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.label_icon {
+  width: 18px;
+}
+
+.label_group {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.vehicles_section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.vehicle_card {
+  background: var(--light-background);
+  border: 1px solid var(--white-darker);
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+}
+
+.vehicle_card_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.vehicle_card_title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.remove_vehicle_btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--danger);
+  transition: background var(--transition);
+  line-height: 1;
+}
+
+.remove_vehicle_btn:hover {
+  background: var(--danger-light);
+}
+
+.vehicle_fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 0.75rem;
+}
+
+.vehicle_field_group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 0;
+}
+
+.vehicle_field_label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.vehicle_field_input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--text-muted);
+  font-size: 0.875rem;
+  background: var(--white);
+}
+
+.vehicle_field_input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.add_vehicle_btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primary);
+  background: transparent;
+  border: 1.5px dashed var(--primary);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.add_vehicle_btn:hover {
+  background: var(--primary-50);
+}
+
+@media (max-width: 640px) {
+  .client_page {
+    padding: 24px 16px 20px;
+  }
+
+  .page_header {
+    margin-bottom: 18px;
+  }
+
+  .header_title {
+    font-size: 1.2rem;
+  }
+
+  .header_subtitle {
+    font-size: 0.85rem;
+  }
+
+  .card_container {
+    max-width: 100%;
+  }
+
+  .card_content {
+    padding: 18px 16px 0 16px;
+  }
+
+  .availability_form {
+    padding: 16px;
+  }
+
+  .label_group {
+    gap: 6px;
+    padding: 0;
+    flex-wrap: wrap;
+  }
+
+  .vehicle_card {
+    padding: 0.75rem 0.9rem;
+  }
+
+  .vehicle_card_header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .vehicle_fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .vehicle_fields {
+    grid-template-columns: 1fr;
+  }
+}

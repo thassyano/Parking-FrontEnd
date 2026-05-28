@@ -9,6 +9,10 @@ export interface Configuracao {
   telefoneWhatsApp?: string;
   mensagemWhatsApp?: string;
   horasAntecedenciaConfirmacao: number;
+  evolutionApiUrl?: string;
+  evolutionInstanceName?: string;
+  evolutionConfigurada: boolean;
+  urlConfirmacaoFrontend?: string;
   dataAtualizacao: string;
 }
 
@@ -22,4 +26,8 @@ export interface AtualizarConfiguracaoRequest {
   telefoneWhatsApp?: string;
   mensagemWhatsApp?: string;
   horasAntecedenciaConfirmacao?: number;
+  evolutionApiUrl?: string;
+  evolutionApiKey?: string;
+  evolutionInstanceName?: string;
+  urlConfirmacaoFrontend?: string;
 }

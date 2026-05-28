@@ -53,6 +53,11 @@ export interface AssociarPlacaRequest {
   placaVeiculo: string;
 }
 
+export interface AlterarReservaRequest {
+  qtdDias: number;
+  dataSaidaPrevista: string;
+}
+
 export interface CheckoutRequest {
   formaPagamento: string;
 }

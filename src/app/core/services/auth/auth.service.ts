@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environment';
 import { LoginInterface } from '../../models/auth/login.model';
+import { PERFIL_ADMIN_MASTER, PerfilAdmin } from '../../models/auth/perfil-admin.model';
 import { TokenInterface } from '../../models/auth/token.model';
 
 @Injectable({
@@ -91,7 +92,7 @@ export class AuthService {
     this.router.navigateByUrl('');
   }
 
-  public getUser(): { usuario: string; nome: string; expiraEm: string } | null {
+  public getUser(): { usuario: string; nome: string; perfil: PerfilAdmin; expiraEm: string } | null {
     const tokenInfo = this.getTokenInfo();
 
     if (!tokenInfo) return null;
@@ -100,10 +101,15 @@ export class AuthService {
       return {
         usuario: tokenInfo.usuario,
         nome: tokenInfo.nome,
+        perfil: tokenInfo.perfil,
         expiraEm: tokenInfo.expiraEm,
       };
     } catch {
       return null;
     }
+  }
+
+  public isAdminMaster(): boolean {
+    return this.getTokenInfo()?.perfil === PERFIL_ADMIN_MASTER;
   }
 }

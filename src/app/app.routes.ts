@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminMasterGuard } from './core/guards/admin-master.guard';
 import { authGuard } from './core/guards/auth.guard';
 import { HomeComponent } from './pages/home/home.component';
 
@@ -85,6 +86,7 @@ export const routes: Routes = [
           },
           {
             path: 'admins',
+            canActivate: [adminMasterGuard],
             loadComponent: () =>
               import('./pages/admin/accounts/accounts.component').then((m) => m.AccountsComponent),
           },

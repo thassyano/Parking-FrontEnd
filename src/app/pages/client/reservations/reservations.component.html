@@ -1,0 +1,260 @@
+<div class="container reserva_container">
+  <div class="reserva_page">
+    <h1 class="page_title">Reservar Vaga</h1>
+
+    @if (errorMessage()) {
+      <div class="error_alert">{{ errorMessage() }}</div>
+    }
+
+    <div class="reserva_card">
+      <h2 class="card_title">Dados do Responsável</h2>
+
+      <form class="reserva_form" [formGroup]="reservationForm">
+        <div class="input_group">
+          <label class="input_label">
+            <img class="label_icon" src="assets/icons/person-dark.icon.svg" alt="" />
+            Nome Completo
+          </label>
+          <input
+            type="text"
+            class="input_field"
+            formControlName="customerName"
+            placeholder="Seu nome completo"
+            (blur)="reservationForm.get('customerName')!.markAsTouched()"
+          />
+          @if (fieldError('customerName')) {
+            <span class="field_error">{{ fieldError('customerName') }}</span>
+          }
+        </div>
+
+        <div class="input_group">
+          <label class="input_label">
+            <img class="label_icon" src="assets/icons/phone.icon.svg" alt="" />
+            Telefone
+          </label>
+          <input
+            type="tel"
+            class="input_field"
+            formControlName="customerPhone"
+            placeholder="(ddd) 999999999"
+            (blur)="reservationForm.get('customerPhone')!.markAsTouched()"
+          />
+          @if (fieldError('customerPhone')) {
+            <span class="field_error">{{ fieldError('customerPhone') }}</span>
+          }
+        </div>
+      </form>
+    </div>
+
+    @for (carro of carros(); track $index) {
+      <div class="reserva_card">
+        <div class="vehicle_header">
+          <img class="label_icon" src="assets/icons/car.icon.svg" alt="" />
+          <h2 class="card_title">Veículo {{ $index + 1 }}</h2>
+        </div>
+
+        <div class="period_summary">
+          <div class="period_item">
+            <span class="period_label">Entrada</span>
+            <span class="period_value">{{
+              formatDateTime(carro.dataEntrada, carro.horaEntrada)
+            }}</span>
+          </div>
+          <div class="period_item">
+            <span class="period_label">Saída</span>
+            <span class="period_value">{{ formatDateTime(carro.dataSaida, carro.horaSaida) }}</span>
+          </div>
+          <div class="period_item">
+            <span class="period_label">Dias</span>
+            <span class="period_value">{{ carro.qtdDias }}</span>
+          </div>
+        </div>
+
+        <div class="input_group">
+          <label class="input_label">
+            <img class="label_icon" src="assets/icons/car.icon.svg" alt="" />
+            Placa do Automóvel
+          </label>
+          <input
+            type="text"
+            class="input_field input_field--uppercase"
+            [value]="placasForm.at($index).value"
+            (input)="updatePlaca($index, $any($event.target).value)"
+            (blur)="placasForm.at($index).markAsTouched()"
+            placeholder="ABC1D23"
+          />
+          @if (placaError($index)) {
+            <span class="field_error">{{ placaError($index) }}</span>
+          }
+        </div>
+
+        <div class="input_group">
+          <label class="input_label">
+            <img class="label_icon" src="assets/icons/garage.icon.svg" alt="" />
+            Tipo de Vaga
+          </label>
+          <select
+            class="input_field input_select"
+            [value]="carroTipoVaga()[$index]"
+            (change)="updateTipoVaga($index, $any($event.target).value)"
+          >
+            @if (isCoveredAvailable($index)) {
+              <option [value]="TipoVaga.Coberta">Coberta</option>
+            }
+            @if (isUncoveredAvailable($index)) {
+              <option [value]="TipoVaga.Descoberta">Descoberta</option>
+            }
+          </select>
+        </div>
+
+        @if (isBudgetLoading()) {
+          <div class="budget_loading">Calculando preço...</div>
+        }
+
+        @if (orcamentos()[$index]; as orc) {
+          <div class="budget_card">
+            <h3 class="budget_title">Valor deste Veículo</h3>
+            <div class="budget_row">
+              <span>Diária ({{ orc.tipoVaga }})</span>
+              <span>{{ orc.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+            </div>
+            <div class="budget_row">
+              <span>Quantidade</span>
+              <span>{{ orc.qtdDias }} dia(s)</span>
+            </div>
+            <div class="budget_divider"></div>
+            <div class="budget_row budget_row--total">
+              <span>Total no Cartão</span>
+              <span>{{ orc.valorTotalCartao | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+            </div>
+            <div class="budget_row budget_row--pix">
+              <span>Total Pix / Dinheiro</span>
+              <span>{{ orc.valorTotalPixDinheiro | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+            </div>
+            @if (orc.economiaTotal > 0) {
+              <div class="budget_row budget_row--savings">
+                <span>Você economiza</span>
+                <span>{{ orc.economiaTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @if (isMultiVehicle() && !isBudgetLoading() && todosOrcamentosCarregados()) {
+      <div class="reserva_card">
+        <h2 class="card_title">Total Geral — {{ carros().length }} Veículos</h2>
+        <div class="budget_card">
+          <div class="budget_row budget_row--total">
+            <span>Total no Cartão</span>
+            <span>{{ totalCartao() | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+          </div>
+          <div class="budget_row budget_row--pix">
+            <span>Total Pix / Dinheiro</span>
+            <span>{{ totalPixDinheiro() | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+          </div>
+          @if (totalEconomia() > 0) {
+            <div class="budget_row budget_row--savings">
+              <span>Economia total</span>
+              <span>{{ totalEconomia() | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="reserva_card">
+      <button
+        class="btn_primary"
+        (click)="openConfirmation()"
+        [disabled]="isLoading() || isBudgetLoading() || !todosOrcamentosCarregados()"
+      >
+        {{ isLoading() ? 'Reservando...' : 'Confirmar Reserva' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+@if (isConfirmationVisible()) {
+  <div class="modal_overlay" (click)="closeConfirmation()">
+    <div class="modal_card" (click)="$event.stopPropagation()">
+      <div class="modal_warning_icon">
+        <img class="img_icon" src="assets/icons/alert.icon.svg" alt="" />
+      </div>
+
+      <h2 class="modal_title">Confirmar Reserva?</h2>
+
+      <p class="modal_description">
+        Ao confirmar, sua(s) reserva(s) será(ão) registrada(s) e você será redirecionado para o
+        <strong>WhatsApp</strong> para enviar os dados ao estacionamento.
+      </p>
+
+      <div class="confirmation_summary">
+        <div class="confirmation_row">
+          <span>Nome</span>
+          <span>{{ reservationForm.controls.customerName.value }}</span>
+        </div>
+        <div class="confirmation_row">
+          <span>Telefone</span>
+          <span>{{ reservationForm.controls.customerPhone.value }}</span>
+        </div>
+        <div class="confirmation_row">
+          <span>Veículos</span>
+          <span>{{ carros().length }}</span>
+        </div>
+
+        @for (carro of carros(); track $index) {
+          <div class="confirmation_separator">Veículo {{ $index + 1 }}</div>
+
+          @if (placasForm.at($index).value) {
+            <div class="confirmation_row">
+              <span>Placa</span>
+              <span>{{ placasForm.at($index).value }}</span>
+            </div>
+          }
+          <div class="confirmation_row">
+            <span>Tipo de Vaga</span>
+            <span>{{ carroTipoVaga()[$index] }}</span>
+          </div>
+          <div class="confirmation_row">
+            <span>Entrada</span>
+            <span>{{ formatDateTime(carro.dataEntrada, carro.horaEntrada) }}</span>
+          </div>
+          <div class="confirmation_row">
+            <span>Saída</span>
+            <span>{{ formatDateTime(carro.dataSaida, carro.horaSaida) }}</span>
+          </div>
+
+          @if (orcamentos()[$index]; as orc) {
+            <div class="confirmation_row confirmation_row--total">
+              <span>Total Cartão</span>
+              <span>{{ orc.valorTotalCartao | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+            </div>
+            <div class="confirmation_row confirmation_row--pix">
+              <span>Total Pix / Dinheiro</span>
+              <span>{{ orc.valorTotalPixDinheiro | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+            </div>
+          }
+        }
+
+        @if (isMultiVehicle()) {
+          <div class="confirmation_separator">Total Geral</div>
+          <div class="confirmation_row confirmation_row--total">
+            <span>Total Cartão</span>
+            <span>{{ totalCartao() | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+          </div>
+          <div class="confirmation_row confirmation_row--pix">
+            <span>Total Pix / Dinheiro</span>
+            <span>{{ totalPixDinheiro() | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="modal_actions">
+        <button class="btn_primary" (click)="confirm()">Confirmar e ir para WhatsApp</button>
+        <button class="btn_outline" (click)="closeConfirmation()">Voltar</button>
+      </div>
+    </div>
+  </div>
+}

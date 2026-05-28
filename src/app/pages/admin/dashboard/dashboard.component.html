@@ -1,0 +1,80 @@
+<div class="page-header">
+  <h1 class="page-title">Dashboard</h1>
+</div>
+
+@if (isLoading()) {
+  <div class="loading-spinner">Carregando...</div>
+} @else {
+  <app-reservation-info [reservas]="reservas()"></app-reservation-info>
+
+  @if (disponibilidade()) {
+    <div class="availability-grid">
+      <div class="availability-card card">
+        <h3 class="card-title">Vagas Cobertas</h3>
+        <p class="stat-value">
+          {{ disponibilidade()!.vagasCobertaDisponiveis }} /
+          {{ disponibilidade()!.vagasCobertaTotal }}
+        </p>
+      </div>
+      <div class="availability-card card">
+        <h3 class="card-title">Vagas Descobertas</h3>
+        <p class="stat-value">
+          {{ disponibilidade()!.vagasDescobertaDisponiveis }} /
+          {{ disponibilidade()!.vagasDescobertaTotal }}
+        </p>
+      </div>
+    </div>
+  }
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Reservas Recentes</h2>
+    </div>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr class="table_row">
+            <th class="table_head_item">ID</th>
+            <th class="table_head_item">Cliente</th>
+            <th class="table_head_item">Tipo Vaga</th>
+            <th class="table_head_item">Entrada</th>
+            <th class="table_head_item">Status</th>
+            <th class="table_head_item">Valor</th>
+          </tr>
+        </thead>
+        <tbody class="table_body">
+          @for (reserva of reservasRecentes; track reserva.id) {
+            <tr [routerLink]="['/admin/reservas', reserva.id]" class="table_row">
+              <td class="table_item">{{ reserva.id }}</td>
+              <td class="table_item">{{ reserva.nomeCliente }}</td>
+              <td class="table_item">{{ reserva.tipoVaga }}</td>
+              <td class="table_item">{{ reserva.dataEntrada | date: 'dd/MM/yyyy' }}</td>
+              <td class="table_item">
+                @switch (reserva.status) {
+                  @case (ReservaStatus.Pendente) {
+                    <span class="badge badge--pendente">{{ reserva.status }}</span>
+                  }
+                  @case (ReservaStatus.CheckinRealizado) {
+                    <span class="badge badge--checkin">{{ reserva.status }}</span>
+                  }
+                  @case (ReservaStatus.CheckoutRealizado) {
+                    <span class="badge badge--checkout">{{ reserva.status }}</span>
+                  }
+                  @case (ReservaStatus.Cancelada) {
+                    <span class="badge badge--cancelada">{{ reserva.status }}</span>
+                  }
+                  @default {
+                    <span class="badge">{{ reserva.status }}</span>
+                  }
+                }
+              </td>
+              <td class="table_item">
+                {{ reserva.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

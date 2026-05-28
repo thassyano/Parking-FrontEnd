@@ -1,20 +1,21 @@
 import { Component, inject } from '@angular/core';
-import { ButtonComponent } from "../../components/button/button.component";
-import { BtnClass } from '../../models/enums/button/button-class.enum';
 import { Router } from '@angular/router';
+import { LandingButtonComponent } from "../../components/buttons/landing-button/landing-button.component";
 
 @Component({
   selector: 'app-home',
-  imports: [ButtonComponent],
-  templateUrl: './home.html',
-  styleUrl: './home.css',
+  imports: [LandingButtonComponent],
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.css',
 })
-export class HomeComponent {
-    public btnClassEnum = BtnClass;
-    private router = inject(Router);
-    
-    protected navigate(route: string): void {
-        this.router.navigateByUrl(route);
-    }
+export class HomeComponent{
+  private router = inject(Router);
 
+  protected goToClient(): void {
+    this.router.navigateByUrl('/cliente');
+  }
+
+  protected goToAdmin(): void {
+    this.router.navigateByUrl('/admin/login');
+  }
 }

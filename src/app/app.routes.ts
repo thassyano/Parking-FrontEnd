@@ -1,49 +1,98 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
-import { AdminLayout } from './shared/components/admin-layout/admin-layout';
-import { ClienteLayout } from './shared/components/cliente-layout/cliente-layout';
-import { Home } from './pages/public/home/home';
-import { ClienteConsulta } from './pages/public/cliente-consulta/cliente-consulta';
-import { ClienteReserva } from './pages/public/cliente-reserva/cliente-reserva';
-import { ConfirmarReserva } from './pages/public/confirmar-reserva/confirmar-reserva';
-import { Login } from './pages/admin/login/login';
-import { Dashboard } from './pages/admin/dashboard/dashboard';
-import { Reservas } from './pages/admin/reservas/reservas';
-import { ReservaDetalhe } from './pages/admin/reserva-detalhe/reserva-detalhe';
-import { ReservaPresencial } from './pages/admin/reserva-presencial/reserva-presencial';
-import { Precos } from './pages/admin/precos/precos';
-import { Caixa } from './pages/admin/caixa/caixa';
-import { ConfiguracaoPage } from './pages/admin/configuracao/configuracao';
-import { Admins } from './pages/admin/admins/admins';
+import { HomeComponent } from './pages/home/home.component';
 
 export const routes: Routes = [
-  { path: '', component: Home },
-  { path: 'confirmar', component: ConfirmarReserva },
+  { path: '', component: HomeComponent },
   {
     path: 'cliente',
-    component: ClienteLayout,
+    loadComponent: () =>
+      import('./pages/client/client-layout/client-layout.component').then(
+        (module) => module.ClientLayoutComponent,
+      ),
     children: [
-      { path: '', component: ClienteConsulta },
-      { path: 'reservar', component: ClienteReserva },
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/client/consulta/consulta.component').then(
+            (module) => module.ConsultaComponent,
+          ),
+      },
+      {
+        path: 'reservar',
+        loadComponent: () =>
+          import('./pages/client/reservations/reservations.component').then(
+            (module) => module.ReservationsComponent,
+          ),
+      },
     ],
   },
   {
     path: 'admin',
     children: [
-      { path: 'login', component: Login },
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('./pages/admin/login/login.component').then((m) => m.LoginComponent),
+      },
       {
         path: '',
-        component: AdminLayout,
+        loadComponent: () =>
+          import('./pages/admin/admin-layout/admin-layout.component').then(
+            (m) => m.AdminLayoutComponent,
+          ),
         canActivate: [authGuard],
         children: [
-          { path: 'dashboard', component: Dashboard },
-          { path: 'reservas/:id', component: ReservaDetalhe },
-          { path: 'reservas', component: Reservas },
-          { path: 'reserva-presencial', component: ReservaPresencial },
-          { path: 'precos', component: Precos },
-          { path: 'caixa', component: Caixa },
-          { path: 'configuracao', component: ConfiguracaoPage },
-          { path: 'admins', component: Admins },
+          {
+            path: 'dashboard',
+            loadComponent: () =>
+              import('./pages/admin/dashboard/dashboard.component').then(
+                (m) => m.DashboardComponent,
+              ),
+          },
+          {
+            path: 'reservas',
+            loadComponent: () =>
+              import('./pages/admin/reservations/admin-reservations.component').then(
+                (m) => m.AdminReservationsComponent,
+              ),
+          },
+          {
+            path: 'reserva-presencial',
+            loadComponent: () =>
+              import('./pages/admin/create-reservations/create-reservations.component').then(
+                (m) => m.CreateReservationsComponent,
+              ),
+          },
+          {
+            path: 'reservas/:id',
+            loadComponent: () =>
+              import('./pages/admin/reservation-detail/reservation-detail.component').then(
+                (m) => m.ReservationDetailComponent,
+              ),
+          },
+          {
+            path: 'caixa',
+            loadComponent: () =>
+              import('./pages/admin/register/register.component').then((m) => m.RegisterComponent),
+          },
+          {
+            path: 'configuracao',
+            loadComponent: () =>
+              import('./pages/admin/configuration/configuration.component').then(
+                (m) => m.ConfigurationComponent,
+              ),
+          },
+          {
+            path: 'admins',
+            loadComponent: () =>
+              import('./pages/admin/accounts/accounts.component').then((m) => m.AccountsComponent),
+          },
+          {
+            path: 'precos',
+            loadComponent: () =>
+              import('./pages/admin/pricing/pricing.component').then((m) => m.PricingComponent),
+          },
           { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
         ],
       },

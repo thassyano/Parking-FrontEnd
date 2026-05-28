@@ -112,6 +112,48 @@
           <h2 class="card-title">Acoes</h2>
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          @if (canAlterar()) {
+            @if (!showEditForm()) {
+              <button type="button" class="btn btn-primary" (click)="abrirEditForm()">
+                Alterar Duração
+              </button>
+            } @else {
+              <div class="form-group">
+                <label class="form-label" for="novaQtdDias">Quantidade de Dias</label>
+                <input
+                  id="novaQtdDias"
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="novaQtdDias"
+                  name="novaQtdDias"
+                  min="1"
+                  max="365"
+                />
+                <label class="form-label" for="novaDataSaida">Data de Saída Prevista</label>
+                <input
+                  id="novaDataSaida"
+                  type="date"
+                  class="form-control"
+                  [(ngModel)]="novaDataSaidaPrevista"
+                  name="novaDataSaidaPrevista"
+                />
+                <small class="form-text">
+                  Novo valor: {{ valorPreview() | currency:'BRL':'symbol':'1.2-2' }}
+                </small>
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  (click)="alterarReserva()"
+                  [disabled]="!novaQtdDias || !novaDataSaidaPrevista || actionLoading()"
+                >
+                  @if (actionLoading()) { Salvando... } @else { Salvar Alteração }
+                </button>
+                <button type="button" class="btn btn-outline" (click)="showEditForm.set(false)">
+                  Cancelar
+                </button>
+              </div>
+            }
+          }
           @if (canAssociarPlaca()) {
             @if (!showPlacaForm()) {
               <button type="button" class="btn btn-primary" (click)="showPlacaForm.set(true)">

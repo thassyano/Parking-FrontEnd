@@ -20,6 +20,9 @@ export interface Reserva {
   dataCheckout?: string;
   observacoes?: string;
   dataCriacao: string;
+  confirmadaPeloCliente: boolean;
+  mensagemConfirmacaoEnviada: boolean;
+  dataEnvioConfirmacao?: string;
 }
 
 export interface CriarReservaOnlineRequest {
@@ -48,6 +51,11 @@ export interface CriarReservaPresencialRequest {
 
 export interface AssociarPlacaRequest {
   placaVeiculo: string;
+}
+
+export interface AlterarReservaRequest {
+  qtdDias: number;
+  dataSaidaPrevista: string;
 }
 
 export interface CheckoutRequest {

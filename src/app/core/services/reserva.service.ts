@@ -10,6 +10,7 @@ import {
   CriarReservaLotePresencialRequest,
   ReservaLoteResponse,
   AssociarPlacaRequest,
+  AlterarReservaRequest,
   CheckoutRequest,
   CupomEntrada,
   CupomSaida,
@@ -58,6 +59,10 @@ export class ReservaService {
     return this.http.post<ReservaLoteResponse>(`${this.url}/presencial/lote`, data);
   }
 
+  alterar(id: number, data: AlterarReservaRequest): Observable<Reserva> {
+    return this.http.patch<Reserva>(`${this.url}/${id}/alterar`, data);
+  }
+
   associarPlaca(id: number, data: AssociarPlacaRequest): Observable<Reserva> {
     return this.http.patch<Reserva>(`${this.url}/${id}/placa`, data);
   }
@@ -85,4 +90,19 @@ export class ReservaService {
   whatsapp(id: number): Observable<WhatsAppResponse> {
     return this.http.get<WhatsAppResponse>(`${this.url}/${id}/whatsapp`);
   }
+
+  confirmarPorToken(token: string): Observable<ConfirmacaoReservaResponse> {
+    return this.http.get<ConfirmacaoReservaResponse>(`${this.url}/confirmar/${token}`);
+  }
+}
+
+export interface ConfirmacaoReservaResponse {
+  message: string;
+  confirmada: boolean;
+  reservaId: number;
+  nomeCliente: string;
+  dataEntrada: string;
+  tipoVaga?: string;
+  placa?: string;
+  status?: string;
 }

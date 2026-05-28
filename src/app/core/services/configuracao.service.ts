@@ -15,4 +15,10 @@ export class ConfiguracaoService {
   atualizar(data: AtualizarConfiguracaoRequest): Observable<Configuracao> {
     return this.http.put<Configuracao>(`${environment.apiUrl}/configuracao`, data);
   }
+
+  testarEvolution(telefoneCliente: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/configuracao/testar-evolution`, {
+      telefoneCliente,
+    });
+  }
 }

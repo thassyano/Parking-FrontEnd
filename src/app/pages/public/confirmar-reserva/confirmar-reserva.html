@@ -1,0 +1,68 @@
+<div class="landing-page">
+  <div class="landing-content" style="max-width: 480px; text-align: center;">
+
+    @if (estado() === 'carregando') {
+      <div style="padding: 2rem;">
+        <p style="font-size: 1.1rem;">Confirmando sua reserva...</p>
+      </div>
+    }
+
+    @if (estado() === 'sucesso') {
+      <div class="success-icon" style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+      <h1 style="margin-bottom: 0.5rem;">Reserva Confirmada!</h1>
+      <p style="color: #666; margin-bottom: 1.5rem;">
+        Olá <strong>{{ dados()!.nomeCliente }}</strong>, sua reserva foi confirmada com sucesso.
+      </p>
+
+      <div class="card" style="text-align: left; padding: 1rem 1.5rem; margin-bottom: 1.5rem;">
+        <div class="detail-row">
+          <span class="detail-label">Data de entrada</span>
+          <span class="detail-value">{{ dados()!.dataEntrada | date: 'dd/MM/yyyy' }}</span>
+        </div>
+        @if (dados()!.tipoVaga) {
+          <div class="detail-row">
+            <span class="detail-label">Tipo de vaga</span>
+            <span class="detail-value">{{ dados()!.tipoVaga }}</span>
+          </div>
+        }
+        @if (dados()!.placa) {
+          <div class="detail-row">
+            <span class="detail-label">Placa</span>
+            <span class="detail-value">{{ dados()!.placa }}</span>
+          </div>
+        }
+      </div>
+
+      <p style="color: #555; font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Compareça no horário combinado. O pagamento é feito na saída.
+      </p>
+      <a routerLink="/" class="btn btn-dark btn-block btn-lg">Voltar ao início</a>
+    }
+
+    @if (estado() === 'jaConfirmada') {
+      <div style="font-size: 3rem; margin-bottom: 1rem;">ℹ️</div>
+      <h1 style="margin-bottom: 0.5rem;">Já Confirmada</h1>
+      <p style="color: #666; margin-bottom: 1.5rem;">
+        Esta reserva já foi confirmada anteriormente. Até logo, <strong>{{ dados()?.nomeCliente }}</strong>!
+      </p>
+      <a routerLink="/" class="btn btn-dark btn-block btn-lg">Voltar ao início</a>
+    }
+
+    @if (estado() === 'cancelada') {
+      <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+      <h1 style="margin-bottom: 0.5rem;">Reserva Cancelada</h1>
+      <p style="color: #666; margin-bottom: 1.5rem;">
+        Infelizmente esta reserva já foi cancelada. Para fazer uma nova reserva acesse o nosso site.
+      </p>
+      <a routerLink="/" class="btn btn-dark btn-block btn-lg">Fazer nova reserva</a>
+    }
+
+    @if (estado() === 'erro') {
+      <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+      <h1 style="margin-bottom: 0.5rem;">Link Inválido</h1>
+      <p style="color: #666; margin-bottom: 1.5rem;">{{ mensagemErro() }}</p>
+      <a routerLink="/" class="btn btn-dark btn-block btn-lg">Voltar ao início</a>
+    }
+
+  </div>
+</div>

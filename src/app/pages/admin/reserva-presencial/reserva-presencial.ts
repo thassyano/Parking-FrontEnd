@@ -106,7 +106,10 @@ export class ReservaPresencial {
           observacoes: v.observacoes || undefined,
         })
         .subscribe({
-          next: (reserva) => this.router.navigate(['/admin/reservas', reserva.id]),
+          next: (reserva) => {
+            this.loading.set(false);
+            this.router.navigate(['/admin/reservas', reserva.id]);
+          },
           error: (err) => {
             this.erro.set(err.error?.message || 'Erro ao criar reserva');
             this.loading.set(false);
@@ -130,7 +133,10 @@ export class ReservaPresencial {
           carros,
         })
         .subscribe({
-          next: () => this.router.navigate(['/admin/reservas']),
+          next: () => {
+            this.loading.set(false);
+            this.router.navigate(['/admin/reservas']);
+          },
           error: (err) => {
             this.erro.set(err.error?.message || 'Erro ao criar reservas');
             this.loading.set(false);

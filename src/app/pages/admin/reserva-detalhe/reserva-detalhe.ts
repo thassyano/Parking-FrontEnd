@@ -22,6 +22,9 @@ export class ReservaDetalhe implements OnInit {
 
   showPlacaForm = signal(false);
   showCheckoutForm = signal(false);
+  showEditForm = signal(false);
+  novaQtdDias = 1;
+  novaDataSaidaPrevista = '';
   cupomEntrada = signal<CupomEntrada | null>(null);
   cupomSaida = signal<CupomSaida | null>(null);
   showCupomEntradaPrint = signal(false);
@@ -153,6 +156,48 @@ export class ReservaDetalhe implements OnInit {
       window.print();
       this.showCupomSaidaPrint.set(false);
     });
+  }
+
+  abrirEditForm() {
+    const r = this.reserva();
+    if (!r) return;
+    this.novaQtdDias = r.qtdDias;
+    this.novaDataSaidaPrevista = r.dataSaidaPrevista.split('T')[0];
+    this.showEditForm.set(true);
+  }
+
+  alterarReserva() {
+    if (!this.novaQtdDias || !this.novaDataSaidaPrevista) return;
+    this.actionLoading.set(true);
+    this.erro.set('');
+    this.reservaService
+      .alterar(this.reservaId, {
+        qtdDias: this.novaQtdDias,
+        dataSaidaPrevista: `${this.novaDataSaidaPrevista}T00:00:00`,
+      })
+      .subscribe({
+        next: (data) => {
+          this.reserva.set(data);
+          this.showEditForm.set(false);
+          this.sucesso.set('Reserva atualizada com sucesso');
+          this.actionLoading.set(false);
+        },
+        error: (err) => {
+          this.erro.set(err.error?.message || 'Erro ao atualizar reserva');
+          this.actionLoading.set(false);
+        },
+      });
+  }
+
+  valorPreview(): number {
+    const r = this.reserva();
+    if (!r) return 0;
+    return r.valorDiaria * this.novaQtdDias;
+  }
+
+  canAlterar(): boolean {
+    const r = this.reserva();
+    return !!r && (r.status === 'Pendente' || r.status === 'Confirmada');
   }
 
   canAssociarPlaca(): boolean {

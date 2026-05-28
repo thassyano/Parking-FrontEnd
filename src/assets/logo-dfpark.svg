@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="200" viewBox="0 0 800 200">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#cbd5e6" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="200" fill="#020d1f" />
+  <text x="50%" y="80" text-anchor="middle" font-family="Inter, Roboto, sans-serif" font-size="72" font-weight="800" fill="url(#logoGradient)">DF PARK</text>
+  <text x="50%" y="140" text-anchor="middle" font-family="Inter, Roboto, sans-serif" font-size="24" letter-spacing="0.32em" fill="#dbeafe">ESTACIONAMENTO</text>
+</svg>

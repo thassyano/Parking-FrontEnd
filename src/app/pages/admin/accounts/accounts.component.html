@@ -1,7 +1,7 @@
 <div class="page-header">
   <h1 class="page-title">Administradores</h1>
   <div class="page-actions">
-    <button type="button" class="btn btn-primary" (click)="showForm.set(!showForm())">
+    <button type="button" class="btn btn-primary" (click)="abrirFormCriar()">
       {{ showForm() ? 'Cancelar' : 'Novo Admin' }}
     </button>
   </div>
@@ -25,17 +25,45 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="usuario">Usuário</label>
-            <input type="text" id="usuario" class="form-control" formControlName="usuario" />
+            <input
+              type="text"
+              id="usuario"
+              class="form-control"
+              [class.form-control--invalid]="campoInvalido(novoAdminForm, 'usuario')"
+              formControlName="usuario"
+            />
+            @if (campoInvalido(novoAdminForm, 'usuario')) {
+              <span class="field-error">Informe o usuário</span>
+            }
           </div>
           <div class="form-group">
             <label class="form-label" for="senha">Senha</label>
-            <input type="password" id="senha" class="form-control" formControlName="senha" />
+            <input
+              type="password"
+              id="senha"
+              class="form-control"
+              [class.form-control--invalid]="campoInvalido(novoAdminForm, 'senha')"
+              formControlName="senha"
+            />
+            <span class="form-hint">Mínimo de 6 caracteres</span>
+            @if (campoInvalido(novoAdminForm, 'senha')) {
+              <span class="field-error">A senha deve ter pelo menos 6 caracteres</span>
+            }
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="email">Email</label>
-            <input type="email" id="email" class="form-control" formControlName="email" />
+            <input
+              type="email"
+              id="email"
+              class="form-control"
+              [class.form-control--invalid]="campoInvalido(novoAdminForm, 'email')"
+              formControlName="email"
+            />
+            @if (campoInvalido(novoAdminForm, 'email')) {
+              <span class="field-error">Informe um email válido</span>
+            }
           </div>
           <div class="form-group">
             <label class="form-label" for="nome">Nome (opcional)</label>
@@ -44,6 +72,62 @@
         </div>
         <button type="submit" class="btn btn-primary" [disabled]="formLoading()">
           {{ formLoading() ? 'Criando...' : 'Criar Admin' }}
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+@if (editingAdmin(); as admin) {
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Editar Administrador — {{ admin.usuario }}</h2>
+      <button type="button" class="btn btn-sm btn-secondary" (click)="cancelarEdicao()">
+        Cancelar
+      </button>
+    </div>
+    <form [formGroup]="editarAdminForm" (ngSubmit)="salvarEdicao()">
+      <div class="form-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="edit-usuario">Usuário</label>
+            <input
+              type="text"
+              id="edit-usuario"
+              class="form-control"
+              formControlName="usuario"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-senha">Nova senha</label>
+            <input
+              type="password"
+              id="edit-senha"
+              class="form-control"
+              [class.form-control--invalid]="campoInvalido(editarAdminForm, 'senha')"
+              formControlName="senha"
+              placeholder="Deixe em branco para manter"
+            />
+            @if (campoInvalido(editarAdminForm, 'senha')) {
+              <span class="field-error">A senha deve ter pelo menos 6 caracteres</span>
+            }
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="edit-email">Email</label>
+            <input type="email" id="edit-email" class="form-control" formControlName="email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-nome">Nome (opcional)</label>
+            <input type="text" id="edit-nome" class="form-control" formControlName="nome" />
+          </div>
+        </div>
+        <p class="form-hint">
+          Perfil: {{ admin.perfil === 'AdminMaster' ? 'Master' : 'Admin' }} (não editável)
+        </p>
+        <button type="submit" class="btn btn-primary" [disabled]="formLoading()">
+          {{ formLoading() ? 'Salvando...' : 'Salvar alterações' }}
         </button>
       </div>
     </form>
@@ -68,6 +152,7 @@
             <th>Usuário</th>
             <th>Email</th>
             <th>Nome</th>
+            <th>Perfil</th>
             <th>Data Criação</th>
             <th>Ativo</th>
             <th>Ações</th>
@@ -75,10 +160,11 @@
         </thead>
         <tbody>
           @for (admin of admins(); track admin.id) {
-            <tr>
+            <tr [class.row-editing]="editingAdmin()?.id === admin.id">
               <td>{{ admin.usuario }}</td>
               <td>{{ admin.email }}</td>
               <td>{{ admin.nome || '-' }}</td>
+              <td>{{ admin.perfil === 'AdminMaster' ? 'Master' : 'Admin' }}</td>
               <td>{{ admin.dataCriacao | date: 'dd/MM/yyyy' }}</td>
               <td>
                 <span
@@ -90,15 +176,24 @@
                 </span>
               </td>
               <td>
-                <button
-                  type="button"
-                  class="btn btn-sm"
-                  [class.btn-danger]="admin.ativo"
-                  [class.btn-success]="!admin.ativo"
-                  (click)="toggleAtivo(admin)"
-                >
-                  {{ admin.ativo ? 'Desativar' : 'Ativar' }}
-                </button>
+                <div class="table-actions">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-secondary"
+                    (click)="abrirEdicao(admin)"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    [class.btn-danger]="admin.ativo"
+                    [class.btn-success]="!admin.ativo"
+                    (click)="toggleAtivo(admin)"
+                  >
+                    {{ admin.ativo ? 'Desativar' : 'Ativar' }}
+                  </button>
+                </div>
               </td>
             </tr>
           }

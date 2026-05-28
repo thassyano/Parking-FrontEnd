@@ -140,6 +140,22 @@
   box-shadow: 0 0 0 3px var(--primary-transparent);
 }
 
+.form-control--invalid {
+  border-color: var(--danger);
+}
+
+.form-control--invalid:focus {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-light);
+}
+
+.field-error {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--danger);
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -199,6 +215,42 @@
   font-size: 0.8rem;
 }
 
+.btn-secondary {
+  background: var(--white);
+  color: var(--text-secondary);
+  border-color: var(--text-muted);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--medium-background);
+  border-color: var(--text-secondary);
+}
+
+.table-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.form-hint {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted-dark);
+  margin-top: 0.35rem;
+}
+
+.row-editing {
+  background: var(--primary-transparent);
+}
+
+.table tbody tr.row-editing:hover {
+  background: var(--primary-transparent);
+}
+
+.table tbody tr {
+  cursor: default;
+}
+
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -236,7 +288,10 @@
 
 .table tbody tr:hover {
   background: var(--medium-background);
-  cursor: pointer;
+}
+
+.table tbody tr:not(.row-editing):hover {
+  cursor: default;
 }
 
 .table tbody tr:last-child td {

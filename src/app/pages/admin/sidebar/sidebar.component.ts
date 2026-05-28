@@ -17,6 +17,10 @@ export class SidebarComponent {
     return user?.nome || user?.usuario || 'Admin';
   }
 
+  get isAdminMaster(): boolean {
+    return this.authService.isAdminMaster();
+  }
+
   toggleSidebar() {
     this.sidebarOpen.update((v) => !v);
   }

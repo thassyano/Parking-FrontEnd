@@ -23,8 +23,8 @@
                 "output": "/assets/"
               },
               {
-                "glob": "favicon.ico",
-                "input": "src/",
+                "glob": "_redirects",
+                "input": "src",
                 "output": "/"
               }
             ],

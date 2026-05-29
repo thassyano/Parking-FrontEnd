@@ -13,6 +13,7 @@ export class AvailabilityModalComponent {
   public data = input.required<PeriodAvailability>();
   public closeOutput = output<void>();
   public continueOutput = output<void>();
+  public errorMessage = input<string>('');
 
   public additionalVehiclesCount = input<number>(0);
 

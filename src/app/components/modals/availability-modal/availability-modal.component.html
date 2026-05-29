@@ -2,10 +2,15 @@
   <div class="modal_container" (click)="$event.stopPropagation()">
     <h2 class="modal_title">Disponibilidade no Período</h2>
 
+    @if (errorMessage()) {
+      <div class="error_alert">
+        {{ errorMessage() }}
+      </div>
+    }
+
     <p class="modal_period">
-      {{ data().dataInicio | date: 'dd/MM/yyyy' }} a {{ data().dataFim | date: 'dd/MM/yyyy' }} - {{
-        totalDays()
-      }}
+      {{ data().dataInicio | date: 'dd/MM/yyyy' }} a {{ data().dataFim | date: 'dd/MM/yyyy' }} -
+      {{ totalDays() }}
       diária(s)
     </p>
 

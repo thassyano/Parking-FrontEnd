@@ -100,3 +100,11 @@
     gap: 0.75rem;
   }
 }
+
+.error_alert {
+  background: var(--danger-light);
+  color: var(--danger);
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}

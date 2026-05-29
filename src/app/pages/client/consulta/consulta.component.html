@@ -69,6 +69,7 @@
     <app-availability-modal
       [additionalVehiclesCount]="additionalVehicles.length"
       [data]="availability()!"
+      [errorMessage]="errorMessage()"
       (closeOutput)="closeModal()"
       (continueOutput)="continue()"
     >

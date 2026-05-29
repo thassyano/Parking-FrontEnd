@@ -7,6 +7,7 @@ import { CarroEntry } from '../../../core/models/availability/client-flow.model'
 import { PeriodAvailability } from '../../../core/models/availability/period-availability.model';
 import { PeriodAvailabilityService } from '../../../core/services/availability/period-availability.service';
 import { ClientFlowService } from '../../../core/services/client/client-flow.service';
+import { hasSameDateTime } from '../../../core/utils/validators/has-same-date-time';
 
 type VehicleForm = FormGroup<{
   entryDate: FormControl<string | null>;
@@ -53,15 +54,20 @@ export class ConsultaComponent {
   );
 
   public checkAvailability(): void {
+    const { entryDate, entryTime, exitDate, exitTime } = this.availabilityForm.value;
+
     if (this.availabilityForm.invalid) {
       this.errorMessage.set('Preencha as datas de entrada e saída');
       return;
     }
 
+    if (hasSameDateTime(entryDate, entryTime, exitDate, exitTime)) {
+      this.errorMessage.set('Os horários de entrada e saída não podem ser iguais');
+      return;
+    }
+
     this.errorMessage.set('');
     this.isLoading.set(true);
-
-    const { entryDate, exitDate } = this.availabilityForm.value;
 
     this.periodService.checkPeriodAvailability(entryDate!, exitDate!).subscribe({
       next: (result) => {
@@ -92,6 +98,18 @@ export class ConsultaComponent {
     const { entryDate, entryTime, exitDate, exitTime } = this.availabilityForm.value;
 
     if (!entryDate || !entryTime || !exitDate || !exitTime || !this.availability()) return;
+
+    for (const vehicle of this.additionalVehicles) {
+      const { entryDate, entryTime, exitDate, exitTime } = vehicle.value;
+
+      if (hasSameDateTime(entryDate, entryTime, exitDate, exitTime)) {
+        this.errorMessage.set(
+          'Os horários de entrada e saída dos veículos adicionais não podem ser iguais',
+        );
+
+        return;
+      }
+    }
 
     const firstVehicle = this.toCarroEntry(entryDate, entryTime, exitDate, exitTime);
 

@@ -33,6 +33,8 @@ export class LoginComponent implements OnInit {
   });
 
   public onLogin(): void {
+    if (this.isLoading()) return;
+
     if (this.loginForm.invalid) {
       this.errorMessage.set('Senha ou usuário incorretos.');
       setTimeout(() => {

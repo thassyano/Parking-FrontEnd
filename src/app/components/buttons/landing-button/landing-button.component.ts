@@ -15,4 +15,11 @@ export class LandingButtonComponent {
   public type = input<string>('button');
 
   public clicked = output<void>();
+
+  /** Com type="submit", o form usa ngSubmit — não emite clicked para evitar handler duplicado. */
+  protected onClick(): void {
+    if (this.type() !== 'submit') {
+      this.clicked.emit();
+    }
+  }
 }

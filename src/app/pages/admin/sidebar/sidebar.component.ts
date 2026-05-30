@@ -1,5 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { SidebarService } from '../../../core/services/ui/sidebar.service';
 import { RouterModule, RouterOutlet } from '@angular/router';
 
 @Component({
@@ -9,8 +10,9 @@ import { RouterModule, RouterOutlet } from '@angular/router';
   styleUrl: './sidebar.component.css',
 })
 export class SidebarComponent {
-  protected sidebarOpen = signal(false);
+  protected readonly sidebarOpen = inject(SidebarService).sidebarOpen;
   protected authService = inject(AuthService);
+  private readonly sidebarService = inject(SidebarService);
 
   get userName(): string {
     const user = this.authService.getUser();
@@ -21,12 +23,12 @@ export class SidebarComponent {
     return this.authService.isAdminMaster();
   }
 
-  toggleSidebar() {
-    this.sidebarOpen.update((v) => !v);
+  toggleSidebar(): void {
+    this.sidebarService.toggleSidebar();
   }
 
-  closeSidebar() {
-    this.sidebarOpen.set(false);
+  closeSidebar(): void {
+    this.sidebarService.closeSidebar();
   }
 
   logout() {

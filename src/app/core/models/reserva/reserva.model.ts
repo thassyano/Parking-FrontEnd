@@ -11,6 +11,7 @@ export interface Reserva {
   valorDiaria: number;
   valorTotal: number;
   descontoAplicado: number;
+  valorHorasAdicionais: number;
   valorFinal: number;
   formaPagamento?: string;
   pago: boolean;

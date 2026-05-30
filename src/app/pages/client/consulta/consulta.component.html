@@ -1,9 +1,5 @@
 <div class="client_page">
-  <div class="page_header">
-    <p class="header_subtitle">Consulte disponibilidade</p>
-  </div>
-
-  <div class="card_container">
+  <div class="client_content">
     <div class="availability_card">
       <div class="card_content">
         @if (errorMessage()) {
@@ -58,56 +54,55 @@
             [fullWidth]="true"
             [disabled]="availabilityForm.invalid || isLoading()"
             (clicked)="checkAvailability()"
-          >
-          </app-landing-button>
+          ></app-landing-button>
         </div>
       </form>
     </div>
+
+    @if (isModalVisible()) {
+      <app-availability-modal
+        [additionalVehiclesCount]="additionalVehicles.length"
+        [data]="availability()!"
+        (closeOutput)="closeModal()"
+        (continueOutput)="continue()"
+      >
+        <ng-container additionalVehiclesSlot>
+          <div class="vehicles_section">
+            @for (vehicle of additionalVehicles; track $index; let i = $index) {
+              <div class="vehicle_card" [formGroup]="vehicle">
+                <div class="vehicle_card_header">
+                  <span class="vehicle_card_title">Veículo {{ i + 2 }}</span>
+                  <button type="button" class="remove_vehicle_btn" (click)="removeVehicle(i)">
+                    ✕
+                  </button>
+                </div>
+                <div class="vehicle_fields">
+                  <div class="vehicle_field_group">
+                    <label class="vehicle_field_label">Data de Entrada</label>
+                    <input type="date" class="vehicle_field_input" formControlName="entryDate" [min]="minDateToday" />
+                  </div>
+                  <div class="vehicle_field_group">
+                    <label class="vehicle_field_label">Horário de Entrada</label>
+                    <input type="time" class="vehicle_field_input" formControlName="entryTime" />
+                  </div>
+                  <div class="vehicle_field_group">
+                    <label class="vehicle_field_label">Data de Saída</label>
+                    <input type="date" class="vehicle_field_input" formControlName="exitDate" [min]="minDateToday" />
+                  </div>
+                  <div class="vehicle_field_group">
+                    <label class="vehicle_field_label">Horário de Saída</label>
+                    <input type="time" class="vehicle_field_input" formControlName="exitTime" />
+                  </div>
+                </div>
+              </div>
+            }
+
+            <button type="button" class="add_vehicle_btn" (click)="addVehicle()">
+              + Adicionar outro veículo
+            </button>
+          </div>
+        </ng-container>
+      </app-availability-modal>
+    }
   </div>
-
-  @if (isModalVisible()) {
-    <app-availability-modal
-      [additionalVehiclesCount]="additionalVehicles.length"
-      [data]="availability()!"
-      (closeOutput)="closeModal()"
-      (continueOutput)="continue()"
-    >
-      <ng-container additionalVehiclesSlot>
-        <div class="vehicles_section">
-          @for (vehicle of additionalVehicles; track $index; let i = $index) {
-            <div class="vehicle_card" [formGroup]="vehicle">
-              <div class="vehicle_card_header">
-                <span class="vehicle_card_title">Veículo {{ i + 2 }}</span>
-                <button type="button" class="remove_vehicle_btn" (click)="removeVehicle(i)">
-                  ✕
-                </button>
-              </div>
-              <div class="vehicle_fields">
-                <div class="vehicle_field_group">
-                  <label class="vehicle_field_label">Data de Entrada</label>
-                  <input type="date" class="vehicle_field_input" formControlName="entryDate" [min]="minDateToday" />
-                </div>
-                <div class="vehicle_field_group">
-                  <label class="vehicle_field_label">Horário de Entrada</label>
-                  <input type="time" class="vehicle_field_input" formControlName="entryTime" />
-                </div>
-                <div class="vehicle_field_group">
-                  <label class="vehicle_field_label">Data de Saída</label>
-                  <input type="date" class="vehicle_field_input" formControlName="exitDate" [min]="minDateToday" />
-                </div>
-                <div class="vehicle_field_group">
-                  <label class="vehicle_field_label">Horário de Saída</label>
-                  <input type="time" class="vehicle_field_input" formControlName="exitTime" />
-                </div>
-              </div>
-            </div>
-          }
-
-          <button type="button" class="add_vehicle_btn" (click)="addVehicle()">
-            + Adicionar outro veículo
-          </button>
-        </div>
-      </ng-container>
-    </app-availability-modal>
-  }
 </div>

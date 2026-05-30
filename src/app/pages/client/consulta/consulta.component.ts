@@ -55,6 +55,8 @@ export class ConsultaComponent {
   public readonly minDateToday = this.formatDate(new Date());
 
   public checkAvailability(): void {
+    if (this.isLoading()) return;
+
     if (this.availabilityForm.invalid) {
       this.errorMessage.set('Preencha as datas de entrada e saída');
       return;

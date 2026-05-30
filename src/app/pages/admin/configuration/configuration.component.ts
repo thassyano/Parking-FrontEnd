@@ -26,7 +26,6 @@ export class ConfigurationComponent implements OnInit {
     totalVagasCoberta: new FormControl(0, [Validators.required, Validators.min(0)]),
     totalVagasDescoberta: new FormControl(0, [Validators.required, Validators.min(0)]),
     telefoneWhatsApp: new FormControl(''),
-    mensagemWhatsApp: new FormControl(''),
     horasAntecedenciaConfirmacao: new FormControl(0, [Validators.required, Validators.min(0)]),
   });
 
@@ -47,7 +46,6 @@ export class ConfigurationComponent implements OnInit {
           totalVagasCoberta: data.totalVagasCoberta,
           totalVagasDescoberta: data.totalVagasDescoberta,
           telefoneWhatsApp: data.telefoneWhatsApp || '',
-          mensagemWhatsApp: data.mensagemWhatsApp || '',
           horasAntecedenciaConfirmacao: data.horasAntecedenciaConfirmacao,
         });
         this.loading.set(false);
@@ -80,7 +78,6 @@ export class ConfigurationComponent implements OnInit {
         totalVagasCoberta: v.totalVagasCoberta!,
         totalVagasDescoberta: v.totalVagasDescoberta!,
         telefoneWhatsApp: v.telefoneWhatsApp || undefined,
-        mensagemWhatsApp: v.mensagemWhatsApp || undefined,
         horasAntecedenciaConfirmacao: v.horasAntecedenciaConfirmacao!,
       })
       .subscribe({

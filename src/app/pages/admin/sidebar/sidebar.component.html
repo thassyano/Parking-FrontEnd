@@ -60,6 +60,14 @@
         (click)="closeSidebar()"
         >Configuração</a
       >
+      <a
+        routerLink="/admin/atividades"
+        [routerLinkActiveOptions]="{ exact: true }"
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="closeSidebar()"
+        >Atividades</a
+      >
       @if (isAdminMaster) {
         <a
           routerLink="/admin/admins"

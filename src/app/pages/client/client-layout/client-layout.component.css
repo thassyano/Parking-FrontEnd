@@ -1,0 +1,12 @@
+.client-header {
+  width: 100%;
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 0;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.client-header app-back-btn {
+  display: inline-flex;
+}

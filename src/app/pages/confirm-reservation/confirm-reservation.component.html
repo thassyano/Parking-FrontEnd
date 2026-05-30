@@ -1,0 +1,70 @@
+<main class="confirm_page">
+  <div class="confirm_card">
+    <img class="confirm_logo" src="assets/logo-dfpark.svg" alt="DF Park Estacionamento" />
+
+    @switch (estado()) {
+      @case ('carregando') {
+        <div class="confirm_state">
+          <div class="confirm_spinner" aria-hidden="true"></div>
+          <h1>Confirmando reserva...</h1>
+          <p>Aguarde um instante.</p>
+        </div>
+      }
+
+      @case ('sucesso') {
+        <div class="confirm_state confirm_state--success">
+          <div class="confirm_icon" aria-hidden="true">✓</div>
+          <h1>Reserva confirmada!</h1>
+          <p class="confirm_message">{{ dados()?.message }}</p>
+
+          @if (dados(); as d) {
+            <dl class="confirm_details">
+              <div class="confirm_detail">
+                <dt>Cliente</dt>
+                <dd>{{ d.nomeCliente }}</dd>
+              </div>
+              @if (d.placa) {
+                <div class="confirm_detail">
+                  <dt>Placa</dt>
+                  <dd>{{ d.placa }}</dd>
+                </div>
+              }
+              @if (d.tipoVaga) {
+                <div class="confirm_detail">
+                  <dt>Vaga</dt>
+                  <dd>{{ d.tipoVaga }}</dd>
+                </div>
+              }
+              <div class="confirm_detail">
+                <dt>Entrada</dt>
+                <dd>{{ d.dataEntrada | date: 'dd/MM/yyyy HH:mm' }}</dd>
+              </div>
+            </dl>
+          }
+
+          <a routerLink="/" class="confirm_btn">Voltar ao início</a>
+        </div>
+      }
+
+      @case ('cancelada') {
+        <div class="confirm_state confirm_state--warning">
+          <div class="confirm_icon confirm_icon--warning" aria-hidden="true">!</div>
+          <h1>Reserva cancelada</h1>
+          <p class="confirm_message">
+            Esta reserva já foi cancelada e não pode mais ser confirmada.
+          </p>
+          <a routerLink="/cliente" class="confirm_btn confirm_btn--outline">Fazer nova reserva</a>
+        </div>
+      }
+
+      @case ('erro') {
+        <div class="confirm_state confirm_state--error">
+          <div class="confirm_icon confirm_icon--error" aria-hidden="true">✕</div>
+          <h1>Não foi possível confirmar</h1>
+          <p class="confirm_message">{{ mensagemErro() }}</p>
+          <a routerLink="/cliente" class="confirm_btn confirm_btn--outline">Tentar nova reserva</a>
+        </div>
+      }
+    }
+  </div>
+</main>

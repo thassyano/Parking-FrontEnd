@@ -1,10 +1,12 @@
 .landing-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #020d1f;
-  padding: 1.5rem;
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  box-sizing: border-box;
 }
 
 .landing-content {
@@ -19,6 +21,8 @@
   max-width: 340px;
   width: 100%;
   margin: 0 auto 1.75rem;
+  transform: scale(1.25);
+  transform-origin: center;
 }
 
 .landing-title {
@@ -39,4 +43,24 @@
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
+}
+
+@media (max-width: 480px) {
+  .landing-content {
+    padding: 2rem 1rem;
+  }
+
+  .landing-logo {
+    max-width: min(280px, 85vw);
+    margin-bottom: 1.25rem;
+  }
+
+  .landing-title {
+    font-size: 1.5rem;
+  }
+
+  .landing-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
 }

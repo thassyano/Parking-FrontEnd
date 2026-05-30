@@ -17,6 +17,7 @@ import {
   CriarReservaLoteOnlineRequest,
   CriarReservaLotePresencialRequest,
 } from '../../models/reserva/criar-reserva-lote-request.interface';
+import { ConfirmacaoReservaResponse } from '../../models/reserva/confirmacao-reserva-response.interface';
 import { ReservaLoteResponse } from '../../models/reserva/reserva-lote-response.interface';
 
 @Injectable({
@@ -88,5 +89,9 @@ export class ReservaService {
 
   public whatsapp(id: number): Observable<WhatsAppResponse> {
     return this.http.get<WhatsAppResponse>(`${this.url}/${id}/whatsapp`);
+  }
+
+  public confirmarPorToken(token: string): Observable<ConfirmacaoReservaResponse> {
+    return this.http.get<ConfirmacaoReservaResponse>(`${this.url}/confirmar/${token}`);
   }
 }

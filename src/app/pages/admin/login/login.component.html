@@ -68,8 +68,7 @@
           [label]="isLoading() ? 'Carregando...' : 'Entrar'"
           [variant]="'primary'"
           [fullWidth]="true"
-          [disabled]="isLoading()"
-          (clicked)="onLogin()"
+          [disabled]="isLoading() || loginForm.invalid"
         ></app-landing-button>
       </form>
 

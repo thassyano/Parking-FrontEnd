@@ -23,6 +23,7 @@
   position: fixed;
   inset: 60px auto 0 0;
   transition: transform 0.2s ease;
+  z-index: 300;
 }
 
 .sidebar-header {
@@ -131,6 +132,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  padding-top: 60px;
+  width: 100%;
 }
 
 .admin-topbar {
@@ -164,11 +167,14 @@
   background-color: var(--medium-background);
   flex: 1;
   padding: 1.5rem;
+  min-width: 0;
 }
 
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
+    width: 100%;
+    inset: 60px 0 0 0;
   }
 
   .sidebar.open {
@@ -185,9 +191,26 @@
 
   .admin-main {
     margin-left: 0;
+    padding-top: 60px;
   }
 
   .menu-toggle {
     display: block;
+  }
+
+  .admin-content {
+    padding: 1rem;
+  }
+
+  .admin-wrapper {
+    flex-direction: column;
+  }
+
+  .sidebar-nav {
+    padding: 0.75rem 0;
+  }
+
+  .nav-item {
+    padding: 0.75rem 1rem;
   }
 }

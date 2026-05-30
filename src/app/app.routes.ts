@@ -29,6 +29,13 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'confirmar',
+    loadComponent: () =>
+      import('./pages/confirm-reservation/confirm-reservation.component').then(
+        (module) => module.ConfirmReservationComponent,
+      ),
+  },
+  {
     path: 'admin',
     children: [
       {
@@ -82,6 +89,13 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./pages/admin/configuration/configuration.component').then(
                 (m) => m.ConfigurationComponent,
+              ),
+          },
+          {
+            path: 'atividades',
+            loadComponent: () =>
+              import('./pages/admin/activity-logs/activity-logs.component').then(
+                (m) => m.ActivityLogsComponent,
               ),
           },
           {

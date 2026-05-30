@@ -1,6 +1,6 @@
 .back_button {
   padding: 8px 16px;
-  background-color: var(--primary-dark);
+  background-color: var(--text-dark);
   color: var(--white);
   border: none;
   border-radius: 4px;
@@ -9,5 +9,5 @@
 }
 
 .back_button:hover {
-  background-color: var(--primary);
+  background-color: var(--dark-hover);
 }

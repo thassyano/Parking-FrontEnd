@@ -52,9 +52,17 @@ export class ConsultaComponent {
     this.minAvailability((day) => day.vagasDescobertaDisponiveis),
   );
 
+  public readonly minDateToday = this.formatDate(new Date());
+
   public checkAvailability(): void {
     if (this.availabilityForm.invalid) {
       this.errorMessage.set('Preencha as datas de entrada e saída');
+      return;
+    }
+
+    const periodoErro = this.validarPeriodoFormulario(this.availabilityForm);
+    if (periodoErro) {
+      this.errorMessage.set(periodoErro);
       return;
     }
 
@@ -90,6 +98,22 @@ export class ConsultaComponent {
 
   public continue(): void {
     const { entryDate, entryTime, exitDate, exitTime } = this.availabilityForm.value;
+
+    const periodoErro = this.validarPeriodoFormulario(this.availabilityForm);
+    if (periodoErro) {
+      this.errorMessage.set(periodoErro);
+      this.closeModal();
+      return;
+    }
+
+    for (const vehicle of this.additionalVehicles) {
+      const erroVeiculo = this.validarPeriodoFormulario(vehicle);
+      if (erroVeiculo) {
+        this.errorMessage.set(`Veículo adicional: ${erroVeiculo}`);
+        this.closeModal();
+        return;
+      }
+    }
 
     if (!entryDate || !entryTime || !exitDate || !exitTime || !this.availability()) return;
 
@@ -178,5 +202,22 @@ export class ConsultaComponent {
 
   private formatTime(date: Date): string {
     return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
+  }
+
+  private validarPeriodoFormulario(form: FormGroup): string | null {
+    const entryDate = form.get('entryDate')?.value;
+    const exitDate = form.get('exitDate')?.value;
+
+    if (!entryDate || !exitDate) return 'Preencha as datas de entrada e saída';
+
+    if (entryDate < this.minDateToday) {
+      return 'A data de entrada não pode ser anterior a hoje';
+    }
+
+    if (exitDate < entryDate) {
+      return 'A data de saída deve ser maior ou igual à data de entrada';
+    }
+
+    return null;
   }
 }

@@ -12,6 +12,7 @@ export interface CupomSaida {
   valorDiaria: number;
   valorTotal: number;
   descontoAplicado: number;
+  valorHorasAdicionais: number;
   valorFinal: number;
   formaPagamento: string;
 }

@@ -1,14 +1,21 @@
 .client_page {
   width: 100%;
-  margin: 0 auto;
-  padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px 20px;
+  min-height: 100dvh;
+  background: #e7efff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--primary-50);
-  min-height: 100dvh;
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 24px;
   box-sizing: border-box;
 }
+
+.client_content {
+  width: 100%;
+  max-width: 440px;
+  margin-block: auto;
+  flex-shrink: 0;
+}
+
 .card_container {
   width: 100%;
   max-width: 440px;
@@ -44,16 +51,19 @@
 .availability_card {
   background: var(--white);
   border-radius: 16px;
-  border: 1px solid var(--primary-50);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
 .card_content {
-  padding: 20px 20px 0 20px;
+  padding: 20px 20px 0;
+  text-align: left;
 }
 
 .section_title {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--text-dark);
 }
 
@@ -64,20 +74,20 @@
 .input_group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   margin-bottom: 16px;
 }
 
 .input_label {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--text-dark);
 }
 
 .input_field {
   width: 100%;
-  padding: 10px 14px;
+  padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid var(--text-muted);
+  border: 1px solid #334155;
   font-size: 0.95rem;
   background: var(--white);
   min-width: 0;
@@ -86,10 +96,11 @@
 .input_field:focus {
   outline: none;
   border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .primary_action {
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .availability_success {
@@ -215,8 +226,7 @@
 
 @media (max-width: 640px) {
   .client_page {
-    padding: 20px 12px 16px;
-    padding-top: calc(60px + env(safe-area-inset-top, 0px) + 20px);
+    padding: calc(env(safe-area-inset-top, 0px) + 12px) 12px 16px;
   }
 
   .page_header {

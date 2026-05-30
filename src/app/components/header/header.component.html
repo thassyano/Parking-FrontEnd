@@ -1,5 +1,14 @@
-<div class="container header_container">
-    <button (click)="navigateHome()" class="header_name">{{headerName()}}</button>
+<div class="header_container">
+    <button
+      *ngIf="showMenuToggle()"
+      type="button"
+      class="header_menu_toggle"
+      (click)="toggleSidebar()"
+    >
+      ☰
+    </button>
 
-    <app-back-btn></app-back-btn>
+    <button type="button" (click)="navigateHome()" class="header_name">
+      {{ headerName() }}
+    </button>
 </div>

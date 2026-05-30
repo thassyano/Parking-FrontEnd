@@ -1,21 +1,22 @@
-import { CurrencyPipe, ViewportScroller } from '@angular/common';
+import { CurrencyPipe, DatePipe, ViewportScroller } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { CarroEntry } from '../../../core/models/availability/client-flow.model';
 import { TipoVaga } from '../../../core/models/enums/tipo-vaga.enum';
 import { OrcamentoResponse } from '../../../core/models/reserva/orcamento/orcamento-response.model';
 import { ClientFlowService } from '../../../core/services/client/client-flow.service';
 import { OrcamentoService } from '../../../core/services/orcamento/orcamento.service';
-import { ReservaService } from '../../../core/services/reserva/reserva.service';
+import { ConflitoPorPlaca, ReservaService } from '../../../core/services/reserva/reserva.service';
+import { WhatsAppResponse } from '../../../core/models/reserva/whats-app-response.model';
 import { formatToISO } from '../../../core/utils/date/format-date-to-ISO';
 import { Patterns } from '../../../core/utils/patterns/form-patterns';
 import { scrollToTop } from '../../../core/utils/viewport/scroll-to-top';
 
 @Component({
   selector: 'app-reservations',
-  imports: [ReactiveFormsModule, CurrencyPipe],
+  imports: [ReactiveFormsModule, CurrencyPipe, DatePipe],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',
 })
@@ -33,6 +34,13 @@ export class ReservationsComponent implements OnInit {
   public isConfirmationVisible = signal(false);
   public isBudgetLoading = signal(false);
   public errorMessage = signal('');
+
+  // Conflito de placa
+  public conflitos = signal<ConflitoPorPlaca[]>([]);
+  public isConflitoVisible = signal(false);
+  public readonly todosConflitosPodemAtualizar = computed(() =>
+    this.conflitos().length > 0 && this.conflitos().every((c) => c.podeAtualizar),
+  );
 
   public carros = signal<CarroEntry[]>([]);
   public carroTipoVaga = signal<TipoVaga[]>([]);
@@ -125,8 +133,8 @@ export class ReservationsComponent implements OnInit {
     const requests = this.carros().map((carro, i) =>
       this.orcamentoService.calcular({
         tipoVaga: this.carroTipoVaga()[i],
-        dataEntrada: formatToISO(carro.dataEntrada),
-        qtdDias: carro.qtdDias,
+        dataEntrada: `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`,
+        dataSaidaPrevista: `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`,
       }),
     );
 
@@ -149,8 +157,8 @@ export class ReservationsComponent implements OnInit {
     this.orcamentoService
       .calcular({
         tipoVaga: this.carroTipoVaga()[index],
-        dataEntrada: formatToISO(carro.dataEntrada),
-        qtdDias: carro.qtdDias,
+        dataEntrada: `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`,
+        dataSaidaPrevista: `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`,
       })
       .subscribe({
         next: (orc) => {
@@ -223,6 +231,120 @@ export class ReservationsComponent implements OnInit {
     }
 
     this.errorMessage.set('');
+    this.verificarConflitosEProsseguir();
+  }
+
+  private verificarConflitosEProsseguir(): void {
+    const carros = this.carros();
+    const checks = carros.map((carro, i) => {
+      const placa = this.placasForm.at(i).value;
+      if (!placa) return null;
+      const dataEntrada = `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`;
+      const dataSaida = `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`;
+      return this.reservaService.verificarConflito(placa, dataEntrada, dataSaida);
+    });
+
+    const validos = checks.filter((c): c is NonNullable<typeof c> => c !== null);
+    if (!validos.length) {
+      this.isConfirmationVisible.set(true);
+      return;
+    }
+
+    this.isLoading.set(true);
+    forkJoin(validos).subscribe({
+      next: (resultados) => {
+        this.isLoading.set(false);
+        const encontrados = resultados.filter((r): r is ConflitoPorPlaca => r !== null);
+        if (encontrados.length) {
+          this.conflitos.set(encontrados);
+          this.isConflitoVisible.set(true);
+        } else {
+          this.isConfirmationVisible.set(true);
+        }
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.isConfirmationVisible.set(true);
+      },
+    });
+  }
+
+  public rejeitarConflito(): void {
+    this.isConflitoVisible.set(false);
+    this.conflitos.set([]);
+  }
+
+  public confirmarAtualizacaoConflito(): void {
+    this.isConflitoVisible.set(false);
+    const carros = this.carros();
+    const telefoneCliente = this.reservationForm.get('customerPhone')!.value ?? '';
+
+    const atualizacoes = this.conflitos().map((conflito) => {
+      const index = carros.findIndex(
+        (c, i) =>
+          this.placasForm.at(i).value.toUpperCase() === conflito.placaVeiculo.toUpperCase(),
+      );
+      if (index === -1) return null;
+      const carro = carros[index];
+      const placa = this.placasForm.at(index).value.toUpperCase();
+      const dataSaida = `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`;
+      return this.reservaService.atualizarCliente(conflito.id, {
+        dataSaidaPrevista: dataSaida,
+        placaVeiculo: placa,
+        telefoneCliente,
+      });
+    }).filter((a): a is NonNullable<typeof a> => a !== null);
+
+    if (!atualizacoes.length) return;
+
+    this.isLoading.set(true);
+    const idsAtualizados = this.conflitos().map((c) => c.id);
+
+    forkJoin(atualizacoes).subscribe({
+      next: () => {
+        const placasComConflito = new Set(
+          this.conflitos().map((c) => c.placaVeiculo.toUpperCase()),
+        );
+        this.conflitos.set([]);
+
+        const whatsapp$ =
+          idsAtualizados.length === 1
+            ? this.reservaService.whatsappAlteracao(idsAtualizados[0])
+            : this.reservaService.whatsappAlteracaoLote(idsAtualizados);
+
+        this.redirecionarWhatsApp(whatsapp$, () => this.criarReservasSemConflito(placasComConflito));
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        this.errorMessage.set(err.error?.message ?? 'Erro ao atualizar reserva existente');
+        scrollToTop(this.scroller);
+      },
+    });
+  }
+
+  private redirecionarWhatsApp(whatsapp$: Observable<WhatsAppResponse>, depois: () => void): void {
+    whatsapp$.subscribe({
+      next: (wp) => {
+        window.open(wp.url, '_blank');
+        this.isLoading.set(false);
+        depois();
+      },
+      error: () => {
+        this.isLoading.set(false);
+        depois();
+      },
+    });
+  }
+
+  private criarReservasSemConflito(placasComConflito: Set<string>): void {
+    const carrosSemConflito = this.carros().filter(
+      (_, i) => !placasComConflito.has(this.placasForm.at(i).value.toUpperCase()),
+    );
+    if (!carrosSemConflito.length) {
+      this.clientFlowService.resetClienteFlow();
+      this.router.navigate(['/']);
+      return;
+    }
     this.isConfirmationVisible.set(true);
   }
 

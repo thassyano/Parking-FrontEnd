@@ -1,14 +1,24 @@
-.reserva_container {
-  background-color: var(--medium-background);
-  padding-top: calc(60px + env(safe-area-inset-top, 0px));
+.client_page {
+  width: 100%;
   min-height: 100dvh;
+  background: #e7efff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 24px;
   box-sizing: border-box;
 }
 
-.reserva_page {
+.client_content {
+  width: 100%;
   max-width: 480px;
+  margin-block: auto;
+  flex-shrink: 0;
+}
+
+.reserva_page {
   margin: 0 auto;
-  padding: 2rem 0;
+  padding: 0;
 }
 
 .page_title {
@@ -36,10 +46,10 @@
 
 .reserva_card {
   background: var(--white);
-  border: 1px solid var(--medium-background);
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
   box-shadow: var(--shadow);
-  padding: 1.5rem;
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 1.1rem;

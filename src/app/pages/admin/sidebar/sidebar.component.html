@@ -85,10 +85,11 @@
     </div>
   </aside>
   <div class="admin-main">
-    <header class="admin-topbar">
-      <button class="menu-toggle" (click)="toggleSidebar()">&#9776;</button>
-      <span class="topbar-title">Painel Administrativo</span>
-    </header>
+    <div class="admin-topbar">
+      <button type="button" class="menu-toggle" (click)="toggleSidebar()" aria-label="Abrir menu">
+        ☰
+      </button>
+    </div>
     <div class="admin-content">
       <router-outlet />
     </div>

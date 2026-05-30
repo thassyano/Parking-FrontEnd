@@ -40,6 +40,18 @@
           }}</span>
         </div>
         <div class="price_detail">
+          <span class="price_label">Hora extra (até 6h)</span>
+          <span class="price_value">{{
+            preco.valorHorasAdicionaisAte6h | currency: 'BRL' : 'symbol' : '1.2-2'
+          }}</span>
+        </div>
+        <div class="price_detail">
+          <span class="price_label">Hora extra (até 12h)</span>
+          <span class="price_value">{{
+            preco.valorHorasAdicionaisAte12h | currency: 'BRL' : 'symbol' : '1.2-2'
+          }}</span>
+        </div>
+        <div class="price_detail">
           <span class="price_label">Vigência</span>
           <span class="price_value">
             {{ preco.dataInicio | date: 'dd/MM/yyyy' }}
@@ -63,10 +75,19 @@
       <div class="preco_form_row">
         <div class="preco_input_group">
           <label class="preco_input_label">Tipo de Vaga *</label>
-          <select class="preco_input_field preco_input_select" formControlName="tipoVaga">
+          <select
+            class="preco_input_field preco_input_select"
+            formControlName="tipoVaga"
+            (change)="onTipoVagaChange($any($event.target).value)"
+          >
             <option class="preco_select_option" value="Coberta">Coberta</option>
             <option class="preco_select_option" value="Descoberta">Descoberta</option>
           </select>
+          @if (carregandoPrecoAtual()) {
+            <span class="preco_input_hint">Carregando valores atuais...</span>
+          } @else if (precoAtualCarregado()) {
+            <span class="preco_input_hint">✓ Valores carregados do preço vigente — edite o que quiser</span>
+          }
         </div>
 
         <div class="preco_input_group">
@@ -86,6 +107,28 @@
             type="number"
             class="preco_input_field"
             formControlName="descontoPixDinheiro"
+            step="0.01"
+            min="0"
+          />
+        </div>
+
+        <div class="preco_input_group">
+          <label class="preco_input_label">Hora extra até 6h (R$)</label>
+          <input
+            type="number"
+            class="preco_input_field"
+            formControlName="valorHorasAdicionaisAte6h"
+            step="0.01"
+            min="0"
+          />
+        </div>
+
+        <div class="preco_input_group">
+          <label class="preco_input_label">Hora extra até 12h (R$)</label>
+          <input
+            type="number"
+            class="preco_input_field"
+            formControlName="valorHorasAdicionaisAte12h"
             step="0.01"
             min="0"
           />
@@ -126,6 +169,8 @@
             <th class="preco_table_th">Tipo Vaga</th>
             <th class="preco_table_th">Valor Diária</th>
             <th class="preco_table_th">Desconto PIX/Dinheiro</th>
+            <th class="preco_table_th">Extra até 6h</th>
+            <th class="preco_table_th">Extra até 12h</th>
             <th class="preco_table_th">Vigente de</th>
             <th class="preco_table_th">Vigente até</th>
             <th class="preco_table_th">Ativo</th>
@@ -140,6 +185,12 @@
               </td>
               <td class="preco_table_td">
                 {{ preco.descontoPixDinheiro | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              </td>
+              <td class="preco_table_td">
+                {{ preco.valorHorasAdicionaisAte6h | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              </td>
+              <td class="preco_table_td">
+                {{ preco.valorHorasAdicionaisAte12h | currency: 'BRL' : 'symbol' : '1.2-2' }}
               </td>
               <td class="preco_table_td">{{ preco.dataInicio | date: 'dd/MM/yyyy' }}</td>
               <td class="preco_table_td">

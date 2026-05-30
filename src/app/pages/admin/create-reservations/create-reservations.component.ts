@@ -1,11 +1,11 @@
-import { ViewportScroller } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { ClientNameLengths } from '../../../constants/cliente-name-lenght';
 import { CarroPresencialLoteRequest } from '../../../core/models/reserva/carros/carro-lote-request.interface';
-import { ReservaService } from '../../../core/services/reserva/reserva.service';
+import { ConflitoPorPlaca, ReservaService } from '../../../core/services/reserva/reserva.service';
 import { Patterns } from '../../../core/utils/patterns/form-patterns';
 import { cpfValidator } from '../../../core/utils/reservation/cpf-validator';
 import { saidaPosteriorEntradaValidator } from '../../../core/utils/reservation/entry-exit-date-validator';
@@ -16,11 +16,10 @@ import {
   sanitizePhone,
   sanitizePlate,
 } from '../../../core/utils/reservation/reservation-utils';
-import { scrollToTop } from '../../../core/utils/viewport/scroll-to-top';
 
 @Component({
   selector: 'app-create-reservations',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DatePipe],
   templateUrl: './create-reservations.component.html',
   styleUrl: './create-reservations.component.css',
 })
@@ -28,13 +27,18 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
   protected loading = signal(false);
   protected erro = signal('');
 
-  private readonly MS_POR_DIA = 1000 * 60 * 60 * 24;
+  // Conflito de placa
+  protected conflitos = signal<ConflitoPorPlaca[]>([]);
+  protected isConflitoVisible = signal(false);
+  protected readonly todosConflitosPodemAtualizar = computed(() =>
+    this.conflitos().length > 0 && this.conflitos().every((c) => c.podeAtualizar),
+  );
+  private payloadPendente: (() => void) | null = null;
 
   private hoje = new Date();
-  private amanha = new Date(this.hoje.getTime() + this.MS_POR_DIA);
+  private amanha = new Date(this.hoje.getTime() + 86_400_000);
   private sub = new Subscription();
 
-  private readonly scroller = inject(ViewportScroller);
   private reservaService = inject(ReservaService);
   private router = inject(Router);
 
@@ -82,7 +86,7 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
         horaEntrada: new FormControl(horaEntrada, Validators.required),
         dataSaida: new FormControl(dataSaida, Validators.required),
         horaSaida: new FormControl(horaEntrada, Validators.required),
-        qtdDias: new FormControl({ value: 1, disabled: true }, Validators.min(1)),
+        qtdDias: new FormControl({ value: 0, disabled: true }, Validators.min(0)),
         observacoes: new FormControl(''),
       },
       { validators: saidaPosteriorEntradaValidator() },
@@ -123,8 +127,8 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
 
     if (saida <= entrada) return;
 
-    const diff = saida.getTime() - entrada.getTime();
-    const dias = Math.max(1, Math.ceil(diff / this.MS_POR_DIA));
+    const horas = (saida.getTime() - entrada.getTime()) / 3_600_000;
+    const dias = horas <= 12 ? 0 : Math.floor(horas / 24) || 1;
     group.get('qtdDias')!.setValue(dias, { emitEvent: false });
   }
 
@@ -201,7 +205,7 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
 
     if (ctrl.hasError('cpfInvalid')) return 'CPF informado é inválido.';
 
-    if (ctrl.hasError('min')) return 'A quantidade mínima é 1 dia.';
+    if (ctrl.hasError('min')) return 'Quantidade de dias inválida.';
 
     return 'Campo inválido.';
   }
@@ -211,7 +215,6 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
 
     if (this.form.invalid) {
       this.erro.set('Preencha todos os campos corretamente.');
-      scrollToTop(this.scroller);
       return;
     }
 
@@ -232,23 +235,105 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
 
     if (duplicadas.length) {
       this.erro.set(`Placas duplicadas no(s) veículo(s): ${[...new Set(duplicadas)].join(', ')}`);
-      scrollToTop(this.scroller);
       return;
     }
 
-    this.loading.set(true);
     this.erro.set('');
-
     const { nomeCliente, telefoneCliente, cpfCliente, veiculos } = this.form.value;
     const cpfNormalizado = cpfCliente ? normalizeCpfForSubmit(cpfCliente) : undefined;
 
-    if (veiculos!.length === 1) {
-      const v = veiculos![0];
+    // Verifica conflitos antes de criar
+    this.loading.set(true);
+    const checks = veiculos!.map((v, i) =>
+      this.reservaService.verificarConflito(
+        v.placaVeiculo!.toUpperCase(),
+        `${v.dataEntrada}T${v.horaEntrada || '00:00'}`,
+        `${v.dataSaida}T${v.horaSaida || '00:00'}`,
+      ),
+    );
+
+    forkJoin(checks).subscribe({
+      next: (resultados) => {
+        this.loading.set(false);
+        const encontrados = resultados.filter((r): r is ConflitoPorPlaca => r !== null);
+
+        if (encontrados.length) {
+          this.conflitos.set(encontrados);
+          this.payloadPendente = () => this.executarCriacao(nomeCliente!, telefoneCliente!, cpfNormalizado, veiculos!);
+          this.isConflitoVisible.set(true);
+        } else {
+          this.executarCriacao(nomeCliente!, telefoneCliente!, cpfNormalizado, veiculos!);
+        }
+      },
+      error: () => {
+        this.loading.set(false);
+        this.executarCriacao(nomeCliente!, telefoneCliente!, cpfNormalizado, veiculos!);
+      },
+    });
+  }
+
+  protected rejeitarConflito(): void {
+    this.isConflitoVisible.set(false);
+    this.conflitos.set([]);
+    this.payloadPendente = null;
+  }
+
+  protected confirmarAtualizacaoConflito(): void {
+    this.isConflitoVisible.set(false);
+    const veiculos = this.form.value.veiculos!;
+
+    const atualizacoes = this.conflitos().map((conflito) => {
+      const v = veiculos.find(
+        (veh) => veh.placaVeiculo?.toUpperCase() === conflito.placaVeiculo.toUpperCase(),
+      );
+      if (!v) return null;
+      return this.reservaService.atualizar(conflito.id, {
+        dataSaidaPrevista: `${v.dataSaida}T${v.horaSaida || '00:00'}`,
+      });
+    }).filter((a): a is NonNullable<typeof a> => a !== null);
+
+    this.loading.set(true);
+    forkJoin(atualizacoes).subscribe({
+      next: () => {
+        this.loading.set(false);
+        const placasComConflito = new Set(
+          this.conflitos().map((c) => c.placaVeiculo.toUpperCase()),
+        );
+        this.conflitos.set([]);
+        const semConflito = veiculos.filter(
+          (v) => !placasComConflito.has(v.placaVeiculo?.toUpperCase() ?? ''),
+        );
+        const { nomeCliente, telefoneCliente, cpfCliente } = this.form.value;
+        const cpfNorm = cpfCliente ? normalizeCpfForSubmit(cpfCliente) : undefined;
+        if (semConflito.length) {
+          this.executarCriacao(nomeCliente!, telefoneCliente!, cpfNorm, semConflito);
+        } else {
+          this.router.navigate(['/admin/reservas']);
+        }
+        this.payloadPendente = null;
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.erro.set(err.error?.message ?? 'Erro ao atualizar reserva existente');
+      },
+    });
+  }
+
+  private executarCriacao(
+    nomeCliente: string,
+    telefoneCliente: string,
+    cpfCliente: string | undefined,
+    veiculos: any[],
+  ): void {
+    this.loading.set(true);
+
+    if (veiculos.length === 1) {
+      const v = veiculos[0];
       this.reservaService
         .criarPresencial({
-          nomeCliente: nomeCliente!,
-          telefoneCliente: telefoneCliente!,
-          cpfCliente: cpfNormalizado,
+          nomeCliente,
+          telefoneCliente,
+          cpfCliente,
           placaVeiculo: v.placaVeiculo!.toUpperCase(),
           tipoVaga: v.tipoVaga!,
           dataEntrada: `${v.dataEntrada}T${v.horaEntrada || '00:00'}`,
@@ -264,7 +349,7 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
           },
         });
     } else {
-      const carros: CarroPresencialLoteRequest[] = veiculos!.map((v, i) => ({
+      const carros: CarroPresencialLoteRequest[] = veiculos.map((v, i) => ({
         placaVeiculo: v.placaVeiculo!.toUpperCase(),
         tipoVaga: v.tipoVaga!,
         dataEntrada: `${v.dataEntrada}T${v.horaEntrada || '00:00'}`,
@@ -274,12 +359,7 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
       }));
 
       this.reservaService
-        .criarPresencialLote({
-          nomeCliente: nomeCliente!,
-          telefoneCliente: telefoneCliente!,
-          cpfCliente: cpfNormalizado,
-          carros,
-        })
+        .criarPresencialLote({ nomeCliente, telefoneCliente, cpfCliente, carros })
         .subscribe({
           next: () => this.router.navigate(['/admin/reservas']),
           error: (err) => {

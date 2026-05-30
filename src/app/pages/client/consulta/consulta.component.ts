@@ -164,7 +164,7 @@ export class ConsultaComponent {
   ): CarroEntry {
     const entrada = this.parseDateTime(entryDate, entryTime);
     const saida = this.parseDateTime(exitDate, exitTime);
-    const qtdDias = this.calcDays(entryDate, exitDate);
+    const qtdDias = this.calcDays(entryDate, entryTime, exitDate, exitTime);
 
     return {
       dataEntrada: entrada.data,
@@ -185,9 +185,12 @@ export class ConsultaComponent {
     return dias.reduce((min, day) => Math.min(min, selector(day)), Infinity);
   }
 
-  private calcDays(entryDate: string, exitDate: string): number {
-    const ms = new Date(exitDate).getTime() - new Date(entryDate).getTime();
-    return Math.max(1, Math.round(ms / 86_400_000));
+  private calcDays(entryDate: string, entryTime: string, exitDate: string, exitTime: string): number {
+    const entrada = new Date(`${entryDate}T${entryTime}`);
+    const saida = new Date(`${exitDate}T${exitTime}`);
+    const horas = (saida.getTime() - entrada.getTime()) / 3_600_000;
+    if (horas <= 12) return 0;
+    return Math.floor(horas / 24) || 1;
   }
 
   private parseDateTime(date: string, time: string): { data: string; hora: string } {
@@ -206,7 +209,9 @@ export class ConsultaComponent {
 
   private validarPeriodoFormulario(form: FormGroup): string | null {
     const entryDate = form.get('entryDate')?.value;
+    const entryTime = form.get('entryTime')?.value ?? '00:00';
     const exitDate = form.get('exitDate')?.value;
+    const exitTime = form.get('exitTime')?.value ?? '00:00';
 
     if (!entryDate || !exitDate) return 'Preencha as datas de entrada e saída';
 
@@ -214,8 +219,11 @@ export class ConsultaComponent {
       return 'A data de entrada não pode ser anterior a hoje';
     }
 
-    if (exitDate < entryDate) {
-      return 'A data de saída deve ser maior ou igual à data de entrada';
+    const entrada = new Date(`${entryDate}T${entryTime}`);
+    const saida = new Date(`${exitDate}T${exitTime}`);
+
+    if (saida <= entrada) {
+      return 'A data/hora de saída deve ser posterior à data/hora de entrada';
     }
 
     return null;

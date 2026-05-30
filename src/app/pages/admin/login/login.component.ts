@@ -8,7 +8,7 @@ import { HeaderComponent } from '../../../components/header/header.component';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, LandingButtonComponent, HeaderComponent],
+  imports: [ReactiveFormsModule, LandingButtonComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })

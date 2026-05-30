@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import {
   AssociarPlacaRequest,
   CheckoutRequest,
@@ -91,7 +92,53 @@ export class ReservaService {
     return this.http.get<WhatsAppResponse>(`${this.url}/${id}/whatsapp`);
   }
 
+  public whatsappAlteracao(id: number): Observable<WhatsAppResponse> {
+    return this.http.get<WhatsAppResponse>(`${this.url}/${id}/whatsapp-alteracao`);
+  }
+
+  whatsappAlteracaoLote(ids: number[]): Observable<WhatsAppResponse> {
+    return this.http.post<WhatsAppResponse>(`${this.url}/whatsapp/lote-alteracao`, ids);
+  }
+
   public confirmarPorToken(token: string): Observable<ConfirmacaoReservaResponse> {
     return this.http.get<ConfirmacaoReservaResponse>(`${this.url}/confirmar/${token}`);
   }
+
+  /**
+   * Verifica se uma placa já possui reserva ativa que se sobreponha ao período.
+   * Retorna o conflito encontrado ou null se não houver.
+   */
+  public verificarConflito(placa: string, dataEntrada: string, dataSaidaPrevista: string): Observable<ConflitoPorPlaca | null> {
+    const params = new HttpParams()
+      .set('placa', placa)
+      .set('dataEntrada', dataEntrada)
+      .set('dataSaidaPrevista', dataSaidaPrevista);
+
+    return this.http.get<ConflitoPorPlaca>(`${this.url}/conflito`, { params }).pipe(
+      catchError(() => of(null)), // 404 = sem conflito
+    );
+  }
+
+  /** Admin autenticado — altera reserva presencial. */
+  public atualizar(id: number, data: { dataSaidaPrevista: string }): Observable<Reserva> {
+    return this.http.patch<Reserva>(`${this.url}/${id}/alterar`, data);
+  }
+
+  /** Cliente online — altera a própria reserva (telefone + placa, sem JWT). */
+  public atualizarCliente(
+    id: number,
+    data: { dataSaidaPrevista: string; placaVeiculo: string; telefoneCliente: string },
+  ): Observable<Reserva> {
+    return this.http.patch<Reserva>(`${this.url}/${id}/alterar-cliente`, data);
+  }
+}
+
+export interface ConflitoPorPlaca {
+  id: number;
+  placaVeiculo: string;
+  dataEntrada: string;
+  dataSaidaPrevista: string;
+  status: string;
+  tipoVaga: string;
+  podeAtualizar: boolean;
 }

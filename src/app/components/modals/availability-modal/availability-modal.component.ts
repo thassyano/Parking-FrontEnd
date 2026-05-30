@@ -1,11 +1,10 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, input, output, ViewEncapsulation } from '@angular/core';
 import { PeriodAvailability } from '../../../core/models/availability/period-availability.model';
 import { LandingButtonComponent } from '../../buttons/landing-button/landing-button.component';
 
 @Component({
   selector: 'app-availability-modal',
-  imports: [LandingButtonComponent, DatePipe],
+  imports: [LandingButtonComponent],
   templateUrl: './availability-modal.component.html',
   styleUrl: './availability-modal.component.css',
 })
@@ -33,8 +32,6 @@ export class AvailabilityModalComponent {
   public hasAvailability = computed(
     () => this.guaranteedCoveredSpots() > 0 || this.guaranteedUncoveredSpots() > 0,
   );
-
-  public totalDays = computed(() => this.data().dias.length);
 
   public emitClose(): void {
     this.closeOutput.emit();

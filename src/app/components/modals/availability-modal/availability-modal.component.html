@@ -2,12 +2,6 @@
   <div class="modal_container" (click)="$event.stopPropagation()">
     <h2 class="modal_title">Disponibilidade no Período</h2>
 
-    <p class="modal_period">
-      {{ data().dataInicio | date: 'dd/MM/yyyy' }} a {{ data().dataFim | date: 'dd/MM/yyyy' }} - {{
-        totalDays()
-      }}
-      diária(s)
-    </p>
 
     <div class="slot_card">
       <span class="slot_label">Vagas Cobertas</span>

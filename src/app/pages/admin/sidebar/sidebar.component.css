@@ -12,16 +12,15 @@
 }
 
 .sidebar {
-  position: absolute;
-  top: 0;
   width: 238px;
-  height: calc(100vh - 60px);
+  height: 100vh;
+  height: 100dvh;
   background: #020d1f;
   color: var(--white);
   display: flex;
   flex-direction: column;
   position: fixed;
-  inset: 60px auto 0 0;
+  inset: 0 auto 0 0;
   transition: transform 0.2s ease;
   z-index: 300;
 }
@@ -132,19 +131,20 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding-top: 60px;
+  min-height: 100dvh;
   width: 100%;
 }
 
 .admin-topbar {
+  display: none;
   background: var(--white);
   border-bottom: 1px solid var(--medium-background);
-  padding: 0 1.5rem;
-  height: 56px;
-  display: flex;
+  padding: 0 1rem;
+  height: 52px;
   align-items: center;
   gap: 1rem;
   box-shadow: var(--shadow);
+  flex-shrink: 0;
 }
 
 .menu-toggle {
@@ -173,8 +173,8 @@
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
-    width: 100%;
-    inset: 60px 0 0 0;
+    width: min(100%, 280px);
+    inset: 0 auto 0 0;
   }
 
   .sidebar.open {
@@ -191,11 +191,14 @@
 
   .admin-main {
     margin-left: 0;
-    padding-top: 60px;
+  }
+
+  .admin-topbar {
+    display: flex;
   }
 
   .menu-toggle {
-    display: block;
+    display: inline-flex;
   }
 
   .admin-content {

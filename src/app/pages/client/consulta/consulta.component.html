@@ -24,7 +24,7 @@
             <img class="label_icon" src="assets/icons/calendar.icon.svg" alt="" />
             <label class="input_label">Data de Entrada</label>
           </div>
-          <input type="date" class="input_field" formControlName="entryDate" />
+          <input type="date" class="input_field" formControlName="entryDate" [min]="minDateToday" />
         </div>
 
         <div class="input_group">
@@ -40,7 +40,7 @@
             <img class="label_icon" src="assets/icons/calendar.icon.svg" alt="" />
             <label class="input_label">Data de Saída</label>
           </div>
-          <input type="date" class="input_field" formControlName="exitDate" />
+          <input type="date" class="input_field" formControlName="exitDate" [min]="minDateToday" />
         </div>
 
         <div class="input_group">
@@ -85,7 +85,7 @@
               <div class="vehicle_fields">
                 <div class="vehicle_field_group">
                   <label class="vehicle_field_label">Data de Entrada</label>
-                  <input type="date" class="vehicle_field_input" formControlName="entryDate" />
+                  <input type="date" class="vehicle_field_input" formControlName="entryDate" [min]="minDateToday" />
                 </div>
                 <div class="vehicle_field_group">
                   <label class="vehicle_field_label">Horário de Entrada</label>
@@ -93,7 +93,7 @@
                 </div>
                 <div class="vehicle_field_group">
                   <label class="vehicle_field_label">Data de Saída</label>
-                  <input type="date" class="vehicle_field_input" formControlName="exitDate" />
+                  <input type="date" class="vehicle_field_input" formControlName="exitDate" [min]="minDateToday" />
                 </div>
                 <div class="vehicle_field_group">
                   <label class="vehicle_field_label">Horário de Saída</label>

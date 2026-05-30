@@ -35,10 +35,15 @@ export class PricingComponent implements OnInit {
     });
   });
 
+  public precoAtualCarregado = signal<Preco | null>(null);
+  public carregandoPrecoAtual = signal(false);
+
   public precoForm = new FormGroup({
     tipoVaga: new FormControl<string>('Coberta', Validators.required),
     valorDiaria: new FormControl<number>(0, [Validators.required, Validators.min(0.01)]),
     descontoPixDinheiro: new FormControl<number>(0, Validators.min(0)),
+    valorHorasAdicionaisAte6h: new FormControl<number>(0, Validators.min(0)),
+    valorHorasAdicionaisAte12h: new FormControl<number>(0, Validators.min(0)),
     dataInicio: new FormControl<string>('', Validators.required),
     dataFim: new FormControl<string>(''),
   });
@@ -128,7 +133,7 @@ export class PricingComponent implements OnInit {
       return;
     }
 
-    const { dataInicio, dataFim, tipoVaga, valorDiaria, descontoPixDinheiro } =
+    const { dataInicio, dataFim, tipoVaga, valorDiaria, descontoPixDinheiro, valorHorasAdicionaisAte6h, valorHorasAdicionaisAte12h } =
       this.precoForm.value;
 
     if (dataFim && dataFim <= dataInicio!) {
@@ -150,6 +155,8 @@ export class PricingComponent implements OnInit {
         tipoVaga: tipoVaga!,
         valorDiaria: valorDiaria!,
         descontoPixDinheiro: descontoPixDinheiro ?? 0,
+        valorHorasAdicionaisAte6h: valorHorasAdicionaisAte6h ?? 0,
+        valorHorasAdicionaisAte12h: valorHorasAdicionaisAte12h ?? 0,
         dataInicio: dataInicio!,
         dataFim: dataFim || undefined,
       })
@@ -182,6 +189,36 @@ export class PricingComponent implements OnInit {
 
   public toggleForm(): void {
     this.showForm.update((v) => !v);
+    if (this.showForm()) {
+      this.carregarPrecoAtualPorTipo(this.precoForm.controls.tipoVaga.value ?? 'Coberta');
+    }
+  }
+
+  public onTipoVagaChange(tipo: string): void {
+    this.carregarPrecoAtualPorTipo(tipo);
+  }
+
+  private carregarPrecoAtualPorTipo(tipo: string): void {
+    this.carregandoPrecoAtual.set(true);
+    this.precoAtualCarregado.set(null);
+
+    this.precoService.obterPorTipo(tipo).subscribe({
+      next: (preco) => {
+        this.precoAtualCarregado.set(preco);
+        this.precoForm.patchValue({
+          valorDiaria: preco.valorDiaria,
+          descontoPixDinheiro: preco.descontoPixDinheiro,
+          valorHorasAdicionaisAte6h: preco.valorHorasAdicionaisAte6h,
+          valorHorasAdicionaisAte12h: preco.valorHorasAdicionaisAte12h,
+        });
+        this.carregandoPrecoAtual.set(false);
+      },
+      error: () => {
+        // Nenhum preço ativo para esse tipo — mantém os campos em branco
+        this.precoAtualCarregado.set(null);
+        this.carregandoPrecoAtual.set(false);
+      },
+    });
   }
 
   private precoFormReset(): void {
@@ -189,6 +226,8 @@ export class PricingComponent implements OnInit {
       tipoVaga: 'Coberta',
       valorDiaria: 0,
       descontoPixDinheiro: 0,
+      valorHorasAdicionaisAte6h: 0,
+      valorHorasAdicionaisAte12h: 0,
       dataInicio: this.getLocalDate(),
       dataFim: '',
     });

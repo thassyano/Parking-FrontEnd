@@ -2,8 +2,62 @@
   <h1 class="page-title">Nova Reserva Presencial</h1>
 </div>
 
+@if (isConflitoVisible()) {
+  <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="conflito-modal-title">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-alert-icon">
+        <img class="img-icon" src="assets/icons/alert.icon.svg" alt="" />
+      </div>
+      <h2 id="conflito-modal-title" class="modal-title">Reserva já existente</h2>
+
+      @for (conflito of conflitos(); track conflito.id) {
+        <p class="modal-description">
+          O veículo com placa <strong>{{ conflito.placaVeiculo }}</strong> já possui uma reserva ativa:<br />
+          De <strong>{{ conflito.dataEntrada | date: 'dd/MM/yyyy HH:mm' }}</strong>
+          até <strong>{{ conflito.dataSaidaPrevista | date: 'dd/MM/yyyy HH:mm' }}</strong>
+          ({{ conflito.tipoVaga }})
+        </p>
+        @if (!conflito.podeAtualizar) {
+          <p class="modal-description modal-description--danger">
+            Veículo já com check-in realizado — não é possível alterar pelo fluxo de reserva.
+          </p>
+        }
+      }
+
+      @if (todosConflitosPodemAtualizar()) {
+        <p class="modal-description">Deseja alterar a reserva existente com as novas datas?</p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-primary" (click)="confirmarAtualizacaoConflito()">
+            Sim, alterar a existente
+          </button>
+          <button type="button" class="btn btn-outline-secondary" (click)="rejeitarConflito()">
+            Não, manter a existente
+          </button>
+        </div>
+      } @else {
+        <div class="modal-actions">
+          <button type="button" class="btn btn-primary btn-block" (click)="rejeitarConflito()">
+            OK
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}
+
 @if (erro()) {
-  <div class="alert alert-danger">{{ erro() }}</div>
+  <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="erro-modal-title">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-alert-icon">
+        <img class="img-icon" src="assets/icons/alert.icon.svg" alt="" />
+      </div>
+      <h2 id="erro-modal-title" class="modal-title">Ocorreu um erro</h2>
+      <p class="modal-description">{{ erro() }}</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary btn-block" (click)="erro.set('')">OK</button>
+      </div>
+    </div>
+  </div>
 }
 
 <form [formGroup]="form" (ngSubmit)="submeter()">

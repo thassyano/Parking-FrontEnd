@@ -1,8 +1,8 @@
-<div class="container reserva_container">
-  <div class="reserva_page">
-    <h1 class="page_title">Reservar Vaga</h1>
+<div class="client_page">
+  <div class="client_content">
+    <div class="reserva_page">
 
-    @if (errorMessage()) {
+      @if (errorMessage()) {
       <div class="error_alert">{{ errorMessage() }}</div>
     }
 
@@ -114,14 +114,28 @@
         @if (orcamentos()[$index]; as orc) {
           <div class="budget_card">
             <h3 class="budget_title">Valor deste Veículo</h3>
-            <div class="budget_row">
-              <span>Diária ({{ orc.tipoVaga }})</span>
-              <span>{{ orc.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
-            </div>
-            <div class="budget_row">
-              <span>Quantidade</span>
-              <span>{{ orc.qtdDias }} dia(s)</span>
-            </div>
+
+            @if (orc.tipoPrecificacao === 'HorasAte6h') {
+              <div class="budget_row">
+                <span>Permanência até 6h ({{ orc.tipoVaga }})</span>
+                <span>{{ orc.valorTotalCartao | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+              </div>
+            } @else if (orc.tipoPrecificacao === 'HorasAte12h') {
+              <div class="budget_row">
+                <span>Permanência até 12h ({{ orc.tipoVaga }})</span>
+                <span>{{ orc.valorTotalCartao | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+              </div>
+            } @else {
+              <div class="budget_row">
+                <span>Diária ({{ orc.tipoVaga }})</span>
+                <span>{{ orc.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+              </div>
+              <div class="budget_row">
+                <span>Quantidade</span>
+                <span>{{ orc.qtdDias }} dia(s)</span>
+              </div>
+            }
+
             <div class="budget_divider"></div>
             <div class="budget_row budget_row--total">
               <span>Total no Cartão</span>
@@ -175,6 +189,51 @@
     </div>
   </div>
 </div>
+
+@if (isConflitoVisible()) {
+  <div class="modal_overlay" (click)="rejeitarConflito()">
+    <div class="modal_card" (click)="$event.stopPropagation()">
+      <div class="modal_warning_icon">
+        <img class="img_icon" src="assets/icons/alert.icon.svg" alt="" />
+      </div>
+
+      <h2 class="modal_title">Reserva já existente</h2>
+
+      @for (conflito of conflitos(); track conflito.id) {
+        <p class="modal_description">
+          O veículo com placa <strong>{{ conflito.placaVeiculo }}</strong> já possui uma reserva ativa:
+          <br />
+          De <strong>{{ conflito.dataEntrada | date: 'dd/MM/yyyy HH:mm' }}</strong>
+          até <strong>{{ conflito.dataSaidaPrevista | date: 'dd/MM/yyyy HH:mm' }}</strong>
+          ({{ conflito.tipoVaga }})
+        </p>
+
+        @if (!conflito.podeAtualizar) {
+          <p class="modal_description" style="color: var(--color-danger)">
+            Este veículo já realizou check-in e não pode ser alterado por aqui.
+          </p>
+        }
+      }
+
+      @if (todosConflitosPodemAtualizar()) {
+        <p class="modal_description">
+          Deseja alterar a reserva existente com as novas datas? Em seguida você será direcionado ao
+          <strong>WhatsApp</strong> para avisar o estacionamento da alteração.
+        </p>
+        <div class="modal_actions">
+          <button class="btn_primary" (click)="confirmarAtualizacaoConflito()">
+            Sim, alterar e ir para WhatsApp
+          </button>
+          <button class="btn_outline" (click)="rejeitarConflito()">Não, manter a existente</button>
+        </div>
+      } @else {
+        <div class="modal_actions">
+          <button class="btn_outline" (click)="rejeitarConflito()">Fechar</button>
+        </div>
+      }
+    </div>
+  </div>
+}
 
 @if (isConfirmationVisible()) {
   <div class="modal_overlay" (click)="closeConfirmation()">

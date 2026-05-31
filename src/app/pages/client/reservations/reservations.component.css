@@ -104,15 +104,21 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .input_label {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-secondary);
   gap: 8px;
+}
+
+.input_label img {
+  flex-shrink: 0;
 }
 
 .input_field {

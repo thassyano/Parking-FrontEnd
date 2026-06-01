@@ -15,36 +15,40 @@
         [formGroup]="availabilityForm"
         (ngSubmit)="checkAvailability()"
       >
-        <div class="input_group">
-          <div class="label_group">
+        <!-- ENTRADA -->
+        <div class="period_section">
+          <div class="period_label">
             <img class="label_icon" src="assets/icons/calendar.icon.svg" alt="" />
-            <label class="input_label">Data de Entrada</label>
+            <span>Entrada</span>
           </div>
-          <input type="date" class="input_field" formControlName="entryDate" [min]="minDateToday" />
+          <div class="period_row">
+            <div class="input_group">
+              <label class="input_label">Data</label>
+              <input type="date" class="input_field" formControlName="entryDate" [min]="minDateToday" />
+            </div>
+            <div class="input_group">
+              <label class="input_label">Horário</label>
+              <input type="time" class="input_field" formControlName="entryTime" />
+            </div>
+          </div>
         </div>
 
-        <div class="input_group">
-          <div class="label_group">
-            <img class="label_icon" src="assets/icons/clock.icon.svg" alt="" />
-            <label class="input_label">Horário de Entrada</label>
-          </div>
-          <input type="time" class="input_field" formControlName="entryTime" />
-        </div>
-
-        <div class="input_group">
-          <div class="label_group">
+        <!-- SAÍDA -->
+        <div class="period_section">
+          <div class="period_label">
             <img class="label_icon" src="assets/icons/calendar.icon.svg" alt="" />
-            <label class="input_label">Data de Saída</label>
+            <span>Saída</span>
           </div>
-          <input type="date" class="input_field" formControlName="exitDate" [min]="minDateToday" />
-        </div>
-
-        <div class="input_group">
-          <div class="label_group">
-            <img class="label_icon" src="assets/icons/clock.icon.svg" alt="" />
-            <label class="input_label">Horário de Saída</label>
+          <div class="period_row">
+            <div class="input_group">
+              <label class="input_label">Data</label>
+              <input type="date" class="input_field" formControlName="exitDate" [min]="minDateToday" />
+            </div>
+            <div class="input_group">
+              <label class="input_label">Horário</label>
+              <input type="time" class="input_field" formControlName="exitTime" />
+            </div>
           </div>
-          <input type="time" class="input_field" formControlName="exitTime" />
         </div>
 
         <div class="primary_action">

@@ -23,6 +23,11 @@
                 "output": "/assets/"
               },
               {
+                "glob": "**/*",
+                "input": "public/",
+                "output": "/"
+              },
+              {
                 "glob": "favicon.ico",
                 "input": "src/",
                 "output": "/"

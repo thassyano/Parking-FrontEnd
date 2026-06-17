@@ -8,4 +8,5 @@ export interface CriarReservaPresencialRequest {
   dataSaidaPrevista: string;
   qtdDias: number;
   observacoes?: string;
+  reservaFutura?: boolean;
 }

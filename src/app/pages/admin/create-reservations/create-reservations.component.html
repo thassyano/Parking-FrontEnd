@@ -232,10 +232,31 @@
     </button>
   </div>
 
+  <div class="card" style="padding: 1rem 1.5rem">
+    <label class="form-check-label">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        [(ngModel)]="reservaFutura"
+        [ngModelOptions]="{standalone: true}"
+      />
+      &nbsp;Reserva futura (o cliente não está chegando agora)
+    </label>
+    <p class="form-check-hint">
+      Quando marcado, a reserva fica como <strong>Pendente</strong> — ideal para quem agenda com antecedência.
+    </p>
+  </div>
+
   <div class="card" style="padding: 1rem">
     <button type="submit" class="btn btn-primary btn-lg btn-block" [disabled]="loading()">
       @if (loading()) {
         Registrando...
+      } @else if (reservaFutura) {
+        @if (veiculosArray.length > 1) {
+          Agendar {{ veiculosArray.length }} Reservas Futuras
+        } @else {
+          Agendar Reserva Futura
+        }
       } @else if (veiculosArray.length > 1) {
         Registrar {{ veiculosArray.length }} Entradas
       } @else {

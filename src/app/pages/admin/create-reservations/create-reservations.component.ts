@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { forkJoin, Subscription } from 'rxjs';
 import { ClientNameLengths } from '../../../constants/cliente-name-lenght';
@@ -19,13 +19,14 @@ import {
 
 @Component({
   selector: 'app-create-reservations',
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, FormsModule, DatePipe],
   templateUrl: './create-reservations.component.html',
   styleUrl: './create-reservations.component.css',
 })
 export class CreateReservationsComponent implements OnInit, OnDestroy {
   protected loading = signal(false);
   protected erro = signal('');
+  protected reservaFutura = false;
 
   // Conflito de placa
   protected conflitos = signal<ConflitoPorPlaca[]>([]);
@@ -340,6 +341,7 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
           dataSaidaPrevista: `${v.dataSaida}T${v.horaSaida || '00:00'}`,
           qtdDias: this.veiculoGroup(0).get('qtdDias')!.value,
           observacoes: v.observacoes || undefined,
+          reservaFutura: this.reservaFutura,
         })
         .subscribe({
           next: (reserva) => this.router.navigate(['/admin/reservas', reserva.id]),

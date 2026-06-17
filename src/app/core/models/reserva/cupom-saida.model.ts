@@ -6,6 +6,7 @@ export interface CupomSaida {
   numero: number;
   placaVeiculo: string;
   dataHoraEntrada: string;
+  dataSaidaPrevista: string;
   dataHoraSaida: string;
   tipoVaga: string;
   qtdDias: number;

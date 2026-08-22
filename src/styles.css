@@ -157,19 +157,18 @@ body {
 }
 
 @media print {
-  * {
-    font-family: 'Courier New', Courier, monospace;
-    margin-bottom: 2px;
-    font-size: 18px;
+  @page {
+    size: 80mm auto;
+    margin: 4mm;
   }
 
-  @page {
-    margin: 12mm;
+  * {
+    font-family: 'Courier New', Courier, monospace;
   }
 
   html,
   body {
-    background: var(--surface);
+    background: #fff;
     height: auto;
     min-height: 0;
   }
@@ -203,20 +202,29 @@ body {
     display: none !important;
   }
 
+  /* Cupom termico: preto puro + negrito para nao sair fraco */
   .cupom-print-active,
   .cupom-print-active * {
     visibility: visible !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
+  /* Largura do rolo termico (72mm) e fonte compacta para nao sair grande */
   .cupom-print-active {
-    background: var(--surface);
-    border: 1px solid var(--text);
-    border-radius: var(--radius);
+    background: #fff;
+    border: none;
+    border-radius: 0;
     box-shadow: none;
     display: block !important;
     margin: 0 auto !important;
-    max-width: 440px;
-    padding: 1.5rem;
+    width: 72mm;
+    max-width: 72mm;
+    padding: 0;
     position: static;
+    font-size: 12px;
+    line-height: 1.35;
   }
 }

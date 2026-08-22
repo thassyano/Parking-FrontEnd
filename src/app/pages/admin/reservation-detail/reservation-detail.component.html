@@ -198,6 +198,16 @@
                   <option value="Dinheiro">Dinheiro</option>
                 </select>
               </div>
+              <div class="form-group">
+                <label class="checkbox-inline">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="comTraslado"
+                    name="comTraslado"
+                  />
+                  Cobrar traslado (R$ conforme configuração; grátis a partir de 2 diárias)
+                </label>
+              </div>
               <div class="acoes-form-buttons">
                 <button
                   type="button"
@@ -333,6 +343,10 @@
           <span>{{ cupomSaida()!.tipoVaga }}</span>
           <span>{{ cupomSaida()!.qtdDias }} dia(s)</span>
         </div>
+        <div class="cupom-line">
+          <span>Permanência</span>
+          <span>{{ cupomSaida()!.permanencia }}</span>
+        </div>
         <div class="cupom-divider"></div>
         <div class="cupom-line">
           <span>Diária</span>
@@ -350,6 +364,12 @@
           <div class="cupom-line">
             <span>Horas adicionais</span>
             <span>{{ cupomSaida()!.valorHorasAdicionais | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+          </div>
+        }
+        @if (cupomSaida()!.comTraslado) {
+          <div class="cupom-line">
+            <span>Traslado</span>
+            <span>{{ cupomSaida()!.valorTraslado | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
           </div>
         }
         <div class="cupom-line">

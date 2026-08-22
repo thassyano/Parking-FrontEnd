@@ -28,6 +28,7 @@ export class ReservationDetailComponent implements OnInit {
 
   protected placaVeiculo = '';
   protected formaPagamento = 'Pix';
+  protected comTraslado = false;
 
   protected showCupomEntradaPrint = signal(false);
   protected showCupomSaidaPrint = signal(false);
@@ -97,7 +98,7 @@ export class ReservationDetailComponent implements OnInit {
     this.actionLoading.set(true);
     this.erro.set('');
     this.reservaService
-      .checkout(this.reservaId, { formaPagamento: this.formaPagamento })
+      .checkout(this.reservaId, { formaPagamento: this.formaPagamento, comTraslado: this.comTraslado })
       .subscribe({
         next: (data) => {
           this.reserva.set(data);

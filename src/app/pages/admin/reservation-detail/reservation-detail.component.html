@@ -314,72 +314,42 @@
         @if (cupomSaida()!.endereco) {
           <div class="cupom-center">{{ cupomSaida()!.endereco }}</div>
         }
-        @if (cupomSaida()!.contato) {
-          <div class="cupom-center">Contato: {{ cupomSaida()!.contato }}</div>
-        }
         @if (cupomSaida()!.cnpj) {
           <div class="cupom-center">CNPJ: {{ cupomSaida()!.cnpj }}</div>
         }
         <div class="cupom-divider"></div>
-        <div class="cupom-title">CUPOM DE SAÍDA</div>
+        <div class="cupom-title">RECIBO DE ESTACIONAMENTO</div>
         <div class="cupom-divider"></div>
-        <div class="cupom-line">
-          <span>Nº {{ cupomSaida()!.numero }}</span>
-          <span>Placa: {{ cupomSaida()!.placaVeiculo }}</span>
+        <div class="cupom-recibo-row">
+          <div>
+            <div class="cupom-small">Cupom Nº.</div>
+            <div class="cupom-num-big">{{ numeroRecibo(cupomSaida()!) }}</div>
+          </div>
+          <div style="text-align: right">
+            <div class="cupom-small">Valor</div>
+            <div class="cupom-valor-big">{{ cupomSaida()!.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2' }}</div>
+          </div>
         </div>
         <div class="cupom-line">
-          <span>Entrada</span>
-          <span>{{ cupomSaida()!.dataHoraEntrada | date: 'dd/MM/yyyy HH:mm' }}</span>
+          <span>Placa:</span>
+          <span>{{ cupomSaida()!.placaVeiculo }}</span>
         </div>
         <div class="cupom-line">
-          <span>Saída prevista</span>
-          <span>{{ cupomSaida()!.dataSaidaPrevista | date: 'dd/MM/yyyy HH:mm' }}</span>
+          <span>Entrada:</span>
+          <span>{{ cupomSaida()!.dataHoraEntrada | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
         </div>
         <div class="cupom-line">
-          <span>Saída real</span>
-          <span>{{ cupomSaida()!.dataHoraSaida | date: 'dd/MM/yyyy HH:mm' }}</span>
+          <span>Saída:</span>
+          <span>{{ cupomSaida()!.dataHoraSaida | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
         </div>
         <div class="cupom-line">
-          <span>{{ cupomSaida()!.tipoVaga }}</span>
-          <span>{{ cupomSaida()!.qtdDias }} dia(s)</span>
-        </div>
-        <div class="cupom-line">
-          <span>Permanência</span>
+          <span>Permanência:</span>
           <span>{{ cupomSaida()!.permanencia }}</span>
         </div>
         <div class="cupom-divider"></div>
-        <div class="cupom-line">
-          <span>Diária</span>
-          <span>{{ cupomSaida()!.valorDiaria | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
-        </div>
-        <div class="cupom-line">
-          <span>Total</span>
-          <span>{{ cupomSaida()!.valorTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
-        </div>
-        <div class="cupom-line">
-          <span>Desconto</span>
-          <span>{{ cupomSaida()!.descontoAplicado | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
-        </div>
-        @if (cupomSaida()!.valorHorasAdicionais > 0) {
-          <div class="cupom-line">
-            <span>Horas adicionais</span>
-            <span>{{ cupomSaida()!.valorHorasAdicionais | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
-          </div>
-        }
-        @if (cupomSaida()!.comTraslado) {
-          <div class="cupom-line">
-            <span>Traslado</span>
-            <span>{{ cupomSaida()!.valorTraslado | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
-          </div>
-        }
-        <div class="cupom-line">
-          <span><strong>Valor Final</strong></span>
-          <span><strong>{{ cupomSaida()!.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2' }}</strong></span>
-        </div>
-        <div class="cupom-line">
-          <span>Pagamento</span>
-          <span>{{ cupomSaida()!.formaPagamento }}</span>
-        </div>
+        <div class="cupom-center">CARRO - {{ cupomSaida()!.tipoVaga }}</div>
+        <div class="cupom-divider"></div>
+        <div class="cupom-footer">Obrigado pela preferência!</div>
         <button type="button" class="btn btn-primary" style="margin-top: 1rem" (click)="imprimirCupomSaida()">
           Imprimir
         </button>

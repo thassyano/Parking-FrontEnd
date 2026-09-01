@@ -15,6 +15,13 @@ import { scrollToBottom } from '../../../core/utils/viewport/scroll-to-bottom';
   styleUrl: './reservation-detail.component.css',
 })
 export class ReservationDetailComponent implements OnInit {
+  protected numeroRecibo(c: CupomSaida): string {
+    const d = new Date(c.dataHoraEntrada);
+    const ano = d.getFullYear();
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    return `${ano}${mes}${String(c.numero).padStart(6, '0')}`;
+  }
+
   protected reserva = signal<Reserva | null>(null);
   protected loading = signal(true);
   protected actionLoading = signal(false);

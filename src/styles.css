@@ -158,8 +158,8 @@ body {
 
 @media print {
   @page {
-    size: 80mm auto;
-    margin: 4mm;
+    size: 58mm auto;
+    margin: 0;
   }
 
   * {
@@ -212,7 +212,7 @@ body {
     print-color-adjust: exact;
   }
 
-  /* Largura do rolo termico (72mm) e fonte compacta para nao sair grande */
+  /* Largura do rolo termico (58mm) e fonte compacta para nao sair grande */
   .cupom-print-active {
     background: #fff;
     border: none;
@@ -220,11 +220,17 @@ body {
     box-shadow: none;
     display: block !important;
     margin: 0 auto !important;
-    width: 72mm;
-    max-width: 72mm;
-    padding: 0;
+    width: 58mm;
+    max-width: 58mm;
+    padding: 1mm 2mm;
     position: static;
-    font-size: 12px;
-    line-height: 1.35;
+    font-size: 11px;
+    line-height: 1.25;
   }
 }
+
+/* Recibo de saida compacto */
+.cupom-recibo-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; margin: 6px 0; }
+.cupom-small { font-size: 10px; }
+.cupom-num-big { font-size: 14px; font-weight: 700; letter-spacing: 0.02em; }
+.cupom-valor-big { font-size: 19px; font-weight: 700; }

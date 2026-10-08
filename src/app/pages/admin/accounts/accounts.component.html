@@ -53,7 +53,7 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" for="email">Email</label>
+            <label class="form-label" for="email">Email (opcional)</label>
             <input
               type="email"
               id="email"
@@ -68,6 +68,17 @@
           <div class="form-group">
             <label class="form-label" for="nome">Nome (opcional)</label>
             <input type="text" id="nome" class="form-control" formControlName="nome" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="perfil">Perfil</label>
+            <select id="perfil" class="form-control form-select" formControlName="perfil">
+              @for (opcao of perfilOpcoes; track opcao.valor) {
+                <option [value]="opcao.valor">{{ opcao.rotulo }}</option>
+              }
+            </select>
+            <span class="form-hint">Admin Master pode gerenciar administradores.</span>
           </div>
         </div>
         <button type="submit" class="btn btn-primary" [disabled]="formLoading()">
@@ -115,7 +126,7 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" for="edit-email">Email</label>
+            <label class="form-label" for="edit-email">Email (opcional)</label>
             <input type="email" id="edit-email" class="form-control" formControlName="email" />
           </div>
           <div class="form-group">
@@ -162,7 +173,7 @@
           @for (admin of admins(); track admin.id) {
             <tr [class.row-editing]="editingAdmin()?.id === admin.id">
               <td>{{ admin.usuario }}</td>
-              <td>{{ admin.email }}</td>
+              <td>{{ admin.email || '-' }}</td>
               <td>{{ admin.nome || '-' }}</td>
               <td>{{ admin.perfil === 'AdminMaster' ? 'Master' : 'Admin' }}</td>
               <td>{{ admin.dataCriacao | date: 'dd/MM/yyyy' }}</td>

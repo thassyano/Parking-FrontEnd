@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angula
 import { AdminService } from '../../../core/services/accounts/admin.service';
 import { DatePipe } from '@angular/common';
 import { Admin } from '../../../core/models/admin-config/admin.model';
+import { PERFIL_ADMIN_OPCOES, PerfilAdmin } from '../../../core/models/auth/perfil-admin.model';
 
 @Component({
   selector: 'app-accounts',
@@ -18,6 +19,7 @@ export class AccountsComponent {
   protected formLoading = signal(false);
   protected erro = signal('');
   protected sucesso = signal('');
+  protected readonly perfilOpcoes = PERFIL_ADMIN_OPCOES;
 
   private adminService = inject(AdminService);
 
@@ -28,14 +30,15 @@ export class AccountsComponent {
       Validators.minLength(6),
       Validators.maxLength(30),
     ]),
-    email: new FormControl('', [Validators.required, Validators.email, Validators.maxLength(100)]),
+    email: new FormControl('', [Validators.email, Validators.maxLength(100)]),
     nome: new FormControl(''),
+    perfil: new FormControl<PerfilAdmin>('Admin', { nonNullable: true, validators: [Validators.required] }),
   });
 
   protected editarAdminForm = new FormGroup({
     usuario: new FormControl('', [Validators.required, Validators.maxLength(50)]),
     senha: new FormControl('', [Validators.minLength(6), Validators.maxLength(30)]),
-    email: new FormControl('', [Validators.required, Validators.email, Validators.maxLength(100)]),
+    email: new FormControl('', [Validators.email, Validators.maxLength(100)]),
     nome: new FormControl(''),
   });
 
@@ -70,7 +73,7 @@ export class AccountsComponent {
     this.editingAdmin.set(admin);
     this.editarAdminForm.reset({
       usuario: admin.usuario,
-      email: admin.email,
+      email: admin.email ?? '',
       nome: admin.nome || '',
       senha: '',
     });
@@ -99,8 +102,9 @@ export class AccountsComponent {
       .criar({
         usuario: v.usuario!,
         senha: v.senha!,
-        email: v.email!,
+        email: v.email?.trim() || undefined,
         nome: v.nome || undefined,
+        perfil: v.perfil!,
       })
       .subscribe({
         next: () => {
@@ -135,7 +139,7 @@ export class AccountsComponent {
     this.adminService
       .atualizar(admin.id, {
         usuario: v.usuario!,
-        email: v.email!,
+        email: v.email?.trim() || undefined,
         nome: v.nome || undefined,
         senha: v.senha?.trim() ? v.senha : undefined,
       })
@@ -184,7 +188,6 @@ export class AccountsComponent {
     if (senhaObrigatoria && senha?.hasError('required')) return 'Informe a senha';
     if (senha?.hasError('minlength')) return 'A senha deve ter pelo menos 6 caracteres';
     if (senha?.hasError('maxlength')) return 'A senha deve ter no máximo 30 caracteres';
-    if (email?.hasError('required')) return 'Informe o email';
     if (email?.hasError('email')) return 'Informe um email válido';
     if (email?.hasError('maxlength')) return 'Email deve ter no máximo 100 caracteres';
     if (form.invalid) return 'Verifique os campos do formulário';

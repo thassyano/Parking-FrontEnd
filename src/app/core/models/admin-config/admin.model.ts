@@ -3,7 +3,7 @@ import { PerfilAdmin } from '../auth/perfil-admin.model';
 export interface Admin {
   id: number;
   usuario: string;
-  email: string;
+  email?: string | null;
   nome: string;
   perfil: PerfilAdmin;
   dataCriacao: string;

@@ -11,6 +11,7 @@ import { OrcamentoService } from '../../../core/services/orcamento/orcamento.ser
 import { ConflitoPorPlaca, ReservaService } from '../../../core/services/reserva/reserva.service';
 import { WhatsAppResponse } from '../../../core/models/reserva/whats-app-response.model';
 import { formatToISO } from '../../../core/utils/date/format-date-to-ISO';
+import { formatDuration } from '../../../core/utils/date/format-duration';
 import { Patterns } from '../../../core/utils/patterns/form-patterns';
 import { scrollToTop } from '../../../core/utils/viewport/scroll-to-top';
 
@@ -436,6 +437,13 @@ export class ReservationsComponent implements OnInit {
     if (!date) return '';
     const [year, month, day] = date.includes('-') ? date.split('-') : date.split('/').reverse();
     return time ? `${day}/${month}/${year} ${time}` : `${day}/${month}/${year}`;
+  }
+
+  /** Permanência por extenso (dias, horas e minutos) calculada a partir da entrada e saída do veículo. */
+  public formatPermanencia(carro: CarroEntry): string {
+    const entrada = new Date(`${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`);
+    const saida = new Date(`${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`);
+    return formatDuration(entrada, saida);
   }
 
   public fieldError(campo: string): string {

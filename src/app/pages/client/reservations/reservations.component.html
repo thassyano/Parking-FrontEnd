@@ -65,8 +65,8 @@
             <span class="period_value">{{ formatDateTime(carro.dataSaida, carro.horaSaida) }}</span>
           </div>
           <div class="period_item">
-            <span class="period_label">Dias</span>
-            <span class="period_value">{{ carro.qtdDias }}</span>
+            <span class="period_label">Permanência</span>
+            <span class="period_value">{{ formatPermanencia(carro) || carro.qtdDias + ' dia(s)' }}</span>
           </div>
         </div>
 
@@ -284,6 +284,12 @@
             <span>Saída</span>
             <span>{{ formatDateTime(carro.dataSaida, carro.horaSaida) }}</span>
           </div>
+          @if (formatPermanencia(carro)) {
+            <div class="confirmation_row">
+              <span>Permanência</span>
+              <span>{{ formatPermanencia(carro) }}</span>
+            </div>
+          }
 
           @if (orcamentos()[$index]; as orc) {
             <div class="confirmation_row confirmation_row--total">

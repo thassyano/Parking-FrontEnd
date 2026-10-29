@@ -1,4 +1,4 @@
-import { formatDuration } from './format-duration';
+import { calcularDiariasCobradas, formatDuration } from './format-duration';
 
 describe('formatDuration', () => {
   const entrada = new Date(2026, 9, 17, 16, 1);
@@ -25,5 +25,24 @@ describe('formatDuration', () => {
     expect(formatDuration(entrada, entrada)).toBe('');
     expect(formatDuration(entrada, new Date(2026, 9, 17, 10, 0))).toBe('');
     expect(formatDuration(entrada, new Date(NaN))).toBe('');
+  });
+});
+
+describe('calcularDiariasCobradas', () => {
+  const entrada = new Date(2026, 9, 17, 8, 0);
+
+  it('conta o parcial como diária a partir de 12 horas', () => {
+    expect(calcularDiariasCobradas(entrada, new Date(2026, 9, 18, 20, 0))).toBe(2); // 1 dia e 12h
+    expect(calcularDiariasCobradas(entrada, new Date(2026, 9, 19, 21, 0))).toBe(3); // 2 dias e 13h
+  });
+
+  it('não conta o parcial menor que 12 horas', () => {
+    expect(calcularDiariasCobradas(entrada, new Date(2026, 9, 18, 19, 59))).toBe(1); // 1 dia e 11h59
+    expect(calcularDiariasCobradas(entrada, new Date(2026, 9, 17, 13, 0))).toBe(0);
+  });
+
+  it('retorna 0 para período inválido', () => {
+    expect(calcularDiariasCobradas(entrada, entrada)).toBe(0);
+    expect(calcularDiariasCobradas(entrada, new Date(NaN))).toBe(0);
   });
 });

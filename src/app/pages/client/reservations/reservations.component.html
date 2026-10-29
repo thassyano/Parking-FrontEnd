@@ -51,7 +51,55 @@
         <div class="vehicle_header">
           <img class="label_icon" src="assets/icons/car.icon.svg" alt="" />
           <h2 class="card_title">Veículo {{ $index + 1 }}</h2>
+          @if ($index > 0) {
+            <button type="button" class="remove_vehicle_btn" (click)="removerVeiculo($index)">
+              Remover
+            </button>
+          }
         </div>
+
+        @if ($index > 0) {
+          <div class="period_edit">
+            <div class="input_group">
+              <label class="input_label">Data de entrada</label>
+              <input
+                type="date"
+                class="input_field"
+                [value]="isoDate(carro.dataEntrada)"
+                [min]="minDateToday"
+                (change)="atualizarPeriodo($index, 'dataEntrada', $any($event.target).value)"
+              />
+            </div>
+            <div class="input_group">
+              <label class="input_label">Horário de entrada</label>
+              <input
+                type="time"
+                class="input_field"
+                [value]="carro.horaEntrada"
+                (change)="atualizarPeriodo($index, 'horaEntrada', $any($event.target).value)"
+              />
+            </div>
+            <div class="input_group">
+              <label class="input_label">Data de saída</label>
+              <input
+                type="date"
+                class="input_field"
+                [value]="isoDate(carro.dataSaida)"
+                [min]="minDateToday"
+                (change)="atualizarPeriodo($index, 'dataSaida', $any($event.target).value)"
+              />
+            </div>
+            <div class="input_group">
+              <label class="input_label">Horário de saída</label>
+              <input
+                type="time"
+                class="input_field"
+                [value]="carro.horaSaida"
+                (change)="atualizarPeriodo($index, 'horaSaida', $any($event.target).value)"
+              />
+            </div>
+          </div>
+        }
 
         <div class="period_summary">
           <div class="period_item">
@@ -86,6 +134,21 @@
           @if (placaError($index)) {
             <span class="field_error">{{ placaError($index) }}</span>
           }
+        </div>
+
+        <div class="vehicle_details" [formGroup]="detalhesForm.at($index)">
+          <div class="input_group">
+            <label class="input_label">Marca <small>(opcional)</small></label>
+            <input type="text" class="input_field" formControlName="marca" maxlength="50" placeholder="Ex.: Fiat" />
+          </div>
+          <div class="input_group">
+            <label class="input_label">Modelo <small>(opcional)</small></label>
+            <input type="text" class="input_field" formControlName="modelo" maxlength="50" placeholder="Ex.: Argo" />
+          </div>
+          <div class="input_group">
+            <label class="input_label">Cor <small>(opcional)</small></label>
+            <input type="text" class="input_field" formControlName="cor" maxlength="30" placeholder="Ex.: Prata" />
+          </div>
         </div>
 
         <div class="input_group">
@@ -132,8 +195,14 @@
               </div>
               <div class="budget_row">
                 <span>Quantidade</span>
-                <span>{{ orc.qtdDias }} dia(s)</span>
+                <span>{{ orc.diariasCheias }} diária(s)</span>
               </div>
+              @if (orc.diariasCheias === orc.diariasCompletas && orc.valorHorasAdicionais > 0) {
+                <div class="budget_row">
+                  <span>Horas adicionais</span>
+                  <span>{{ orc.valorHorasAdicionais | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+                </div>
+              }
             }
 
             <div class="budget_divider"></div>
@@ -178,7 +247,21 @@
       </div>
     }
 
+    <button
+      type="button"
+      class="add_vehicle_btn"
+      (click)="adicionarVeiculo()"
+      [disabled]="isAddingVehicle() || isLoading()"
+    >
+      {{ isAddingVehicle() ? 'Verificando vagas...' : '+ Adicionar veículo' }}
+    </button>
+
     <div class="reserva_card">
+      <p class="aviso_aproximado">
+        <strong>Valor total aproximado.</strong> O valor final é calculado na saída, pelo tempo real
+        de permanência: cada 24 horas é uma diária e o restante conta como diária a partir de 12
+        horas. O traslado é gratuito somente a partir de 48 horas de permanência.
+      </p>
       <button
         class="btn_primary"
         (click)="openConfirmation()"
@@ -217,12 +300,13 @@
 
       @if (todosConflitosPodemAtualizar()) {
         <p class="modal_description">
-          Deseja alterar a reserva existente com as novas datas? Em seguida você será direcionado ao
+          <strong>Atenção:</strong> a reserva anterior será <strong>sobrescrita</strong> pelas novas
+          datas e horários. Deseja continuar? Em seguida você será direcionado ao
           <strong>WhatsApp</strong> para avisar o estacionamento da alteração.
         </p>
         <div class="modal_actions">
           <button class="btn_primary" (click)="confirmarAtualizacaoConflito()">
-            Sim, alterar e ir para WhatsApp
+            Sim, sobrescrever e ir para WhatsApp
           </button>
           <button class="btn_outline" (click)="rejeitarConflito()">Não, manter a existente</button>
         </div>
@@ -315,6 +399,8 @@
           </div>
         }
       </div>
+
+      <p class="aviso_aproximado">Valores aproximados: o total final é calculado na saída.</p>
 
       <div class="modal_actions">
         <button class="btn_primary" (click)="confirm()">Confirmar e ir para WhatsApp</button>

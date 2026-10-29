@@ -4,6 +4,11 @@ export interface OrcamentoResponse {
   tipoVaga: string;
   dataEntrada: string;
   qtdDias: number;
+  /** Diárias cheias cobradas (24h completas + parcial a partir de 12h). */
+  diariasCheias: number;
+  diariasCompletas: number;
+  /** Valor da parte parcial (faixa até 6h / até 12h / diária a partir de 12h). */
+  valorHorasAdicionais: number;
   dataSaidaPrevista: string;
   tipoPrecificacao: TipoPrecificacao;
   valorDiaria: number;

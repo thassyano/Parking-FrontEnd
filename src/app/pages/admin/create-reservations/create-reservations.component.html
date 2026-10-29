@@ -25,10 +25,13 @@
       }
 
       @if (todosConflitosPodemAtualizar()) {
-        <p class="modal-description">Deseja alterar a reserva existente com as novas datas?</p>
+        <p class="modal-description">
+          <strong>Atenção:</strong> a reserva anterior será <strong>sobrescrita</strong> pelas novas
+          datas e horários. Deseja continuar?
+        </p>
         <div class="modal-actions">
           <button type="button" class="btn btn-primary" (click)="confirmarAtualizacaoConflito()">
-            Sim, alterar a existente
+            Sim, sobrescrever a existente
           </button>
           <button type="button" class="btn btn-outline-secondary" (click)="rejeitarConflito()">
             Não, manter a existente
@@ -152,6 +155,21 @@
               <option value="Coberta">Coberta</option>
               <option value="Descoberta">Descoberta</option>
             </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Marca</label>
+            <input type="text" class="form-control" formControlName="marcaVeiculo" maxlength="50" placeholder="Ex.: Fiat" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Modelo</label>
+            <input type="text" class="form-control" formControlName="modeloVeiculo" maxlength="50" placeholder="Ex.: Argo" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cor</label>
+            <input type="text" class="form-control" formControlName="corVeiculo" maxlength="30" placeholder="Ex.: Prata" />
           </div>
         </div>
 

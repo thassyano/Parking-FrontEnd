@@ -3,6 +3,9 @@ export interface CriarReservaPresencialRequest {
   telefoneCliente: string;
   cpfCliente?: string;
   placaVeiculo: string;
+  marcaVeiculo?: string;
+  modeloVeiculo?: string;
+  corVeiculo?: string;
   tipoVaga: string;
   dataEntrada: string;
   dataSaidaPrevista: string;

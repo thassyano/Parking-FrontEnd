@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { CupomEntrada } from '../../../core/models/reserva/cupom-entrada.model';
 import { CupomSaida } from '../../../core/models/reserva/cupom-saida.model';
+import { PreviaCheckout } from '../../../core/models/reserva/previa-checkout.model';
 import { Reserva } from '../../../core/models/reserva/reserva.model';
 import { ReservaService } from '../../../core/services/reserva/reserva.service';
 import { scrollToBottom } from '../../../core/utils/viewport/scroll-to-bottom';
@@ -36,6 +37,21 @@ export class ReservationDetailComponent implements OnInit {
   protected placaVeiculo = '';
   protected formaPagamento = 'Pix';
   protected comTraslado = false;
+
+  // Prévia do check-out (recalculada a cada mudança de pagamento/traslado)
+  protected previa = signal<PreviaCheckout | null>(null);
+  protected previaLoading = signal(false);
+
+  // Correção da forma de pagamento depois do check-out
+  protected showPagamentoForm = signal(false);
+  protected novaFormaPagamento = 'Pix';
+  protected novoComTraslado = false;
+
+  // Marca, modelo e cor
+  protected showVeiculoForm = signal(false);
+  protected marcaVeiculo = '';
+  protected modeloVeiculo = '';
+  protected corVeiculo = '';
 
   protected showCupomEntradaPrint = signal(false);
   protected showCupomSaidaPrint = signal(false);
@@ -101,6 +117,98 @@ export class ReservationDetailComponent implements OnInit {
     });
   }
 
+  protected abrirCheckout(): void {
+    this.showCheckoutForm.set(true);
+    this.atualizarPrevia();
+  }
+
+  protected fecharCheckout(): void {
+    this.showCheckoutForm.set(false);
+    this.previa.set(null);
+  }
+
+  /** Pede ao back-end o cálculo para o pagamento/traslado atuais (descontos e traslado mudam junto). */
+  protected atualizarPrevia(): void {
+    this.previaLoading.set(true);
+    this.erro.set('');
+    this.reservaService
+      .previaCheckout(this.reservaId, this.formaPagamento, this.comTraslado)
+      .subscribe({
+        next: (data) => {
+          this.previa.set(data);
+          this.previaLoading.set(false);
+        },
+        error: (err) => {
+          this.previa.set(null);
+          this.erro.set(err.error?.message || 'Erro ao calcular o check-out');
+          this.previaLoading.set(false);
+        },
+      });
+  }
+
+  protected abrirCorrecaoPagamento(): void {
+    const r = this.reserva();
+    if (!r) return;
+    this.novaFormaPagamento = r.formaPagamento || 'Pix';
+    this.novoComTraslado = !!r.comTraslado;
+    this.showPagamentoForm.set(true);
+  }
+
+  protected salvarFormaPagamento(): void {
+    this.actionLoading.set(true);
+    this.erro.set('');
+    this.reservaService
+      .alterarFormaPagamento(this.reservaId, {
+        formaPagamento: this.novaFormaPagamento,
+        comTraslado: this.novoComTraslado,
+      })
+      .subscribe({
+        next: (data) => {
+          this.reserva.set(data);
+          this.showPagamentoForm.set(false);
+          this.cupomSaida.set(null);
+          this.sucesso.set('Forma de pagamento corrigida e valores recalculados');
+          this.actionLoading.set(false);
+        },
+        error: (err) => {
+          this.erro.set(err.error?.message || 'Erro ao corrigir forma de pagamento');
+          this.actionLoading.set(false);
+        },
+      });
+  }
+
+  protected abrirEdicaoVeiculo(): void {
+    const r = this.reserva();
+    if (!r) return;
+    this.marcaVeiculo = r.marcaVeiculo ?? '';
+    this.modeloVeiculo = r.modeloVeiculo ?? '';
+    this.corVeiculo = r.corVeiculo ?? '';
+    this.showVeiculoForm.set(true);
+  }
+
+  protected salvarDadosVeiculo(): void {
+    this.actionLoading.set(true);
+    this.erro.set('');
+    this.reservaService
+      .atualizarDadosVeiculo(this.reservaId, {
+        marcaVeiculo: this.marcaVeiculo,
+        modeloVeiculo: this.modeloVeiculo,
+        corVeiculo: this.corVeiculo,
+      })
+      .subscribe({
+        next: (data) => {
+          this.reserva.set(data);
+          this.showVeiculoForm.set(false);
+          this.sucesso.set('Dados do veículo atualizados');
+          this.actionLoading.set(false);
+        },
+        error: (err) => {
+          this.erro.set(err.error?.message || 'Erro ao atualizar dados do veículo');
+          this.actionLoading.set(false);
+        },
+      });
+  }
+
   protected realizarCheckout(): void {
     this.actionLoading.set(true);
     this.erro.set('');
@@ -109,7 +217,7 @@ export class ReservationDetailComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.reserva.set(data);
-          this.showCheckoutForm.set(false);
+          this.fecharCheckout();
           this.sucesso.set('Check-out realizado com sucesso');
           this.actionLoading.set(false);
         },

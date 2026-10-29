@@ -6,6 +6,7 @@ import { forkJoin, Subscription } from 'rxjs';
 import { ClientNameLengths } from '../../../constants/cliente-name-lenght';
 import { CarroPresencialLoteRequest } from '../../../core/models/reserva/carros/carro-lote-request.interface';
 import { ConflitoPorPlaca, ReservaService } from '../../../core/services/reserva/reserva.service';
+import { calcularDiariasCobradas } from '../../../core/utils/date/format-duration';
 import { Patterns } from '../../../core/utils/patterns/form-patterns';
 import { cpfValidator } from '../../../core/utils/reservation/cpf-validator';
 import { saidaPosteriorEntradaValidator } from '../../../core/utils/reservation/entry-exit-date-validator';
@@ -82,6 +83,9 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
           Validators.required,
           Validators.pattern(Patterns.vehiclePlate),
         ]),
+        marcaVeiculo: new FormControl('', Validators.maxLength(50)),
+        modeloVeiculo: new FormControl('', Validators.maxLength(50)),
+        corVeiculo: new FormControl('', Validators.maxLength(30)),
         tipoVaga: new FormControl('Coberta', Validators.required),
         dataEntrada: new FormControl(dataEntrada, Validators.required),
         horaEntrada: new FormControl(horaEntrada, Validators.required),
@@ -128,9 +132,7 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
 
     if (saida <= entrada) return;
 
-    const horas = (saida.getTime() - entrada.getTime()) / 3_600_000;
-    const dias = horas <= 12 ? 0 : Math.floor(horas / 24) || 1;
-    group.get('qtdDias')!.setValue(dias, { emitEvent: false });
+    group.get('qtdDias')!.setValue(calcularDiariasCobradas(entrada, saida), { emitEvent: false });
   }
 
   protected onNomeClienteChange(event: Event): void {
@@ -289,6 +291,8 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
       );
       if (!v) return null;
       return this.reservaService.atualizar(conflito.id, {
+        dataEntrada: `${v.dataEntrada}T${v.horaEntrada || '00:00'}`,
+        tipoVaga: v.tipoVaga ?? undefined,
         dataSaidaPrevista: `${v.dataSaida}T${v.horaSaida || '00:00'}`,
       });
     }).filter((a): a is NonNullable<typeof a> => a !== null);
@@ -320,6 +324,19 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Marca/modelo/cor preenchidos (em branco não são enviados). */
+  private detalhesDoVeiculo(v: {
+    marcaVeiculo?: string | null;
+    modeloVeiculo?: string | null;
+    corVeiculo?: string | null;
+  }): { marcaVeiculo?: string; modeloVeiculo?: string; corVeiculo?: string } {
+    return {
+      marcaVeiculo: v.marcaVeiculo?.trim() || undefined,
+      modeloVeiculo: v.modeloVeiculo?.trim() || undefined,
+      corVeiculo: v.corVeiculo?.trim() || undefined,
+    };
+  }
+
   private executarCriacao(
     nomeCliente: string,
     telefoneCliente: string,
@@ -336,6 +353,7 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
           telefoneCliente,
           cpfCliente,
           placaVeiculo: v.placaVeiculo!.toUpperCase(),
+          ...this.detalhesDoVeiculo(v),
           tipoVaga: v.tipoVaga!,
           dataEntrada: `${v.dataEntrada}T${v.horaEntrada || '00:00'}`,
           dataSaidaPrevista: `${v.dataSaida}T${v.horaSaida || '00:00'}`,
@@ -353,6 +371,7 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
     } else {
       const carros: CarroPresencialLoteRequest[] = veiculos.map((v, i) => ({
         placaVeiculo: v.placaVeiculo!.toUpperCase(),
+        ...this.detalhesDoVeiculo(v),
         tipoVaga: v.tipoVaga!,
         dataEntrada: `${v.dataEntrada}T${v.horaEntrada || '00:00'}`,
         dataSaidaPrevista: `${v.dataSaida}T${v.horaSaida || '00:00'}`,

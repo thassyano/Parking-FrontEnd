@@ -2,18 +2,28 @@ import { CurrencyPipe, DatePipe, ViewportScroller } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { CarroEntry } from '../../../core/models/availability/client-flow.model';
 import { TipoVaga } from '../../../core/models/enums/tipo-vaga.enum';
 import { OrcamentoResponse } from '../../../core/models/reserva/orcamento/orcamento-response.model';
+import { PeriodAvailability } from '../../../core/models/availability/period-availability.model';
+import { PeriodAvailabilityService } from '../../../core/services/availability/period-availability.service';
+import { BloqueioService } from '../../../core/services/bloqueio/bloqueio.service';
 import { ClientFlowService } from '../../../core/services/client/client-flow.service';
 import { OrcamentoService } from '../../../core/services/orcamento/orcamento.service';
 import { ConflitoPorPlaca, ReservaService } from '../../../core/services/reserva/reserva.service';
 import { WhatsAppResponse } from '../../../core/models/reserva/whats-app-response.model';
 import { formatToISO } from '../../../core/utils/date/format-date-to-ISO';
-import { formatDuration } from '../../../core/utils/date/format-duration';
+import { calcularDiariasCobradas, formatDuration } from '../../../core/utils/date/format-duration';
 import { Patterns } from '../../../core/utils/patterns/form-patterns';
 import { scrollToTop } from '../../../core/utils/viewport/scroll-to-top';
+
+type VeiculoDetalhesForm = FormGroup<{
+  marca: FormControl<string>;
+  modelo: FormControl<string>;
+  cor: FormControl<string>;
+}>;
 
 @Component({
   selector: 'app-reservations',
@@ -25,6 +35,8 @@ export class ReservationsComponent implements OnInit {
   private readonly clientFlowService = inject(ClientFlowService);
   private readonly orcamentoService = inject(OrcamentoService);
   private readonly reservaService = inject(ReservaService);
+  private readonly periodService = inject(PeriodAvailabilityService);
+  private readonly bloqueioService = inject(BloqueioService);
   private readonly router = inject(Router);
   private readonly scroller = inject(ViewportScroller);
 
@@ -34,6 +46,7 @@ export class ReservationsComponent implements OnInit {
   public isLoading = signal(false);
   public isConfirmationVisible = signal(false);
   public isBudgetLoading = signal(false);
+  public isAddingVehicle = signal(false);
   public errorMessage = signal('');
 
   // Conflito de placa
@@ -47,6 +60,11 @@ export class ReservationsComponent implements OnInit {
   public carroTipoVaga = signal<TipoVaga[]>([]);
 
   public readonly placasForm = new FormArray<FormControl<string>>([]);
+
+  /** Marca, modelo e cor de cada veículo (opcionais). Mesma ordem de `carros`. */
+  public readonly detalhesForm = new FormArray<VeiculoDetalhesForm>([]);
+
+  protected readonly minDateToday = new Date().toLocaleDateString('en-CA');
 
   public orcamentos = signal<(OrcamentoResponse | null)[]>([]);
 
@@ -106,18 +124,192 @@ export class ReservationsComponent implements OnInit {
       carros.map((c) => (c.vagasCobertaDisponiveis > 0 ? TipoVaga.Coberta : TipoVaga.Descoberta)),
     );
 
-    carros.forEach(() =>
-      this.placasForm.push(
-        new FormControl<string>('', {
-          nonNullable: true,
-          validators: [Validators.required, Validators.pattern(Patterns.vehiclePlate)],
-        }),
-      ),
-    );
+    carros.forEach(() => this.adicionarControlesDoVeiculo());
 
     this.orcamentos.set(carros.map(() => null));
 
     this.calcularTodosOrcamentos();
+  }
+
+  private adicionarControlesDoVeiculo(): void {
+    this.placasForm.push(
+      new FormControl<string>('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.pattern(Patterns.vehiclePlate)],
+      }),
+    );
+    this.detalhesForm.push(
+      new FormGroup({
+        marca: new FormControl<string>('', { nonNullable: true, validators: [Validators.maxLength(50)] }),
+        modelo: new FormControl<string>('', { nonNullable: true, validators: [Validators.maxLength(50)] }),
+        cor: new FormControl<string>('', { nonNullable: true, validators: [Validators.maxLength(30)] }),
+      }),
+    );
+  }
+
+  /** Adiciona outro veículo repetindo o período do último; só avisa se não houver vaga. */
+  public adicionarVeiculo(): void {
+    const ultimo = this.carros().at(-1);
+    if (!ultimo || this.isAddingVehicle()) return;
+
+    const novo: CarroEntry = { ...ultimo, placa: '' };
+    this.isAddingVehicle.set(true);
+    this.errorMessage.set('');
+
+    this.verificarPeriodoDoVeiculo(novo).subscribe({
+      next: (resultado) => {
+        this.isAddingVehicle.set(false);
+        if (typeof resultado === 'string') {
+          this.errorMessage.set(resultado);
+          scrollToTop(this.scroller);
+          return;
+        }
+
+        this.carros.set([...this.carros(), resultado]);
+        this.carroTipoVaga.set([...this.carroTipoVaga(), this.tipoPadrao(resultado)]);
+        this.orcamentos.set([...this.orcamentos(), null]);
+        this.adicionarControlesDoVeiculo();
+        this.calcularOrcamentoCarro(this.carros().length - 1);
+      },
+      error: (err) => {
+        this.isAddingVehicle.set(false);
+        this.errorMessage.set(err.error?.message ?? 'Erro ao verificar disponibilidade');
+        scrollToTop(this.scroller);
+      },
+    });
+  }
+
+  public removerVeiculo(index: number): void {
+    if (index === 0) return; // o primeiro veículo vem da tela anterior
+
+    this.carros.set(this.carros().filter((_, i) => i !== index));
+    this.carroTipoVaga.set(this.carroTipoVaga().filter((_, i) => i !== index));
+    this.orcamentos.set(this.orcamentos().filter((_, i) => i !== index));
+    this.placasForm.removeAt(index);
+    this.detalhesForm.removeAt(index);
+  }
+
+  /** Veículos adicionais têm período próprio: ao mudar, confere bloqueio/vagas e recalcula o valor. */
+  public atualizarPeriodo(
+    index: number,
+    campo: 'dataEntrada' | 'horaEntrada' | 'dataSaida' | 'horaSaida',
+    valor: string,
+  ): void {
+    const atual = this.carros()[index];
+    if (!atual || !valor) return;
+
+    const isData = campo === 'dataEntrada' || campo === 'dataSaida';
+    const candidato: CarroEntry = {
+      ...atual,
+      [campo]: isData ? this.paraDataBr(valor) : valor,
+    };
+
+    const erro = this.validarPeriodo(candidato);
+    if (erro) {
+      this.errorMessage.set(`Veículo ${index + 1}: ${erro}`);
+      scrollToTop(this.scroller);
+      return;
+    }
+
+    this.errorMessage.set('');
+    this.verificarPeriodoDoVeiculo(candidato).subscribe({
+      next: (resultado) => {
+        if (typeof resultado === 'string') {
+          this.errorMessage.set(`Veículo ${index + 1}: ${resultado}`);
+          scrollToTop(this.scroller);
+          return;
+        }
+
+        const carros = [...this.carros()];
+        carros[index] = resultado;
+        this.carros.set(carros);
+
+        const tipos = [...this.carroTipoVaga()];
+        if (!this.tipoDisponivel(resultado, tipos[index])) tipos[index] = this.tipoPadrao(resultado);
+        this.carroTipoVaga.set(tipos);
+
+        this.calcularOrcamentoCarro(index);
+      },
+      error: (err) => {
+        this.errorMessage.set(err.error?.message ?? 'Erro ao verificar disponibilidade');
+        scrollToTop(this.scroller);
+      },
+    });
+  }
+
+  public isoDate(dataBr: string): string {
+    return dataBr ? formatToISO(dataBr) : '';
+  }
+
+  /**
+   * Confere bloqueio de reservas online e vagas para o período do veículo.
+   * Devolve o veículo com as vagas atualizadas, ou o texto do aviso quando não pode reservar.
+   */
+  private verificarPeriodoDoVeiculo(carro: CarroEntry): Observable<CarroEntry | string> {
+    const entrada = `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`;
+    const saida = `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`;
+
+    return this.bloqueioService.verificar(entrada, saida).pipe(
+      switchMap((bloqueio) =>
+        bloqueio.bloqueado
+          ? of(
+              bloqueio.mensagem ??
+                'Reservas online indisponíveis neste período. Entre em contato com o estacionamento.',
+            )
+          : this.periodService
+              .checkPeriodAvailability(formatToISO(carro.dataEntrada), formatToISO(carro.dataSaida))
+              .pipe(map((disp) => this.aplicarVagas(carro, disp))),
+      ),
+    );
+  }
+
+  private aplicarVagas(carro: CarroEntry, disp: PeriodAvailability): CarroEntry | string {
+    const minimo = (selector: (d: PeriodAvailability['dias'][number]) => number) =>
+      disp.dias?.length ? Math.min(...disp.dias.map(selector)) : 0;
+
+    const coberta = minimo((d) => d.vagasCobertaDisponiveis);
+    const descoberta = minimo((d) => d.vagasDescobertaDisponiveis);
+
+    // Só avisa quando não há vaga nenhuma; quantidades não são mostradas ao cliente.
+    if (coberta <= 0 && descoberta <= 0) {
+      return 'Não há vagas disponíveis para este período. Tente outras datas ou fale com o estacionamento.';
+    }
+
+    const entrada = new Date(`${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`);
+    const saida = new Date(`${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`);
+
+    return {
+      ...carro,
+      qtdDias: calcularDiariasCobradas(entrada, saida),
+      vagasCobertaDisponiveis: coberta,
+      vagasDescobertaDisponiveis: descoberta,
+    };
+  }
+
+  private validarPeriodo(carro: CarroEntry): string | null {
+    const entrada = new Date(`${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`);
+    const saida = new Date(`${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`);
+
+    if (formatToISO(carro.dataEntrada) < this.minDateToday)
+      return 'A data de entrada não pode ser anterior a hoje';
+    if (Number.isNaN(entrada.getTime()) || Number.isNaN(saida.getTime())) return 'Período inválido';
+    if (saida <= entrada) return 'A saída deve ser posterior à entrada';
+    return null;
+  }
+
+  private tipoPadrao(carro: CarroEntry): TipoVaga {
+    return carro.vagasCobertaDisponiveis > 0 ? TipoVaga.Coberta : TipoVaga.Descoberta;
+  }
+
+  private tipoDisponivel(carro: CarroEntry, tipo: TipoVaga): boolean {
+    return tipo === TipoVaga.Coberta
+      ? carro.vagasCobertaDisponiveis > 0
+      : carro.vagasDescobertaDisponiveis > 0;
+  }
+
+  private paraDataBr(iso: string): string {
+    const [ano, mes, dia] = iso.split('-');
+    return `${dia}/${mes}/${ano}`;
   }
 
   public isCoveredAvailable(index: number): boolean {
@@ -288,8 +480,11 @@ export class ReservationsComponent implements OnInit {
       if (index === -1) return null;
       const carro = carros[index];
       const placa = this.placasForm.at(index).value.toUpperCase();
+      const dataEntrada = `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`;
       const dataSaida = `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`;
       return this.reservaService.atualizarCliente(conflito.id, {
+        dataEntrada,
+        tipoVaga: this.carroTipoVaga()[index],
         dataSaidaPrevista: dataSaida,
         placaVeiculo: placa,
         telefoneCliente,
@@ -371,6 +566,7 @@ export class ReservationsComponent implements OnInit {
           nomeCliente: customerName!,
           telefoneCliente: customerPhone!,
           placaVeiculo: this.placasForm.at(0).value || undefined,
+          ...this.detalhesDoVeiculo(0),
           tipoVaga: this.carroTipoVaga()[0],
           dataEntrada: `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`,
           dataSaidaPrevista: `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`,
@@ -403,6 +599,7 @@ export class ReservationsComponent implements OnInit {
           telefoneCliente: customerPhone!,
           carros: carros.map((carro, i) => ({
             placaVeiculo: this.placasForm.at(i).value || undefined,
+            ...this.detalhesDoVeiculo(i),
             tipoVaga: this.carroTipoVaga()[i],
             dataEntrada: `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`,
             dataSaidaPrevista: `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`,
@@ -431,6 +628,16 @@ export class ReservationsComponent implements OnInit {
           },
         });
     }
+  }
+
+  /** Marca/modelo/cor preenchidos (campos em branco não são enviados). */
+  private detalhesDoVeiculo(index: number): { marcaVeiculo?: string; modeloVeiculo?: string; corVeiculo?: string } {
+    const { marca, modelo, cor } = this.detalhesForm.at(index).getRawValue();
+    return {
+      marcaVeiculo: marca.trim() || undefined,
+      modeloVeiculo: modelo.trim() || undefined,
+      corVeiculo: cor.trim() || undefined,
+    };
   }
 
   public formatDateTime(date: string, time: string): string {

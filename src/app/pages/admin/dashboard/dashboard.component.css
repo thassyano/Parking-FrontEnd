@@ -144,3 +144,57 @@
   background: var(--danger-light);
   color: var(--danger);
 }
+
+.bloqueio-card {
+  margin-bottom: 1.5rem;
+}
+
+.bloqueio-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.bloqueio-hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.bloqueio-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.bloqueio-motivo,
+.bloqueio-actions {
+  grid-column: 1 / -1;
+}
+
+.bloqueio-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.bloqueio-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bloqueio-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--medium-background, #dfe6f5);
+  border-radius: 10px;
+}

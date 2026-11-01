@@ -65,7 +65,6 @@ export class ReservationsComponent implements OnInit {
   /** Marca, modelo e cor de cada veículo (obrigatórios). Mesma ordem de `carros`. */
   public readonly detalhesForm = new FormArray<VeiculoDetalhesForm>([]);
 
-  protected readonly minDateToday = new Date().toLocaleDateString('en-CA');
 
   public orcamentos = signal<(OrcamentoResponse | null)[]>([]);
 
@@ -157,12 +156,12 @@ export class ReservationsComponent implements OnInit {
     );
   }
 
-  /** Adiciona outro veículo repetindo o período do último; só avisa se não houver vaga. */
+  /** Adiciona outro veículo no MESMO período do primeiro; só avisa se não houver vaga. */
   public adicionarVeiculo(): void {
-    const ultimo = this.carros().at(-1);
-    if (!ultimo || this.isAddingVehicle()) return;
+    const primeiro = this.carros()[0];
+    if (!primeiro || this.isAddingVehicle()) return;
 
-    const novo: CarroEntry = { ...ultimo, placa: '' };
+    const novo: CarroEntry = { ...primeiro, placa: '' };
     this.isAddingVehicle.set(true);
     this.errorMessage.set('');
 
@@ -197,58 +196,6 @@ export class ReservationsComponent implements OnInit {
     this.orcamentos.set(this.orcamentos().filter((_, i) => i !== index));
     this.placasForm.removeAt(index);
     this.detalhesForm.removeAt(index);
-  }
-
-  /** Veículos adicionais têm período próprio: ao mudar, confere bloqueio/vagas e recalcula o valor. */
-  public atualizarPeriodo(
-    index: number,
-    campo: 'dataEntrada' | 'horaEntrada' | 'dataSaida' | 'horaSaida',
-    valor: string,
-  ): void {
-    const atual = this.carros()[index];
-    if (!atual || !valor) return;
-
-    const isData = campo === 'dataEntrada' || campo === 'dataSaida';
-    const candidato: CarroEntry = {
-      ...atual,
-      [campo]: isData ? this.paraDataBr(valor) : valor,
-    };
-
-    const erro = this.validarPeriodo(candidato);
-    if (erro) {
-      this.errorMessage.set(`Veículo ${index + 1}: ${erro}`);
-      scrollToTop(this.scroller);
-      return;
-    }
-
-    this.errorMessage.set('');
-    this.verificarPeriodoDoVeiculo(candidato).subscribe({
-      next: (resultado) => {
-        if (typeof resultado === 'string') {
-          this.errorMessage.set(`Veículo ${index + 1}: ${resultado}`);
-          scrollToTop(this.scroller);
-          return;
-        }
-
-        const carros = [...this.carros()];
-        carros[index] = resultado;
-        this.carros.set(carros);
-
-        const tipos = [...this.carroTipoVaga()];
-        if (!this.tipoDisponivel(resultado, tipos[index])) tipos[index] = this.tipoPadrao(resultado);
-        this.carroTipoVaga.set(tipos);
-
-        this.calcularOrcamentoCarro(index);
-      },
-      error: (err) => {
-        this.errorMessage.set(err.error?.message ?? 'Erro ao verificar disponibilidade');
-        scrollToTop(this.scroller);
-      },
-    });
-  }
-
-  public isoDate(dataBr: string): string {
-    return dataBr ? formatToISO(dataBr) : '';
   }
 
   /**
@@ -296,17 +243,6 @@ export class ReservationsComponent implements OnInit {
     };
   }
 
-  private validarPeriodo(carro: CarroEntry): string | null {
-    const entrada = new Date(`${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`);
-    const saida = new Date(`${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`);
-
-    if (formatToISO(carro.dataEntrada) < this.minDateToday)
-      return 'A data de entrada não pode ser anterior a hoje';
-    if (Number.isNaN(entrada.getTime()) || Number.isNaN(saida.getTime())) return 'Período inválido';
-    if (saida <= entrada) return 'A saída deve ser posterior à entrada';
-    return null;
-  }
-
   private tipoPadrao(carro: CarroEntry): TipoVaga {
     return carro.vagasCobertaDisponiveis > 0 ? TipoVaga.Coberta : TipoVaga.Descoberta;
   }
@@ -315,11 +251,6 @@ export class ReservationsComponent implements OnInit {
     return tipo === TipoVaga.Coberta
       ? carro.vagasCobertaDisponiveis > 0
       : carro.vagasDescobertaDisponiveis > 0;
-  }
-
-  private paraDataBr(iso: string): string {
-    const [ano, mes, dia] = iso.split('-');
-    return `${dia}/${mes}/${ano}`;
   }
 
   public isCoveredAvailable(index: number): boolean {

@@ -58,49 +58,6 @@
           }
         </div>
 
-        @if ($index > 0) {
-          <div class="period_edit">
-            <div class="input_group">
-              <label class="input_label">Data de entrada</label>
-              <input
-                type="date"
-                class="input_field"
-                [value]="isoDate(carro.dataEntrada)"
-                [min]="minDateToday"
-                (change)="atualizarPeriodo($index, 'dataEntrada', $any($event.target).value)"
-              />
-            </div>
-            <div class="input_group">
-              <label class="input_label">Horário de entrada</label>
-              <input
-                type="time"
-                class="input_field"
-                [value]="carro.horaEntrada"
-                (change)="atualizarPeriodo($index, 'horaEntrada', $any($event.target).value)"
-              />
-            </div>
-            <div class="input_group">
-              <label class="input_label">Data de saída</label>
-              <input
-                type="date"
-                class="input_field"
-                [value]="isoDate(carro.dataSaida)"
-                [min]="minDateToday"
-                (change)="atualizarPeriodo($index, 'dataSaida', $any($event.target).value)"
-              />
-            </div>
-            <div class="input_group">
-              <label class="input_label">Horário de saída</label>
-              <input
-                type="time"
-                class="input_field"
-                [value]="carro.horaSaida"
-                (change)="atualizarPeriodo($index, 'horaSaida', $any($event.target).value)"
-              />
-            </div>
-          </div>
-        }
-
         <div class="period_summary">
           <div class="period_item">
             <span class="period_label">Entrada</span>

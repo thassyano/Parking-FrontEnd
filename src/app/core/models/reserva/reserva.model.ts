@@ -4,6 +4,9 @@ export interface Reserva {
   telefoneCliente: string;
   cpfCliente?: string;
   placaVeiculo?: string;
+  marcaVeiculo?: string;
+  modeloVeiculo?: string;
+  corVeiculo?: string;
   tipoVaga: string;
   dataEntrada: string;
   qtdDias: number;
@@ -13,6 +16,8 @@ export interface Reserva {
   descontoAplicado: number;
   valorHorasAdicionais: number;
   valorFinal: number;
+  comTraslado?: boolean;
+  valorTraslado?: number;
   formaPagamento?: string;
   pago: boolean;
   status: string;

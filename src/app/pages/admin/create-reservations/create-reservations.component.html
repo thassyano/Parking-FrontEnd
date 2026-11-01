@@ -25,10 +25,13 @@
       }
 
       @if (todosConflitosPodemAtualizar()) {
-        <p class="modal-description">Deseja alterar a reserva existente com as novas datas?</p>
+        <p class="modal-description">
+          <strong>Atenção:</strong> a reserva anterior será <strong>sobrescrita</strong> pelas novas
+          datas e horários. Deseja continuar?
+        </p>
         <div class="modal-actions">
           <button type="button" class="btn btn-primary" (click)="confirmarAtualizacaoConflito()">
-            Sim, alterar a existente
+            Sim, sobrescrever a existente
           </button>
           <button type="button" class="btn btn-outline-secondary" (click)="rejeitarConflito()">
             Não, manter a existente
@@ -153,6 +156,10 @@
               <option value="Descoberta">Descoberta</option>
             </select>
           </div>
+        </div>
+
+        <div class="form-row">
+          <app-veiculo-fields [group]="veiculoGroup($index)"></app-veiculo-fields>
         </div>
 
         <div class="form-row">

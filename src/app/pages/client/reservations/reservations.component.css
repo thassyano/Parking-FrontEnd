@@ -453,3 +453,52 @@
     font-size: 1.3rem;
   }
 }
+
+.aviso_aproximado {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff8e1;
+  color: #6b5200;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.remove_vehicle_btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.remove_vehicle_btn:hover {
+  background: var(--danger-light);
+}
+
+.add_vehicle_btn {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--primary);
+  background: transparent;
+  border: 1.5px dashed var(--primary);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.add_vehicle_btn:hover:not(:disabled) {
+  background: var(--primary-50);
+}
+
+.add_vehicle_btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+

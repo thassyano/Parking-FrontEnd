@@ -26,6 +26,79 @@
     </div>
   }
 
+  <div class="card bloqueio-card">
+    <div class="card-header bloqueio-header">
+      <h2 class="card-title">Bloqueio de reservas online</h2>
+      @if (!showBloqueioForm()) {
+        <button type="button" class="btn btn-danger" (click)="abrirBloqueio()">
+          Bloquear novas reservas
+        </button>
+      }
+    </div>
+
+    <p class="bloqueio-hint">
+      Impede que clientes façam reservas pelo site no período escolhido (inclui qualquer reserva
+      que encoste nele). Reservas presenciais continuam liberadas.
+    </p>
+
+    @if (bloqueioSucesso()) {
+      <div class="alert alert-success">{{ bloqueioSucesso() }}</div>
+    }
+
+    @if (showBloqueioForm()) {
+      @if (bloqueioErro()) {
+        <div class="alert alert-danger">{{ bloqueioErro() }}</div>
+      }
+      <div class="bloqueio-form">
+        <div class="form-group">
+          <label class="form-label" for="bloqueioInicio">De (data e hora)</label>
+          <input id="bloqueioInicio" type="datetime-local" class="form-control"
+            [(ngModel)]="bloqueioInicio" name="bloqueioInicio" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="bloqueioFim">Até (data e hora)</label>
+          <input id="bloqueioFim" type="datetime-local" class="form-control"
+            [(ngModel)]="bloqueioFim" name="bloqueioFim" />
+        </div>
+        <div class="form-group bloqueio-motivo">
+          <label class="form-label" for="bloqueioMotivo">Motivo (opcional)</label>
+          <input id="bloqueioMotivo" type="text" class="form-control" maxlength="200"
+            [(ngModel)]="bloqueioMotivo" name="bloqueioMotivo" />
+        </div>
+        <div class="bloqueio-actions">
+          <button type="button" class="btn btn-danger" (click)="criarBloqueio()"
+            [disabled]="bloqueioLoading()">
+            Confirmar bloqueio
+          </button>
+          <button type="button" class="btn btn-outline" (click)="fecharBloqueio()">Cancelar</button>
+        </div>
+      </div>
+    } @else if (bloqueioErro()) {
+      <div class="alert alert-danger">{{ bloqueioErro() }}</div>
+    }
+
+    @if (bloqueios().length) {
+      <ul class="bloqueio-list">
+        @for (b of bloqueios(); track b.id) {
+          <li class="bloqueio-item">
+            <span>
+              <strong>{{ b.dataInicio | date: 'dd/MM/yyyy HH:mm' }}</strong>
+              até
+              <strong>{{ b.dataFim | date: 'dd/MM/yyyy HH:mm' }}</strong>
+              @if (b.motivo) {
+                <small> — {{ b.motivo }}</small>
+              }
+            </span>
+            <button type="button" class="btn btn-outline" (click)="removerBloqueio(b)"
+              [disabled]="bloqueioLoading()">
+              Remover
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
   <div class="card">
     <div class="card-header">
       <h2 class="card-title">Reservas Recentes</h2>

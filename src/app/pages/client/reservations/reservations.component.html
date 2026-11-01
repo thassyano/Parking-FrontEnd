@@ -51,6 +51,11 @@
         <div class="vehicle_header">
           <img class="label_icon" src="assets/icons/car.icon.svg" alt="" />
           <h2 class="card_title">Veículo {{ $index + 1 }}</h2>
+          @if ($index > 0) {
+            <button type="button" class="remove_vehicle_btn" (click)="removerVeiculo($index)">
+              Remover
+            </button>
+          }
         </div>
 
         <div class="period_summary">
@@ -87,6 +92,8 @@
             <span class="field_error">{{ placaError($index) }}</span>
           }
         </div>
+
+        <app-veiculo-fields [group]="detalhesForm.at($index)"></app-veiculo-fields>
 
         <div class="input_group">
           <label class="input_label">
@@ -132,8 +139,14 @@
               </div>
               <div class="budget_row">
                 <span>Quantidade</span>
-                <span>{{ orc.qtdDias }} dia(s)</span>
+                <span>{{ orc.diariasCheias }} diária(s)</span>
               </div>
+              @if (orc.diariasCheias === orc.diariasCompletas && orc.valorHorasAdicionais > 0) {
+                <div class="budget_row">
+                  <span>Horas adicionais</span>
+                  <span>{{ orc.valorHorasAdicionais | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+                </div>
+              }
             }
 
             <div class="budget_divider"></div>
@@ -178,7 +191,21 @@
       </div>
     }
 
+    <button
+      type="button"
+      class="add_vehicle_btn"
+      (click)="adicionarVeiculo()"
+      [disabled]="isAddingVehicle() || isLoading()"
+    >
+      {{ isAddingVehicle() ? 'Verificando vagas...' : '+ Adicionar veículo' }}
+    </button>
+
     <div class="reserva_card">
+      <p class="aviso_aproximado">
+        <strong>Valor total aproximado.</strong> O valor final é calculado na saída, pelo tempo real
+        de permanência: cada 24 horas é uma diária e o restante conta como diária a partir de 12
+        horas. O traslado é gratuito somente a partir de 48 horas de permanência.
+      </p>
       <button
         class="btn_primary"
         (click)="openConfirmation()"
@@ -217,12 +244,13 @@
 
       @if (todosConflitosPodemAtualizar()) {
         <p class="modal_description">
-          Deseja alterar a reserva existente com as novas datas? Em seguida você será direcionado ao
+          <strong>Atenção:</strong> a reserva anterior será <strong>sobrescrita</strong> pelas novas
+          datas e horários. Deseja continuar? Em seguida você será direcionado ao
           <strong>WhatsApp</strong> para avisar o estacionamento da alteração.
         </p>
         <div class="modal_actions">
           <button class="btn_primary" (click)="confirmarAtualizacaoConflito()">
-            Sim, alterar e ir para WhatsApp
+            Sim, sobrescrever e ir para WhatsApp
           </button>
           <button class="btn_outline" (click)="rejeitarConflito()">Não, manter a existente</button>
         </div>
@@ -315,6 +343,8 @@
           </div>
         }
       </div>
+
+      <p class="aviso_aproximado">Valores aproximados: o total final é calculado na saída.</p>
 
       <div class="modal_actions">
         <button class="btn_primary" (click)="confirm()">Confirmar e ir para WhatsApp</button>

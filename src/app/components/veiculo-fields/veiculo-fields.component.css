@@ -1,0 +1,43 @@
+.veiculo_fields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.veiculo_field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.veiculo_label {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.veiculo_input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--text-muted, #9aa5bd);
+  font-size: 0.9rem;
+  background: var(--white, #fff);
+  box-sizing: border-box;
+}
+
+.veiculo_input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.veiculo_error {
+  font-size: 0.8rem;
+  color: var(--danger);
+}
+
+@media (max-width: 640px) {
+  .veiculo_fields {
+    grid-template-columns: 1fr;
+  }
+}

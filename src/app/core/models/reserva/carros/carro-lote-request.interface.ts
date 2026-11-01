@@ -1,5 +1,8 @@
 export interface CarroLoteRequest {
   placaVeiculo?: string;
+  marcaVeiculo?: string;
+  modeloVeiculo?: string;
+  corVeiculo?: string;
   tipoVaga: string;
   dataEntrada: string;
   dataSaidaPrevista: string;
@@ -9,6 +12,9 @@ export interface CarroLoteRequest {
 
 export interface CarroPresencialLoteRequest {
   placaVeiculo: string;
+  marcaVeiculo?: string;
+  modeloVeiculo?: string;
+  corVeiculo?: string;
   tipoVaga: string;
   dataEntrada: string;
   dataSaidaPrevista: string;

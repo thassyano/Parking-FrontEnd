@@ -18,6 +18,11 @@ import {
   CriarReservaLoteOnlineRequest,
   CriarReservaLotePresencialRequest,
 } from '../../models/reserva/criar-reserva-lote-request.interface';
+import {
+  AlterarFormaPagamentoRequest,
+  AtualizarDadosVeiculoRequest,
+  PreviaCheckout,
+} from '../../models/reserva/previa-checkout.model';
 import { ConfirmacaoReservaResponse } from '../../models/reserva/confirmacao-reserva-response.interface';
 import { ReservaLoteResponse } from '../../models/reserva/reserva-lote-response.interface';
 
@@ -76,6 +81,24 @@ export class ReservaService {
     return this.http.patch<Reserva>(`${this.url}/${id}/checkout`, data);
   }
 
+  /** Calcula o check-out (sem gravar) para a forma de pagamento/traslado escolhidos. */
+  public previaCheckout(id: number, formaPagamento: string, comTraslado: boolean): Observable<PreviaCheckout> {
+    const params = new HttpParams()
+      .set('formaPagamento', formaPagamento)
+      .set('comTraslado', comTraslado);
+    return this.http.get<PreviaCheckout>(`${this.url}/${id}/previa-checkout`, { params });
+  }
+
+  /** Corrige forma de pagamento (e traslado) depois do check-out; valores são recalculados. */
+  public alterarFormaPagamento(id: number, data: AlterarFormaPagamentoRequest): Observable<Reserva> {
+    return this.http.patch<Reserva>(`${this.url}/${id}/forma-pagamento`, data);
+  }
+
+  /** Qualquer admin: altera marca, modelo e cor. */
+  public atualizarDadosVeiculo(id: number, data: AtualizarDadosVeiculoRequest): Observable<Reserva> {
+    return this.http.patch<Reserva>(`${this.url}/${id}/dados-veiculo`, data);
+  }
+
   public cancelar(id: number): Observable<Reserva> {
     return this.http.patch<Reserva>(`${this.url}/${id}/cancelar`, null);
   }
@@ -120,14 +143,23 @@ export class ReservaService {
   }
 
   /** Admin autenticado — altera reserva presencial. */
-  public atualizar(id: number, data: { dataSaidaPrevista: string }): Observable<Reserva> {
+  public atualizar(
+    id: number,
+    data: { dataEntrada?: string; dataSaidaPrevista: string; tipoVaga?: string },
+  ): Observable<Reserva> {
     return this.http.patch<Reserva>(`${this.url}/${id}/alterar`, data);
   }
 
   /** Cliente online — altera a própria reserva (telefone + placa, sem JWT). */
   public atualizarCliente(
     id: number,
-    data: { dataSaidaPrevista: string; placaVeiculo: string; telefoneCliente: string },
+    data: {
+      dataEntrada?: string;
+      dataSaidaPrevista: string;
+      tipoVaga?: string;
+      placaVeiculo: string;
+      telefoneCliente: string;
+    },
   ): Observable<Reserva> {
     return this.http.patch<Reserva>(`${this.url}/${id}/alterar-cliente`, data);
   }

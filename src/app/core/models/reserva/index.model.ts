@@ -7,3 +7,4 @@ export * from './cupom-entrada.model';
 export * from './cupom-saida.model';
 export * from './whats-app-response.model';
 export * from './reserva-filtros.model';
+export * from './previa-checkout.model';

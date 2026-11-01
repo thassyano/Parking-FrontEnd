@@ -35,6 +35,18 @@
           <span class="detail-value">{{ reserva()?.placaVeiculo || 'Sem placa' }}</span>
         </div>
         <div class="detail-item">
+          <span class="detail-label">Marca</span>
+          <span class="detail-value">{{ reserva()?.marcaVeiculo || '-' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Modelo</span>
+          <span class="detail-value">{{ reserva()?.modeloVeiculo || '-' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Cor</span>
+          <span class="detail-value">{{ reserva()?.corVeiculo || '-' }}</span>
+        </div>
+        <div class="detail-item">
           <span class="detail-label">Tipo de Vaga</span>
           <span class="detail-value">{{ reserva()?.tipoVaga }}</span>
         </div>
@@ -181,7 +193,7 @@
           }
           @if (canCheckout()) {
             @if (!showCheckoutForm()) {
-              <button type="button" class="btn btn-warning" (click)="showCheckoutForm.set(true)">
+              <button type="button" class="btn btn-warning" (click)="abrirCheckout()">
                 Realizar Check-out
               </button>
             } @else {
@@ -191,6 +203,7 @@
                   id="formaPagamento"
                   class="form-control form-select"
                   [(ngModel)]="formaPagamento"
+                  (ngModelChange)="atualizarPrevia()"
                   name="formaPagamento"
                 >
                   <option value="Pix">Pix</option>
@@ -203,17 +216,59 @@
                   <input
                     type="checkbox"
                     [(ngModel)]="comTraslado"
+                    (ngModelChange)="atualizarPrevia()"
                     name="comTraslado"
                   />
-                  Cobrar traslado (R$ conforme configuração; grátis a partir de 2 diárias)
+                  Cobrar traslado (R$ conforme configuração; grátis a partir de 48 horas de permanência)
                 </label>
               </div>
+
+              @if (previa(); as p) {
+                <div class="previa-checkout" [class.previa-checkout--loading]="previaLoading()">
+                  <div class="detail-item">
+                    <span class="detail-label">Permanência</span>
+                    <span class="detail-value">{{ p.permanencia }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Diárias cobradas</span>
+                    <span class="detail-value">{{ p.diariasCobradas }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Estadia</span>
+                    <span class="detail-value">{{
+                      p.valorEstadia | currency: 'BRL' : 'symbol' : '1.2-2'
+                    }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Desconto (Pix/Dinheiro)</span>
+                    <span class="detail-value">{{
+                      p.desconto > 0 ? '- ' : ''
+                    }}{{ p.desconto | currency: 'BRL' : 'symbol' : '1.2-2' }}</span>
+                  </div>
+                  @if (p.comTraslado) {
+                    <div class="detail-item">
+                      <span class="detail-label">Traslado</span>
+                      <span class="detail-value">{{
+                        p.trasladoGratis
+                          ? 'Grátis'
+                          : (p.valorTraslado | currency: 'BRL' : 'symbol' : '1.2-2')
+                      }}</span>
+                    </div>
+                  }
+                  <div class="detail-item previa-checkout__total">
+                    <span class="detail-label">Total a cobrar</span>
+                    <span class="detail-value">{{
+                      p.valorFinal | currency: 'BRL' : 'symbol' : '1.2-2'
+                    }}</span>
+                  </div>
+                </div>
+              }
               <div class="acoes-form-buttons">
                 <button
                   type="button"
                   class="btn btn-warning"
                   (click)="realizarCheckout()"
-                  [disabled]="actionLoading()"
+                  [disabled]="actionLoading() || previaLoading() || !previa()"
                 >
                   @if (actionLoading()) {
                     Carregando...
@@ -221,7 +276,7 @@
                     Confirmar Check-out
                   }
                 </button>
-                <button type="button" class="btn btn-outline" (click)="showCheckoutForm.set(false)">
+                <button type="button" class="btn btn-outline" (click)="fecharCheckout()">
                   Cancelar
                 </button>
               </div>
@@ -240,6 +295,65 @@
                 Cancelar Reserva
               }
             </button>
+          }
+          @if (reserva()?.status === 'CheckoutRealizado') {
+            @if (!showPagamentoForm()) {
+              <button type="button" class="btn btn-outline" (click)="abrirCorrecaoPagamento()">
+                Corrigir Forma de Pagamento
+              </button>
+            } @else {
+              <div class="form-group">
+                <label class="form-label" for="novaFormaPagamento">Forma de Pagamento</label>
+                <select
+                  id="novaFormaPagamento"
+                  class="form-control form-select"
+                  [(ngModel)]="novaFormaPagamento"
+                  name="novaFormaPagamento"
+                >
+                  <option value="Pix">Pix</option>
+                  <option value="Cartao">Cartão</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="checkbox-inline">
+                  <input type="checkbox" [(ngModel)]="novoComTraslado" name="novoComTraslado" />
+                  Cobrar traslado (grátis a partir de 48 horas de permanência)
+                </label>
+              </div>
+              <p class="acoes-hint">
+                O desconto de Pix/Dinheiro e o traslado serão recalculados automaticamente.
+              </p>
+              <div class="acoes-form-buttons">
+                <button
+                  type="button"
+                  class="btn btn-warning"
+                  (click)="salvarFormaPagamento()"
+                  [disabled]="actionLoading()"
+                >
+                  Salvar
+                </button>
+                <button type="button" class="btn btn-outline" (click)="showPagamentoForm.set(false)">
+                  Cancelar
+                </button>
+              </div>
+            }
+          }
+          @if (!showVeiculoForm()) {
+            <button type="button" class="btn btn-outline" (click)="abrirEdicaoVeiculo()">
+              Editar Marca / Modelo / Cor
+            </button>
+          } @else {
+            <app-veiculo-fields [group]="veiculoForm"></app-veiculo-fields>
+            <div class="acoes-form-buttons">
+              <button type="button" class="btn btn-primary" (click)="salvarDadosVeiculo()"
+                [disabled]="actionLoading()">
+                Salvar
+              </button>
+              <button type="button" class="btn btn-outline" (click)="showVeiculoForm.set(false)">
+                Cancelar
+              </button>
+            </div>
           }
           <button type="button" class="btn btn-outline" (click)="gerarCupomEntrada()">
             Cupom Entrada

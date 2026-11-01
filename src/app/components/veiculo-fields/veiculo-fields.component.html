@@ -1,0 +1,68 @@
+<div class="veiculo_fields" [formGroup]="group()">
+  <div class="veiculo_field">
+    <label class="veiculo_label">Marca *</label>
+    @if (textoLivre()) {
+      <input type="text" class="veiculo_input" formControlName="marcaVeiculo" maxlength="50" placeholder="Ex.: Fiat" />
+    } @else {
+      <select
+        class="veiculo_input"
+        [value]="valor('marcaVeiculo')"
+        (change)="onMarca($any($event.target).value)"
+        [disabled]="!carregado()"
+      >
+        <option value="">{{ carregado() ? 'Selecione a marca' : 'Carregando...' }}</option>
+        @for (m of opcoes(nomesMarcas(), valor('marcaVeiculo')); track m) {
+          <option [value]="m" [selected]="m === valor('marcaVeiculo')">{{ m }}</option>
+        }
+      </select>
+    }
+    @if (erro('marcaVeiculo')) {
+      <span class="veiculo_error">Informe a marca.</span>
+    }
+  </div>
+
+  <div class="veiculo_field">
+    <label class="veiculo_label">Modelo *</label>
+    @if (textoLivre()) {
+      <input type="text" class="veiculo_input" formControlName="modeloVeiculo" maxlength="50" placeholder="Ex.: Argo" />
+    } @else {
+      <select
+        class="veiculo_input"
+        [value]="valor('modeloVeiculo')"
+        (change)="set('modeloVeiculo', $any($event.target).value)"
+        [disabled]="!valor('marcaVeiculo') || modelosLoading()"
+      >
+        <option value="">
+          {{ modelosLoading() ? 'Carregando...' : valor('marcaVeiculo') ? 'Selecione o modelo' : 'Escolha a marca primeiro' }}
+        </option>
+        @for (m of opcoes(nomesModelos(), valor('modeloVeiculo')); track m) {
+          <option [value]="m" [selected]="m === valor('modeloVeiculo')">{{ m }}</option>
+        }
+      </select>
+    }
+    @if (erro('modeloVeiculo')) {
+      <span class="veiculo_error">Informe o modelo.</span>
+    }
+  </div>
+
+  <div class="veiculo_field">
+    <label class="veiculo_label">Cor *</label>
+    @if (cores().length === 0) {
+      <input type="text" class="veiculo_input" formControlName="corVeiculo" maxlength="30" placeholder="Ex.: Prata" />
+    } @else {
+      <select
+        class="veiculo_input"
+        [value]="valor('corVeiculo')"
+        (change)="set('corVeiculo', $any($event.target).value)"
+      >
+        <option value="">Selecione a cor</option>
+        @for (c of opcoes(cores(), valor('corVeiculo')); track c) {
+          <option [value]="c" [selected]="c === valor('corVeiculo')">{{ c }}</option>
+        }
+      </select>
+    }
+    @if (erro('corVeiculo')) {
+      <span class="veiculo_error">Informe a cor.</span>
+    }
+  </div>
+</div>

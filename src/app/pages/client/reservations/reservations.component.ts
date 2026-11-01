@@ -2,22 +2,33 @@ import { CurrencyPipe, DatePipe, ViewportScroller } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { CarroEntry } from '../../../core/models/availability/client-flow.model';
 import { TipoVaga } from '../../../core/models/enums/tipo-vaga.enum';
 import { OrcamentoResponse } from '../../../core/models/reserva/orcamento/orcamento-response.model';
+import { PeriodAvailability } from '../../../core/models/availability/period-availability.model';
+import { PeriodAvailabilityService } from '../../../core/services/availability/period-availability.service';
+import { BloqueioService } from '../../../core/services/bloqueio/bloqueio.service';
 import { ClientFlowService } from '../../../core/services/client/client-flow.service';
 import { OrcamentoService } from '../../../core/services/orcamento/orcamento.service';
 import { ConflitoPorPlaca, ReservaService } from '../../../core/services/reserva/reserva.service';
 import { WhatsAppResponse } from '../../../core/models/reserva/whats-app-response.model';
 import { formatToISO } from '../../../core/utils/date/format-date-to-ISO';
-import { formatDuration } from '../../../core/utils/date/format-duration';
+import { calcularDiariasCobradas, formatDuration } from '../../../core/utils/date/format-duration';
+import { VeiculoFieldsComponent } from '../../../components/veiculo-fields/veiculo-fields.component';
 import { Patterns } from '../../../core/utils/patterns/form-patterns';
 import { scrollToTop } from '../../../core/utils/viewport/scroll-to-top';
 
+type VeiculoDetalhesForm = FormGroup<{
+  marcaVeiculo: FormControl<string>;
+  modeloVeiculo: FormControl<string>;
+  corVeiculo: FormControl<string>;
+}>;
+
 @Component({
   selector: 'app-reservations',
-  imports: [ReactiveFormsModule, CurrencyPipe, DatePipe],
+  imports: [ReactiveFormsModule, CurrencyPipe, DatePipe, VeiculoFieldsComponent],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',
 })
@@ -25,6 +36,8 @@ export class ReservationsComponent implements OnInit {
   private readonly clientFlowService = inject(ClientFlowService);
   private readonly orcamentoService = inject(OrcamentoService);
   private readonly reservaService = inject(ReservaService);
+  private readonly periodService = inject(PeriodAvailabilityService);
+  private readonly bloqueioService = inject(BloqueioService);
   private readonly router = inject(Router);
   private readonly scroller = inject(ViewportScroller);
 
@@ -34,6 +47,7 @@ export class ReservationsComponent implements OnInit {
   public isLoading = signal(false);
   public isConfirmationVisible = signal(false);
   public isBudgetLoading = signal(false);
+  public isAddingVehicle = signal(false);
   public errorMessage = signal('');
 
   // Conflito de placa
@@ -47,6 +61,10 @@ export class ReservationsComponent implements OnInit {
   public carroTipoVaga = signal<TipoVaga[]>([]);
 
   public readonly placasForm = new FormArray<FormControl<string>>([]);
+
+  /** Marca, modelo e cor de cada veículo (obrigatórios). Mesma ordem de `carros`. */
+  public readonly detalhesForm = new FormArray<VeiculoDetalhesForm>([]);
+
 
   public orcamentos = signal<(OrcamentoResponse | null)[]>([]);
 
@@ -106,18 +124,133 @@ export class ReservationsComponent implements OnInit {
       carros.map((c) => (c.vagasCobertaDisponiveis > 0 ? TipoVaga.Coberta : TipoVaga.Descoberta)),
     );
 
-    carros.forEach(() =>
-      this.placasForm.push(
-        new FormControl<string>('', {
-          nonNullable: true,
-          validators: [Validators.required, Validators.pattern(Patterns.vehiclePlate)],
-        }),
-      ),
-    );
+    carros.forEach(() => this.adicionarControlesDoVeiculo());
 
     this.orcamentos.set(carros.map(() => null));
 
     this.calcularTodosOrcamentos();
+  }
+
+  private adicionarControlesDoVeiculo(): void {
+    this.placasForm.push(
+      new FormControl<string>('', {
+        nonNullable: true,
+        validators: [Validators.required, Validators.pattern(Patterns.vehiclePlate)],
+      }),
+    );
+    this.detalhesForm.push(
+      new FormGroup({
+        marcaVeiculo: new FormControl<string>('', {
+          nonNullable: true,
+          validators: [Validators.required, Validators.maxLength(50)],
+        }),
+        modeloVeiculo: new FormControl<string>('', {
+          nonNullable: true,
+          validators: [Validators.required, Validators.maxLength(50)],
+        }),
+        corVeiculo: new FormControl<string>('', {
+          nonNullable: true,
+          validators: [Validators.required, Validators.maxLength(30)],
+        }),
+      }),
+    );
+  }
+
+  /** Adiciona outro veículo no MESMO período do primeiro; só avisa se não houver vaga. */
+  public adicionarVeiculo(): void {
+    const primeiro = this.carros()[0];
+    if (!primeiro || this.isAddingVehicle()) return;
+
+    const novo: CarroEntry = { ...primeiro, placa: '' };
+    this.isAddingVehicle.set(true);
+    this.errorMessage.set('');
+
+    this.verificarPeriodoDoVeiculo(novo).subscribe({
+      next: (resultado) => {
+        this.isAddingVehicle.set(false);
+        if (typeof resultado === 'string') {
+          this.errorMessage.set(resultado);
+          scrollToTop(this.scroller);
+          return;
+        }
+
+        this.carros.set([...this.carros(), resultado]);
+        this.carroTipoVaga.set([...this.carroTipoVaga(), this.tipoPadrao(resultado)]);
+        this.orcamentos.set([...this.orcamentos(), null]);
+        this.adicionarControlesDoVeiculo();
+        this.calcularOrcamentoCarro(this.carros().length - 1);
+      },
+      error: (err) => {
+        this.isAddingVehicle.set(false);
+        this.errorMessage.set(err.error?.message ?? 'Erro ao verificar disponibilidade');
+        scrollToTop(this.scroller);
+      },
+    });
+  }
+
+  public removerVeiculo(index: number): void {
+    if (index === 0) return; // o primeiro veículo vem da tela anterior
+
+    this.carros.set(this.carros().filter((_, i) => i !== index));
+    this.carroTipoVaga.set(this.carroTipoVaga().filter((_, i) => i !== index));
+    this.orcamentos.set(this.orcamentos().filter((_, i) => i !== index));
+    this.placasForm.removeAt(index);
+    this.detalhesForm.removeAt(index);
+  }
+
+  /**
+   * Confere bloqueio de reservas online e vagas para o período do veículo.
+   * Devolve o veículo com as vagas atualizadas, ou o texto do aviso quando não pode reservar.
+   */
+  private verificarPeriodoDoVeiculo(carro: CarroEntry): Observable<CarroEntry | string> {
+    const entrada = `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`;
+    const saida = `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`;
+
+    return this.bloqueioService.verificar(entrada, saida).pipe(
+      switchMap((bloqueio) =>
+        bloqueio.bloqueado
+          ? of(
+              bloqueio.mensagem ??
+                'Reservas online indisponíveis neste período. Entre em contato com o estacionamento.',
+            )
+          : this.periodService
+              .checkPeriodAvailability(formatToISO(carro.dataEntrada), formatToISO(carro.dataSaida))
+              .pipe(map((disp) => this.aplicarVagas(carro, disp))),
+      ),
+    );
+  }
+
+  private aplicarVagas(carro: CarroEntry, disp: PeriodAvailability): CarroEntry | string {
+    const minimo = (selector: (d: PeriodAvailability['dias'][number]) => number) =>
+      disp.dias?.length ? Math.min(...disp.dias.map(selector)) : 0;
+
+    const coberta = minimo((d) => d.vagasCobertaDisponiveis);
+    const descoberta = minimo((d) => d.vagasDescobertaDisponiveis);
+
+    // Só avisa quando não há vaga nenhuma; quantidades não são mostradas ao cliente.
+    if (coberta <= 0 && descoberta <= 0) {
+      return 'Não há vagas disponíveis para este período. Tente outras datas ou fale com o estacionamento.';
+    }
+
+    const entrada = new Date(`${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`);
+    const saida = new Date(`${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`);
+
+    return {
+      ...carro,
+      qtdDias: calcularDiariasCobradas(entrada, saida),
+      vagasCobertaDisponiveis: coberta,
+      vagasDescobertaDisponiveis: descoberta,
+    };
+  }
+
+  private tipoPadrao(carro: CarroEntry): TipoVaga {
+    return carro.vagasCobertaDisponiveis > 0 ? TipoVaga.Coberta : TipoVaga.Descoberta;
+  }
+
+  private tipoDisponivel(carro: CarroEntry, tipo: TipoVaga): boolean {
+    return tipo === TipoVaga.Coberta
+      ? carro.vagasCobertaDisponiveis > 0
+      : carro.vagasDescobertaDisponiveis > 0;
   }
 
   public isCoveredAvailable(index: number): boolean {
@@ -210,6 +343,14 @@ export class ReservationsComponent implements OnInit {
       return;
     }
 
+    this.detalhesForm.markAllAsTouched();
+
+    if (this.detalhesForm.invalid) {
+      this.errorMessage.set('Informe marca, modelo e cor de cada veículo.');
+      scrollToTop(this.scroller);
+      return;
+    }
+
     const placasDuplicadas: number[] = [];
     const mapa = new Map<string, number[]>();
 
@@ -288,8 +429,11 @@ export class ReservationsComponent implements OnInit {
       if (index === -1) return null;
       const carro = carros[index];
       const placa = this.placasForm.at(index).value.toUpperCase();
+      const dataEntrada = `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`;
       const dataSaida = `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`;
       return this.reservaService.atualizarCliente(conflito.id, {
+        dataEntrada,
+        tipoVaga: this.carroTipoVaga()[index],
         dataSaidaPrevista: dataSaida,
         placaVeiculo: placa,
         telefoneCliente,
@@ -371,6 +515,7 @@ export class ReservationsComponent implements OnInit {
           nomeCliente: customerName!,
           telefoneCliente: customerPhone!,
           placaVeiculo: this.placasForm.at(0).value || undefined,
+          ...this.detalhesDoVeiculo(0),
           tipoVaga: this.carroTipoVaga()[0],
           dataEntrada: `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`,
           dataSaidaPrevista: `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`,
@@ -403,6 +548,7 @@ export class ReservationsComponent implements OnInit {
           telefoneCliente: customerPhone!,
           carros: carros.map((carro, i) => ({
             placaVeiculo: this.placasForm.at(i).value || undefined,
+            ...this.detalhesDoVeiculo(i),
             tipoVaga: this.carroTipoVaga()[i],
             dataEntrada: `${formatToISO(carro.dataEntrada)}T${carro.horaEntrada || '00:00'}`,
             dataSaidaPrevista: `${formatToISO(carro.dataSaida)}T${carro.horaSaida || '00:00'}`,
@@ -431,6 +577,15 @@ export class ReservationsComponent implements OnInit {
           },
         });
     }
+  }
+
+  private detalhesDoVeiculo(index: number): { marcaVeiculo: string; modeloVeiculo: string; corVeiculo: string } {
+    const { marcaVeiculo, modeloVeiculo, corVeiculo } = this.detalhesForm.at(index).getRawValue();
+    return {
+      marcaVeiculo: marcaVeiculo.trim(),
+      modeloVeiculo: modeloVeiculo.trim(),
+      corVeiculo: corVeiculo.trim(),
+    };
   }
 
   public formatDateTime(date: string, time: string): string {

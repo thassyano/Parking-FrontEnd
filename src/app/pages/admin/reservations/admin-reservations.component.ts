@@ -30,7 +30,10 @@ export class AdminReservationsComponent implements OnInit {
 
   protected filteredReservas = computed(() => {
     const { id, telefone, nome, placa, pago } = this.localFilters();
+    const mostrarCanceladas = this.statusFiltro() === 'Cancelada';
     return this.reservas().filter((r) => {
+      // Canceladas só aparecem quando o filtro de status pede "Cancelada" explicitamente.
+      if (!mostrarCanceladas && r.status === 'Cancelada') return false;
       if (id && !String(r.id).includes(id.trim())) return false;
       if (telefone && !r.telefoneCliente?.toLowerCase().includes(telefone.trim().toLowerCase()))
         return false;
@@ -47,6 +50,9 @@ export class AdminReservationsComponent implements OnInit {
     const start = (this.currentPage() - 1) * this.pageSize();
     return this.filteredReservas().slice(start, start + this.pageSize());
   });
+
+  /** Status usado na última busca; controla se as canceladas aparecem. */
+  protected statusFiltro = signal('');
 
   protected localFilters = signal({ id: '', telefone: '', nome: '', placa: '', pago: '' });
 
@@ -78,6 +84,7 @@ export class AdminReservationsComponent implements OnInit {
     if (dataInicio) filtros.dataInicio = dataInicio;
     if (dataFim) filtros.dataFim = dataFim;
 
+    this.statusFiltro.set(status ?? '');
     this.localFilters.set({
       id: id ?? '',
       telefone: telefone ?? '',

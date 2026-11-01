@@ -136,20 +136,7 @@
           }
         </div>
 
-        <div class="vehicle_details" [formGroup]="detalhesForm.at($index)">
-          <div class="input_group">
-            <label class="input_label">Marca <small>(opcional)</small></label>
-            <input type="text" class="input_field" formControlName="marca" maxlength="50" placeholder="Ex.: Fiat" />
-          </div>
-          <div class="input_group">
-            <label class="input_label">Modelo <small>(opcional)</small></label>
-            <input type="text" class="input_field" formControlName="modelo" maxlength="50" placeholder="Ex.: Argo" />
-          </div>
-          <div class="input_group">
-            <label class="input_label">Cor <small>(opcional)</small></label>
-            <input type="text" class="input_field" formControlName="cor" maxlength="30" placeholder="Ex.: Prata" />
-          </div>
-        </div>
+        <app-veiculo-fields [group]="detalhesForm.at($index)"></app-veiculo-fields>
 
         <div class="input_group">
           <label class="input_label">

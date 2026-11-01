@@ -16,18 +16,19 @@ import { ConflitoPorPlaca, ReservaService } from '../../../core/services/reserva
 import { WhatsAppResponse } from '../../../core/models/reserva/whats-app-response.model';
 import { formatToISO } from '../../../core/utils/date/format-date-to-ISO';
 import { calcularDiariasCobradas, formatDuration } from '../../../core/utils/date/format-duration';
+import { VeiculoFieldsComponent } from '../../../components/veiculo-fields/veiculo-fields.component';
 import { Patterns } from '../../../core/utils/patterns/form-patterns';
 import { scrollToTop } from '../../../core/utils/viewport/scroll-to-top';
 
 type VeiculoDetalhesForm = FormGroup<{
-  marca: FormControl<string>;
-  modelo: FormControl<string>;
-  cor: FormControl<string>;
+  marcaVeiculo: FormControl<string>;
+  modeloVeiculo: FormControl<string>;
+  corVeiculo: FormControl<string>;
 }>;
 
 @Component({
   selector: 'app-reservations',
-  imports: [ReactiveFormsModule, CurrencyPipe, DatePipe],
+  imports: [ReactiveFormsModule, CurrencyPipe, DatePipe, VeiculoFieldsComponent],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',
 })
@@ -61,7 +62,7 @@ export class ReservationsComponent implements OnInit {
 
   public readonly placasForm = new FormArray<FormControl<string>>([]);
 
-  /** Marca, modelo e cor de cada veículo (opcionais). Mesma ordem de `carros`. */
+  /** Marca, modelo e cor de cada veículo (obrigatórios). Mesma ordem de `carros`. */
   public readonly detalhesForm = new FormArray<VeiculoDetalhesForm>([]);
 
   protected readonly minDateToday = new Date().toLocaleDateString('en-CA');
@@ -140,9 +141,18 @@ export class ReservationsComponent implements OnInit {
     );
     this.detalhesForm.push(
       new FormGroup({
-        marca: new FormControl<string>('', { nonNullable: true, validators: [Validators.maxLength(50)] }),
-        modelo: new FormControl<string>('', { nonNullable: true, validators: [Validators.maxLength(50)] }),
-        cor: new FormControl<string>('', { nonNullable: true, validators: [Validators.maxLength(30)] }),
+        marcaVeiculo: new FormControl<string>('', {
+          nonNullable: true,
+          validators: [Validators.required, Validators.maxLength(50)],
+        }),
+        modeloVeiculo: new FormControl<string>('', {
+          nonNullable: true,
+          validators: [Validators.required, Validators.maxLength(50)],
+        }),
+        corVeiculo: new FormControl<string>('', {
+          nonNullable: true,
+          validators: [Validators.required, Validators.maxLength(30)],
+        }),
       }),
     );
   }
@@ -402,6 +412,14 @@ export class ReservationsComponent implements OnInit {
       return;
     }
 
+    this.detalhesForm.markAllAsTouched();
+
+    if (this.detalhesForm.invalid) {
+      this.errorMessage.set('Informe marca, modelo e cor de cada veículo.');
+      scrollToTop(this.scroller);
+      return;
+    }
+
     const placasDuplicadas: number[] = [];
     const mapa = new Map<string, number[]>();
 
@@ -630,13 +648,12 @@ export class ReservationsComponent implements OnInit {
     }
   }
 
-  /** Marca/modelo/cor preenchidos (campos em branco não são enviados). */
-  private detalhesDoVeiculo(index: number): { marcaVeiculo?: string; modeloVeiculo?: string; corVeiculo?: string } {
-    const { marca, modelo, cor } = this.detalhesForm.at(index).getRawValue();
+  private detalhesDoVeiculo(index: number): { marcaVeiculo: string; modeloVeiculo: string; corVeiculo: string } {
+    const { marcaVeiculo, modeloVeiculo, corVeiculo } = this.detalhesForm.at(index).getRawValue();
     return {
-      marcaVeiculo: marca.trim() || undefined,
-      modeloVeiculo: modelo.trim() || undefined,
-      corVeiculo: cor.trim() || undefined,
+      marcaVeiculo: marcaVeiculo.trim(),
+      modeloVeiculo: modeloVeiculo.trim(),
+      corVeiculo: corVeiculo.trim(),
     };
   }
 

@@ -1,6 +1,7 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { VeiculoFieldsComponent } from '../../../components/veiculo-fields/veiculo-fields.component';
 import { ActivatedRoute } from '@angular/router';
 import { CupomEntrada } from '../../../core/models/reserva/cupom-entrada.model';
 import { CupomSaida } from '../../../core/models/reserva/cupom-saida.model';
@@ -11,7 +12,7 @@ import { scrollToBottom } from '../../../core/utils/viewport/scroll-to-bottom';
 
 @Component({
   selector: 'app-reservation-detail',
-  imports: [FormsModule, CurrencyPipe, DatePipe],
+  imports: [FormsModule, ReactiveFormsModule, CurrencyPipe, DatePipe, VeiculoFieldsComponent],
   templateUrl: './reservation-detail.component.html',
   styleUrl: './reservation-detail.component.css',
 })
@@ -49,9 +50,11 @@ export class ReservationDetailComponent implements OnInit {
 
   // Marca, modelo e cor
   protected showVeiculoForm = signal(false);
-  protected marcaVeiculo = '';
-  protected modeloVeiculo = '';
-  protected corVeiculo = '';
+  protected veiculoForm = new FormGroup({
+    marcaVeiculo: new FormControl('', [Validators.required, Validators.maxLength(50)]),
+    modeloVeiculo: new FormControl('', [Validators.required, Validators.maxLength(50)]),
+    corVeiculo: new FormControl('', [Validators.required, Validators.maxLength(30)]),
+  });
 
   protected showCupomEntradaPrint = signal(false);
   protected showCupomSaidaPrint = signal(false);
@@ -180,20 +183,29 @@ export class ReservationDetailComponent implements OnInit {
   protected abrirEdicaoVeiculo(): void {
     const r = this.reserva();
     if (!r) return;
-    this.marcaVeiculo = r.marcaVeiculo ?? '';
-    this.modeloVeiculo = r.modeloVeiculo ?? '';
-    this.corVeiculo = r.corVeiculo ?? '';
+    this.veiculoForm.reset({
+      marcaVeiculo: r.marcaVeiculo ?? '',
+      modeloVeiculo: r.modeloVeiculo ?? '',
+      corVeiculo: r.corVeiculo ?? '',
+    });
     this.showVeiculoForm.set(true);
   }
 
   protected salvarDadosVeiculo(): void {
+    this.veiculoForm.markAllAsTouched();
+    if (this.veiculoForm.invalid) {
+      this.erro.set('Informe marca, modelo e cor.');
+      return;
+    }
+
+    const { marcaVeiculo, modeloVeiculo, corVeiculo } = this.veiculoForm.getRawValue();
     this.actionLoading.set(true);
     this.erro.set('');
     this.reservaService
       .atualizarDadosVeiculo(this.reservaId, {
-        marcaVeiculo: this.marcaVeiculo,
-        modeloVeiculo: this.modeloVeiculo,
-        corVeiculo: this.corVeiculo,
+        marcaVeiculo: marcaVeiculo!.trim(),
+        modeloVeiculo: modeloVeiculo!.trim(),
+        corVeiculo: corVeiculo!.trim(),
       })
       .subscribe({
         next: (data) => {

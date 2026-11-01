@@ -4,6 +4,7 @@ import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Va
 import { Router } from '@angular/router';
 import { forkJoin, Subscription } from 'rxjs';
 import { ClientNameLengths } from '../../../constants/cliente-name-lenght';
+import { VeiculoFieldsComponent } from '../../../components/veiculo-fields/veiculo-fields.component';
 import { CarroPresencialLoteRequest } from '../../../core/models/reserva/carros/carro-lote-request.interface';
 import { ConflitoPorPlaca, ReservaService } from '../../../core/services/reserva/reserva.service';
 import { calcularDiariasCobradas } from '../../../core/utils/date/format-duration';
@@ -20,7 +21,7 @@ import {
 
 @Component({
   selector: 'app-create-reservations',
-  imports: [ReactiveFormsModule, FormsModule, DatePipe],
+  imports: [ReactiveFormsModule, FormsModule, DatePipe, VeiculoFieldsComponent],
   templateUrl: './create-reservations.component.html',
   styleUrl: './create-reservations.component.css',
 })
@@ -83,9 +84,9 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
           Validators.required,
           Validators.pattern(Patterns.vehiclePlate),
         ]),
-        marcaVeiculo: new FormControl('', Validators.maxLength(50)),
-        modeloVeiculo: new FormControl('', Validators.maxLength(50)),
-        corVeiculo: new FormControl('', Validators.maxLength(30)),
+        marcaVeiculo: new FormControl('', [Validators.required, Validators.maxLength(50)]),
+        modeloVeiculo: new FormControl('', [Validators.required, Validators.maxLength(50)]),
+        corVeiculo: new FormControl('', [Validators.required, Validators.maxLength(30)]),
         tipoVaga: new FormControl('Coberta', Validators.required),
         dataEntrada: new FormControl(dataEntrada, Validators.required),
         horaEntrada: new FormControl(horaEntrada, Validators.required),
@@ -324,16 +325,15 @@ export class CreateReservationsComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Marca/modelo/cor preenchidos (em branco não são enviados). */
   private detalhesDoVeiculo(v: {
     marcaVeiculo?: string | null;
     modeloVeiculo?: string | null;
     corVeiculo?: string | null;
-  }): { marcaVeiculo?: string; modeloVeiculo?: string; corVeiculo?: string } {
+  }): { marcaVeiculo: string; modeloVeiculo: string; corVeiculo: string } {
     return {
-      marcaVeiculo: v.marcaVeiculo?.trim() || undefined,
-      modeloVeiculo: v.modeloVeiculo?.trim() || undefined,
-      corVeiculo: v.corVeiculo?.trim() || undefined,
+      marcaVeiculo: (v.marcaVeiculo ?? '').trim(),
+      modeloVeiculo: (v.modeloVeiculo ?? '').trim(),
+      corVeiculo: (v.corVeiculo ?? '').trim(),
     };
   }
 

@@ -159,18 +159,7 @@
         </div>
 
         <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Marca</label>
-            <input type="text" class="form-control" formControlName="marcaVeiculo" maxlength="50" placeholder="Ex.: Fiat" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Modelo</label>
-            <input type="text" class="form-control" formControlName="modeloVeiculo" maxlength="50" placeholder="Ex.: Argo" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Cor</label>
-            <input type="text" class="form-control" formControlName="corVeiculo" maxlength="30" placeholder="Ex.: Prata" />
-          </div>
+          <app-veiculo-fields [group]="veiculoGroup($index)"></app-veiculo-fields>
         </div>
 
         <div class="form-row">

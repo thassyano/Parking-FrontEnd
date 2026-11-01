@@ -344,21 +344,7 @@
               Editar Marca / Modelo / Cor
             </button>
           } @else {
-            <div class="form-group">
-              <label class="form-label" for="marcaVeiculo">Marca</label>
-              <input id="marcaVeiculo" type="text" class="form-control" maxlength="50"
-                [(ngModel)]="marcaVeiculo" name="marcaVeiculo" />
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="modeloVeiculo">Modelo</label>
-              <input id="modeloVeiculo" type="text" class="form-control" maxlength="50"
-                [(ngModel)]="modeloVeiculo" name="modeloVeiculo" />
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="corVeiculo">Cor</label>
-              <input id="corVeiculo" type="text" class="form-control" maxlength="30"
-                [(ngModel)]="corVeiculo" name="corVeiculo" />
-            </div>
+            <app-veiculo-fields [group]="veiculoForm"></app-veiculo-fields>
             <div class="acoes-form-buttons">
               <button type="button" class="btn btn-primary" (click)="salvarDadosVeiculo()"
                 [disabled]="actionLoading()">

@@ -38,3 +38,17 @@ export function calcularDiariasCobradas(entrada: Date, saida: Date): number {
   const resto = horas - completas * 24;
   return completas + (resto >= 12 ? 1 : 0);
 }
+
+/**
+ * Permanência prevista de uma reserva a partir das datas que a API devolve (ISO sem fuso).
+ * Ex.: "1 dia, 19 horas e 58 minutos". Devolve '' quando as datas faltam ou a saída não é depois da entrada.
+ *
+ * É apenas exibição: a regra de cobrança continua sendo a do back-end.
+ */
+export function formatPermanenciaReserva(
+  dataEntrada: string | null | undefined,
+  dataSaida: string | null | undefined,
+): string {
+  if (!dataEntrada || !dataSaida) return '';
+  return formatDuration(new Date(dataEntrada), new Date(dataSaida));
+}

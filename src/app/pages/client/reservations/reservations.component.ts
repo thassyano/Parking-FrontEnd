@@ -17,6 +17,8 @@ import { WhatsAppResponse } from '../../../core/models/reserva/whats-app-respons
 import { formatToISO } from '../../../core/utils/date/format-date-to-ISO';
 import { calcularDiariasCobradas, formatDuration } from '../../../core/utils/date/format-duration';
 import { VeiculoFieldsComponent } from '../../../components/veiculo-fields/veiculo-fields.component';
+import { WhatsappEnvioComponent } from '../../../components/whatsapp-envio/whatsapp-envio.component';
+import { WhatsappPendenteService } from '../../../core/services/client/whatsapp-pendente.service';
 import { Patterns } from '../../../core/utils/patterns/form-patterns';
 import { scrollToTop } from '../../../core/utils/viewport/scroll-to-top';
 
@@ -28,12 +30,13 @@ type VeiculoDetalhesForm = FormGroup<{
 
 @Component({
   selector: 'app-reservations',
-  imports: [ReactiveFormsModule, CurrencyPipe, DatePipe, VeiculoFieldsComponent],
+  imports: [ReactiveFormsModule, CurrencyPipe, DatePipe, VeiculoFieldsComponent, WhatsappEnvioComponent],
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.css',
 })
 export class ReservationsComponent implements OnInit {
   private readonly clientFlowService = inject(ClientFlowService);
+  private readonly whatsappPendente = inject(WhatsappPendenteService);
   private readonly orcamentoService = inject(OrcamentoService);
   private readonly reservaService = inject(ReservaService);
   private readonly periodService = inject(PeriodAvailabilityService);
@@ -49,6 +52,14 @@ export class ReservationsComponent implements OnInit {
   public isBudgetLoading = signal(false);
   public isAddingVehicle = signal(false);
   public errorMessage = signal('');
+
+  /** Tela final: a reserva já foi gravada e falta o cliente enviar a mensagem pelo WhatsApp. */
+  public conclusao = signal<{
+    dados: WhatsAppResponse | null;
+    reservaIds: number[];
+    titulo: string;
+    subtitulo: string;
+  } | null>(null);
 
   // Conflito de placa
   public conflitos = signal<ConflitoPorPlaca[]>([]);
@@ -457,7 +468,9 @@ export class ReservationsComponent implements OnInit {
             ? this.reservaService.whatsappAlteracao(idsAtualizados[0])
             : this.reservaService.whatsappAlteracaoLote(idsAtualizados);
 
-        this.redirecionarWhatsApp(whatsapp$, () => this.criarReservasSemConflito(placasComConflito));
+        this.redirecionarWhatsApp(whatsapp$, (wp) =>
+          this.criarReservasSemConflito(placasComConflito, wp, idsAtualizados),
+        );
       },
       error: (err) => {
         this.isLoading.set(false);
@@ -467,30 +480,80 @@ export class ReservationsComponent implements OnInit {
     });
   }
 
-  private redirecionarWhatsApp(whatsapp$: Observable<WhatsAppResponse>, depois: () => void): void {
+  private redirecionarWhatsApp(
+    whatsapp$: Observable<WhatsAppResponse>,
+    depois: (wp: WhatsAppResponse | null) => void,
+  ): void {
     whatsapp$.subscribe({
       next: (wp) => {
-        window.open(wp.url, '_blank');
+        this.tentarAbrirWhatsApp(wp);
         this.isLoading.set(false);
-        depois();
+        depois(wp);
       },
       error: () => {
         this.isLoading.set(false);
-        depois();
+        depois(null);
       },
     });
   }
 
-  private criarReservasSemConflito(placasComConflito: Set<string>): void {
+  private criarReservasSemConflito(
+    placasComConflito: Set<string>,
+    wp: WhatsAppResponse | null,
+    idsAtualizados: number[],
+  ): void {
     const carrosSemConflito = this.carros().filter(
       (_, i) => !placasComConflito.has(this.placasForm.at(i).value.toUpperCase()),
     );
     if (!carrosSemConflito.length) {
-      this.clientFlowService.resetClienteFlow();
-      this.router.navigate(['/']);
+      this.exibirConclusao(wp, idsAtualizados, 'alteracao');
       return;
     }
+
+    // Ainda há veículos novos a reservar: o aviso da alteração fica guardado até o cliente confirmar o envio.
+    if (wp) this.whatsappPendente.registrar({ dados: wp, reservaIds: idsAtualizados, tipo: 'alteracao' });
     this.isConfirmationVisible.set(true);
+  }
+
+  /**
+   * Abre o WhatsApp assim que possível. Isso acontece depois de uma chamada à API, então vários navegadores
+   * (principalmente no celular) bloqueiam a janela: por isso a tela final sempre traz o botão de envio.
+   */
+  private tentarAbrirWhatsApp(wp: WhatsAppResponse): void {
+    window.open(wp.url, '_blank');
+  }
+
+  /** Mostra a tela final com o botão de envio e guarda o aviso até o cliente confirmar que enviou. */
+  private exibirConclusao(
+    wp: WhatsAppResponse | null,
+    reservaIds: number[],
+    tipo: 'reserva' | 'alteracao',
+  ): void {
+    if (wp) this.whatsappPendente.registrar({ dados: wp, reservaIds, tipo });
+    this.clientFlowService.resetClienteFlow();
+    this.isLoading.set(false);
+
+    const alteracao = tipo === 'alteracao';
+    this.conclusao.set({
+      dados: wp,
+      reservaIds,
+      titulo: alteracao
+        ? 'Reserva atualizada!'
+        : reservaIds.length > 1
+          ? 'Reservas registradas!'
+          : 'Reserva registrada!',
+      subtitulo: alteracao
+        ? 'Falta só um passo: avise o estacionamento da alteração enviando a mensagem.'
+        : 'Falta só um passo: envie a mensagem para o estacionamento.',
+    });
+    scrollToTop(this.scroller);
+  }
+
+  /** O cliente confirmou o envio (ou não precisa enviar): encerra o aviso e volta ao início. */
+  public concluirEnvio(): void {
+    this.whatsappPendente.limpar();
+    this.conclusao.set(null);
+    this.router.navigate(['/']);
   }
 
   public closeConfirmation(): void {
@@ -522,19 +585,8 @@ export class ReservationsComponent implements OnInit {
           qtdDias: carro.qtdDias,
         })
         .subscribe({
-          next: (reserva) => {
-            this.reservaService.whatsapp(reserva.id).subscribe({
-              next: (wp) => {
-                this.clientFlowService.resetClienteFlow();
-                window.open(wp.url, '_blank');
-                this.isLoading.set(false);
-              },
-              error: () => {
-                this.clientFlowService.resetClienteFlow();
-                this.router.navigate(['/']);
-              },
-            });
-          },
+          next: (reserva) =>
+            this.finalizarComWhatsApp([reserva.id], this.reservaService.whatsapp(reserva.id)),
           error: (err) => {
             scrollToTop(this.scroller);
             this.errorMessage.set(err.error?.message ?? 'Erro ao criar reserva');
@@ -557,18 +609,8 @@ export class ReservationsComponent implements OnInit {
         })
         .subscribe({
           next: (resultado) => {
-            const ids = resultado.reservas.map((r: any) => r.id);
-            this.reservaService.whatsappLote(ids).subscribe({
-              next: (wp) => {
-                this.clientFlowService.resetClienteFlow();
-                window.open(wp.url, '_blank');
-                this.isLoading.set(false);
-              },
-              error: () => {
-                this.clientFlowService.resetClienteFlow();
-                this.router.navigate(['/']);
-              },
-            });
+            const ids = resultado.reservas.map((r) => r.id);
+            this.finalizarComWhatsApp(ids, this.reservaService.whatsappLote(ids));
           },
           error: (err) => {
             scrollToTop(this.scroller);
@@ -577,6 +619,17 @@ export class ReservationsComponent implements OnInit {
           },
         });
     }
+  }
+
+  /** Reserva já gravada: busca a mensagem de WhatsApp e leva o cliente à tela de envio. */
+  private finalizarComWhatsApp(ids: number[], whatsapp$: Observable<WhatsAppResponse>): void {
+    whatsapp$.subscribe({
+      next: (wp) => {
+        this.tentarAbrirWhatsApp(wp);
+        this.exibirConclusao(wp, ids, 'reserva');
+      },
+      error: () => this.exibirConclusao(null, ids, 'reserva'),
+    });
   }
 
   private detalhesDoVeiculo(index: number): { marcaVeiculo: string; modeloVeiculo: string; corVeiculo: string } {

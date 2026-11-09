@@ -1,0 +1,113 @@
+.envio_card {
+  background: var(--white);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  text-align: center;
+}
+
+.envio_icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--success-light);
+  color: var(--success);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.envio_title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.envio_numeros {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.envio_subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.envio_steps {
+  align-self: stretch;
+  margin: 0;
+  padding: 0.85rem 1rem 0.85rem 2rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  background: var(--primary-50);
+  border: 1px solid var(--primary-light);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.envio_btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.envio_btn--primary {
+  background: var(--success);
+  border: 1px solid var(--success);
+  color: var(--white);
+}
+
+.envio_btn--primary:hover {
+  background: #3c8556;
+  border-color: #3c8556;
+}
+
+.envio_btn--outline {
+  background: var(--white);
+  border: 1.5px solid var(--primary-light);
+  color: var(--text-dark);
+}
+
+.envio_btn--outline:hover {
+  background: var(--primary-50);
+}
+
+.envio_hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.envio_link {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: underline;
+}

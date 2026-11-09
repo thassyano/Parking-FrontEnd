@@ -1,0 +1,102 @@
+<div class="client_page">
+  <div class="client_content">
+    @if (etapa() === 'conclusao') {
+      <app-whatsapp-envio
+        [dados]="whatsapp()"
+        [reservaIds]="selecionada() ? [selecionada()!.id] : []"
+        titulo="Reserva alterada!"
+        subtitulo="Falta só um passo: envie a mensagem com a alteração para o estacionamento."
+        (concluido)="finalizar()"
+      ></app-whatsapp-envio>
+    } @else {
+      <div class="card">
+        <h2 class="section_title">Já tenho uma reserva</h2>
+
+        @if (errorMessage()) {
+          <div class="error_alert">{{ errorMessage() }}</div>
+        }
+
+        @switch (etapa()) {
+          @case ('busca') {
+            <p class="hint">Informe a placa e o telefone usados na reserva para encontrá-la.</p>
+            <form class="form" [formGroup]="buscaForm" (ngSubmit)="buscar()">
+              <div class="input_group">
+                <label class="input_label" for="placa">Placa do veículo</label>
+                <input id="placa" class="input_field input_field--uppercase" formControlName="placa" maxlength="8" autocomplete="off" />
+              </div>
+              <div class="input_group">
+                <label class="input_label" for="telefone">Telefone da reserva</label>
+                <input id="telefone" class="input_field" formControlName="telefone" inputmode="tel" maxlength="20" />
+              </div>
+              <app-landing-button
+                [label]="isLoading() ? 'Buscando...' : 'Buscar reserva'"
+                variant="primary"
+                [fullWidth]="true"
+                [disabled]="isLoading()"
+                (clicked)="buscar()"
+              ></app-landing-button>
+              <app-landing-button label="Voltar" variant="outline" [fullWidth]="true" (clicked)="finalizar()"></app-landing-button>
+            </form>
+          }
+
+          @case ('lista') {
+            @if (semResultado()) {
+              <p class="hint">
+                Não encontramos reservas futuras para esta placa e telefone. Confira os dados ou fale com o estacionamento.
+              </p>
+            } @else {
+              <p class="hint">Escolha a reserva que deseja alterar.</p>
+              <ul class="lista">
+                @for (r of reservas(); track r.id) {
+                  <li class="item" [class.item--bloqueado]="!r.podeAlterar">
+                    <div class="item_head">
+                      <strong>Reserva #{{ r.id }}</strong>
+                      <span class="tag">{{ r.tipoVaga }}</span>
+                    </div>
+                    <div class="item_row">Entrada: {{ r.dataEntrada | date: 'dd/MM/yyyy HH:mm' }}</div>
+                    <div class="item_row">Saída: {{ r.dataSaidaPrevista | date: 'dd/MM/yyyy HH:mm' }}</div>
+                    <div class="item_row">Permanência: {{ permanencia(r) }}</div>
+                    <div class="item_row">
+                      {{ r.marcaVeiculo }} {{ r.modeloVeiculo }} · {{ r.corVeiculo }}
+                    </div>
+                    @if (r.podeAlterar) {
+                      <button type="button" class="btn_item" (click)="escolher(r)">Alterar esta reserva</button>
+                    } @else {
+                      <p class="bloqueio">{{ r.motivoBloqueio }}</p>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+            <app-landing-button label="Buscar outra placa" variant="outline" [fullWidth]="true" (clicked)="voltar()"></app-landing-button>
+          }
+
+          @case ('edicao') {
+            <p class="hint">
+              Reserva #{{ selecionada()?.id }} · {{ selecionada()?.dataEntrada | date: 'dd/MM/yyyy HH:mm' }}
+            </p>
+            <form class="form" [formGroup]="edicaoForm" (ngSubmit)="salvar()">
+              <app-veiculo-fields [group]="edicaoForm"></app-veiculo-fields>
+              <div class="input_group">
+                <label class="input_label" for="tipoVaga">Tipo de vaga</label>
+                <select id="tipoVaga" class="input_field" formControlName="tipoVaga">
+                  <option value="Coberta">Coberta</option>
+                  <option value="Descoberta">Descoberta</option>
+                </select>
+              </div>
+              <p class="hint">O valor é recalculado se o tipo de vaga mudar. Para incluir outro veículo, faça uma nova reserva.</p>
+              <app-landing-button
+                [label]="isLoading() ? 'Salvando...' : 'Salvar alterações'"
+                variant="primary"
+                [fullWidth]="true"
+                [disabled]="isLoading()"
+                (clicked)="salvar()"
+              ></app-landing-button>
+              <app-landing-button label="Voltar" variant="outline" [fullWidth]="true" (clicked)="voltar()"></app-landing-button>
+            </form>
+          }
+        }
+      </div>
+    }
+  </div>
+</div>

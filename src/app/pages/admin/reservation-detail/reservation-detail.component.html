@@ -65,6 +65,10 @@
           <span class="detail-value">{{ reserva()?.qtdDias }}</span>
         </div>
         <div class="detail-item">
+          <span class="detail-label">Permanência Prevista</span>
+          <span class="detail-value">{{ permanenciaPrevista() || '-' }}</span>
+        </div>
+        <div class="detail-item">
           <span class="detail-label">Status</span>
           <span class="detail-value">
             <span [class]="'badge ' + getStatusClass(reserva()!.status)">
@@ -339,21 +343,10 @@
               </div>
             }
           }
-          @if (!showVeiculoForm()) {
-            <button type="button" class="btn btn-outline" (click)="abrirEdicaoVeiculo()">
-              Editar Marca / Modelo / Cor
+          @if (canEditar()) {
+            <button type="button" class="btn btn-outline" (click)="abrirEdicao()">
+              Editar Reserva
             </button>
-          } @else {
-            <app-veiculo-fields [group]="veiculoForm"></app-veiculo-fields>
-            <div class="acoes-form-buttons">
-              <button type="button" class="btn btn-primary" (click)="salvarDadosVeiculo()"
-                [disabled]="actionLoading()">
-                Salvar
-              </button>
-              <button type="button" class="btn btn-outline" (click)="showVeiculoForm.set(false)">
-                Cancelar
-              </button>
-            </div>
           }
           <button type="button" class="btn btn-outline" (click)="gerarCupomEntrada()">
             Cupom Entrada
@@ -497,5 +490,13 @@
         </div>
       </div>
     </div>
+  }
+
+  @if (showEditarModal() && reserva(); as r) {
+    <app-reservation-edit
+      [reserva]="r"
+      (saved)="aoSalvarEdicao($event)"
+      (closed)="showEditarModal.set(false)"
+    ></app-reservation-edit>
   }
 }

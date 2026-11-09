@@ -7,6 +7,7 @@ import { CarroEntry } from '../../../core/models/availability/client-flow.model'
 import { PeriodAvailability } from '../../../core/models/availability/period-availability.model';
 import { PeriodAvailabilityService } from '../../../core/services/availability/period-availability.service';
 import { BloqueioService } from '../../../core/services/bloqueio/bloqueio.service';
+import { WhatsappPendenteService } from '../../../core/services/client/whatsapp-pendente.service';
 import { ClientFlowService } from '../../../core/services/client/client-flow.service';
 import { calcularDiariasCobradas } from '../../../core/utils/date/format-duration';
 
@@ -21,6 +22,7 @@ export class ConsultaComponent {
   private readonly bloqueioService = inject(BloqueioService);
   private readonly clientFlow = inject(ClientFlowService);
   private readonly router = inject(Router);
+  protected readonly whatsappPendente = inject(WhatsappPendenteService);
 
   public readonly isLoading = signal(false);
   public readonly errorMessage = signal('');
@@ -90,6 +92,20 @@ export class ConsultaComponent {
         this.isLoading.set(false);
       },
     });
+  }
+
+  protected irParaMinhaReserva(): void {
+    this.router.navigate(['/cliente/minha-reserva']);
+  }
+
+  /** Reabre o link do WhatsApp pendente (a tela de envio fica na própria página "minha reserva"). */
+  protected retomarEnvio(): void {
+    const url = this.whatsappPendente.pendente()?.dados?.url;
+    if (url) {
+      window.location.href = url;
+    } else {
+      this.irParaMinhaReserva();
+    }
   }
 
   private salvarEIr(coberta: number, descoberta: number): void {

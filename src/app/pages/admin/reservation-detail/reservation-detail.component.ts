@@ -1,18 +1,19 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { VeiculoFieldsComponent } from '../../../components/veiculo-fields/veiculo-fields.component';
+import { FormsModule } from '@angular/forms';
+import { ReservationEditComponent } from '../../../components/reservation-edit/reservation-edit.component';
 import { ActivatedRoute } from '@angular/router';
 import { CupomEntrada } from '../../../core/models/reserva/cupom-entrada.model';
 import { CupomSaida } from '../../../core/models/reserva/cupom-saida.model';
 import { PreviaCheckout } from '../../../core/models/reserva/previa-checkout.model';
 import { Reserva } from '../../../core/models/reserva/reserva.model';
 import { ReservaService } from '../../../core/services/reserva/reserva.service';
+import { formatPermanenciaReserva } from '../../../core/utils/date/format-duration';
 import { scrollToBottom } from '../../../core/utils/viewport/scroll-to-bottom';
 
 @Component({
   selector: 'app-reservation-detail',
-  imports: [FormsModule, ReactiveFormsModule, CurrencyPipe, DatePipe, VeiculoFieldsComponent],
+  imports: [FormsModule, CurrencyPipe, DatePipe, ReservationEditComponent],
   templateUrl: './reservation-detail.component.html',
   styleUrl: './reservation-detail.component.css',
 })
@@ -48,13 +49,8 @@ export class ReservationDetailComponent implements OnInit {
   protected novaFormaPagamento = 'Pix';
   protected novoComTraslado = false;
 
-  // Marca, modelo e cor
-  protected showVeiculoForm = signal(false);
-  protected veiculoForm = new FormGroup({
-    marcaVeiculo: new FormControl('', [Validators.required, Validators.maxLength(50)]),
-    modeloVeiculo: new FormControl('', [Validators.required, Validators.maxLength(50)]),
-    corVeiculo: new FormControl('', [Validators.required, Validators.maxLength(30)]),
-  });
+  // Edição completa da reserva (modal)
+  protected showEditarModal = signal(false);
 
   protected showCupomEntradaPrint = signal(false);
   protected showCupomSaidaPrint = signal(false);
@@ -180,45 +176,25 @@ export class ReservationDetailComponent implements OnInit {
       });
   }
 
-  protected abrirEdicaoVeiculo(): void {
-    const r = this.reserva();
-    if (!r) return;
-    this.veiculoForm.reset({
-      marcaVeiculo: r.marcaVeiculo ?? '',
-      modeloVeiculo: r.modeloVeiculo ?? '',
-      corVeiculo: r.corVeiculo ?? '',
-    });
-    this.showVeiculoForm.set(true);
+  protected abrirEdicao(): void {
+    this.erro.set('');
+    this.sucesso.set('');
+    this.showEditarModal.set(true);
   }
 
-  protected salvarDadosVeiculo(): void {
-    this.veiculoForm.markAllAsTouched();
-    if (this.veiculoForm.invalid) {
-      this.erro.set('Informe marca, modelo e cor.');
-      return;
-    }
+  protected aoSalvarEdicao(reserva: Reserva): void {
+    this.reserva.set(reserva);
+    this.showEditarModal.set(false);
+    // Cupons já gerados mostram dados antigos (placa, vaga, valores): saem da tela até serem gerados de novo
+    this.cupomEntrada.set(null);
+    this.cupomSaida.set(null);
+    this.sucesso.set('Reserva atualizada');
+  }
 
-    const { marcaVeiculo, modeloVeiculo, corVeiculo } = this.veiculoForm.getRawValue();
-    this.actionLoading.set(true);
-    this.erro.set('');
-    this.reservaService
-      .atualizarDadosVeiculo(this.reservaId, {
-        marcaVeiculo: marcaVeiculo!.trim(),
-        modeloVeiculo: modeloVeiculo!.trim(),
-        corVeiculo: corVeiculo!.trim(),
-      })
-      .subscribe({
-        next: (data) => {
-          this.reserva.set(data);
-          this.showVeiculoForm.set(false);
-          this.sucesso.set('Dados do veículo atualizados');
-          this.actionLoading.set(false);
-        },
-        error: (err) => {
-          this.erro.set(err.error?.message || 'Erro ao atualizar dados do veículo');
-          this.actionLoading.set(false);
-        },
-      });
+  /** Permanência prevista por extenso, ex.: "1 dia, 19 horas e 58 minutos". */
+  protected permanenciaPrevista(): string {
+    const r = this.reserva();
+    return r ? formatPermanenciaReserva(r.dataEntrada, r.dataSaidaPrevista) : '';
   }
 
   protected realizarCheckout(): void {
@@ -312,6 +288,11 @@ export class ReservationDetailComponent implements OnInit {
   protected canCheckout(): boolean {
     const r = this.reserva();
     return !!r && r.status === 'CheckinRealizado';
+  }
+
+  protected canEditar(): boolean {
+    const r = this.reserva();
+    return !!r && r.status !== 'Cancelada';
   }
 
   protected canCancelar(): boolean {

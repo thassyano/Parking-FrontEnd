@@ -131,6 +131,9 @@
 
 .primary_action {
   margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .availability_success {
@@ -287,3 +290,6 @@
     grid-template-columns: 1fr;
   }
 }
+
+.pendente_alert { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fff8e1; color: #6b5200; border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; font-size: 0.85rem; }
+.pendente_btn { flex-shrink: 0; border: none; border-radius: 8px; padding: 8px 12px; background: var(--text-dark); color: var(--white); font-weight: 600; cursor: pointer; }

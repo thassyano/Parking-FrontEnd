@@ -1,0 +1,124 @@
+<div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="editar-reserva-titulo">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 id="editar-reserva-titulo" class="modal-title">Editar reserva #{{ reserva().id }}</h2>
+      <button type="button" class="modal-close" aria-label="Fechar" (click)="closed.emit()">×</button>
+    </div>
+
+    @if (erro()) {
+      <div class="alert alert-danger">{{ erro() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="edit-form">
+      <section class="edit-section">
+        <h3 class="section-title">Cliente</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="edit-nome">Nome *</label>
+            <input id="edit-nome" type="text" class="form-control" formControlName="nomeCliente" maxlength="100" />
+            @if (fieldError('nomeCliente')) {
+              <span class="form-error">{{ fieldError('nomeCliente') }}</span>
+            }
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-telefone">Telefone (sem hífen) *</label>
+            <input
+              id="edit-telefone"
+              type="tel"
+              class="form-control"
+              formControlName="telefoneCliente"
+              (input)="onTelefoneInput($event)"
+            />
+            @if (fieldError('telefoneCliente')) {
+              <span class="form-error">{{ fieldError('telefoneCliente') }}</span>
+            }
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit-cpf">CPF</label>
+          <input id="edit-cpf" type="text" class="form-control" formControlName="cpfCliente" (input)="onCpfInput($event)" />
+          @if (fieldError('cpfCliente')) {
+            <span class="form-error">{{ fieldError('cpfCliente') }}</span>
+          }
+        </div>
+      </section>
+
+      <section class="edit-section">
+        <h3 class="section-title">Veículo</h3>
+        <div class="form-group">
+          <label class="form-label" for="edit-placa">
+            Placa @if (placaObrigatoria()) { * }
+          </label>
+          <input
+            id="edit-placa"
+            type="text"
+            class="form-control"
+            formControlName="placaVeiculo"
+            (input)="onPlacaInput($event)"
+            placeholder="ABC1D23"
+          />
+          @if (fieldError('placaVeiculo')) {
+            <span class="form-error">{{ fieldError('placaVeiculo') }}</span>
+          }
+        </div>
+        <app-veiculo-fields [group]="veiculoGroup()"></app-veiculo-fields>
+      </section>
+
+      <section class="edit-section">
+        <h3 class="section-title">Reserva</h3>
+        <div class="form-group">
+          <label class="form-label" for="edit-vaga">Tipo de vaga</label>
+          <select id="edit-vaga" class="form-control form-select" formControlName="tipoVaga">
+            <option value="Coberta">Coberta</option>
+            <option value="Descoberta">Descoberta</option>
+          </select>
+          @if (!vagaEditavel()) {
+            <span class="form-hint">O tipo de vaga não pode ser alterado depois do check-out.</span>
+          } @else {
+            <span class="form-hint">Ao trocar, a disponibilidade é conferida e o valor previsto é recalculado.</span>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="edit-entrada">Entrada</label>
+            <input id="edit-entrada" type="datetime-local" class="form-control" formControlName="dataEntrada" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-saida">Saída prevista</label>
+            <input id="edit-saida" type="datetime-local" class="form-control" formControlName="dataSaida" />
+          </div>
+        </div>
+        @if (!periodoEditavel()) {
+          <span class="form-hint">
+            O período só pode ser alterado enquanto a reserva está Pendente ou Confirmada.
+          </span>
+        }
+        @if (periodoInvalido()) {
+          <span class="form-error">A saída deve ser depois da entrada.</span>
+        }
+
+        <div class="form-group">
+          <label class="form-label" for="edit-obs">Observações</label>
+          <textarea id="edit-obs" class="form-control" rows="2" formControlName="observacoes" maxlength="500"></textarea>
+          @if (fieldError('observacoes')) {
+            <span class="form-error">{{ fieldError('observacoes') }}</span>
+          }
+        </div>
+      </section>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+          @if (saving()) {
+            Salvando...
+          } @else {
+            Salvar alterações
+          }
+        </button>
+        <button type="button" class="btn btn-outline" (click)="closed.emit()" [disabled]="saving()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

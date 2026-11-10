@@ -1,3 +1,17 @@
+@if (conclusao(); as c) {
+  <div class="client_page conclusao_overlay">
+    <div class="client_content">
+      <app-whatsapp-envio
+        [dados]="c.dados"
+        [reservaIds]="c.reservaIds"
+        [titulo]="c.titulo"
+        [subtitulo]="c.subtitulo"
+        (concluido)="concluirEnvio()"
+      ></app-whatsapp-envio>
+    </div>
+  </div>
+}
+
 <div class="client_page">
   <div class="client_content">
     <div class="reserva_page">

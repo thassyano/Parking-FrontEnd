@@ -1,5 +1,12 @@
 <div class="client_page">
   <div class="client_content">
+    @if (whatsappPendente.pendente(); as p) {
+      <div class="pendente_alert">
+        <span>Há uma mensagem de WhatsApp da sua reserva que ainda não foi enviada ao estacionamento.</span>
+        <button type="button" class="pendente_btn" (click)="retomarEnvio()">Enviar agora</button>
+      </div>
+    }
+
     <div class="availability_card">
       <div class="card_content">
         @if (errorMessage()) {
@@ -58,6 +65,12 @@
             [fullWidth]="true"
             [disabled]="availabilityForm.invalid || isLoading()"
             (clicked)="continue()"
+          ></app-landing-button>
+          <app-landing-button
+            label="Já tenho uma reserva"
+            variant="outline"
+            [fullWidth]="true"
+            (clicked)="irParaMinhaReserva()"
           ></app-landing-button>
         </div>
       </form>

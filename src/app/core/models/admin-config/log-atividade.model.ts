@@ -52,6 +52,8 @@ export const ACAO_LABELS: Record<string, string> = {
   ReservaVeiculoAlterado: 'Dados do veículo alterados',
   ReservaPagamentoAlterado: 'Forma de pagamento corrigida',
   ReservaSobrescrita: 'Reserva sobrescrita (mesma placa)',
+  ReservaEditada: 'Reserva editada pelo admin',
+  ReservaAlteradaCliente: 'Reserva alterada pelo cliente',
   BloqueioCriado: 'Bloqueio de reservas criado',
   BloqueioRemovido: 'Bloqueio de reservas removido',
   WorkerWhatsAppEnviado: 'WhatsApp enviado (automático)',

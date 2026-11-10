@@ -26,6 +26,13 @@ export const routes: Routes = [
             (module) => module.ReservationsComponent,
           ),
       },
+      {
+        path: 'minha-reserva',
+        loadComponent: () =>
+          import('./pages/client/my-reservation/my-reservation.component').then(
+            (module) => module.MyReservationComponent,
+          ),
+      },
     ],
   },
   {

@@ -1,4 +1,8 @@
-import { calcularDiariasCobradas, formatDuration } from './format-duration';
+import {
+  calcularDiariasCobradas,
+  formatDuration,
+  formatPermanenciaReserva,
+} from './format-duration';
 
 describe('formatDuration', () => {
   const entrada = new Date(2026, 9, 17, 16, 1);
@@ -44,5 +48,25 @@ describe('calcularDiariasCobradas', () => {
   it('retorna 0 para período inválido', () => {
     expect(calcularDiariasCobradas(entrada, entrada)).toBe(0);
     expect(calcularDiariasCobradas(entrada, new Date(NaN))).toBe(0);
+  });
+});
+
+describe('formatPermanenciaReserva', () => {
+  it('descreve a permanência prevista da reserva #46 (antes aparecia só "1")', () => {
+    expect(formatPermanenciaReserva('2026-11-05T18:02:00', '2026-11-07T14:00:00')).toBe(
+      '1 dia, 19 horas e 58 minutos',
+    );
+  });
+
+  it('mostra dias e horas quando os minutos são zero', () => {
+    expect(formatPermanenciaReserva('2026-11-05T14:00:00', '2026-11-07T13:00:00')).toBe(
+      '1 dia e 23 horas',
+    );
+  });
+
+  it('devolve vazio quando faltam datas ou a saída não é posterior', () => {
+    expect(formatPermanenciaReserva(undefined, '2026-11-07T14:00:00')).toBe('');
+    expect(formatPermanenciaReserva('2026-11-05T18:02:00', null)).toBe('');
+    expect(formatPermanenciaReserva('2026-11-07T14:00:00', '2026-11-05T18:02:00')).toBe('');
   });
 });

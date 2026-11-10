@@ -1,0 +1,41 @@
+<div class="envio_card">
+  <div class="envio_icon" aria-hidden="true">✓</div>
+  <h2 class="envio_title">{{ titulo() }}</h2>
+
+  @if (numeros()) {
+    <p class="envio_numeros">
+      {{ reservaIds().length > 1 ? 'Reservas' : 'Reserva' }} {{ numeros() }}
+    </p>
+  }
+
+  @if (dados(); as d) {
+    <p class="envio_subtitle">{{ subtitulo() }}</p>
+
+    <ol class="envio_steps">
+      <li>Toque em <strong>Enviar mensagem no WhatsApp</strong>.</li>
+      <li>No WhatsApp, a mensagem já aparece pronta: toque em <strong>enviar</strong>.</li>
+    </ol>
+
+    <a class="envio_btn envio_btn--primary" [href]="d.url" target="_blank" rel="noopener noreferrer">
+      Enviar mensagem no WhatsApp
+    </a>
+
+    <button type="button" class="envio_btn envio_btn--outline" (click)="copiarMensagem()">
+      {{ copiado() ? 'Mensagem copiada!' : 'Copiar mensagem' }}
+    </button>
+
+    @if (telefoneExibicao()) {
+      <p class="envio_hint">
+        Se o WhatsApp não abrir, copie a mensagem e envie para <strong>{{ telefoneExibicao() }}</strong>.
+      </p>
+    }
+
+    <button type="button" class="envio_link" (click)="concluido.emit()">{{ rotuloConcluir() }}</button>
+  } @else {
+    <p class="envio_subtitle">
+      Não conseguimos montar a mensagem de WhatsApp agora. Sua reserva está registrada:
+      entre em contato com o estacionamento e informe o número {{ numeros() || 'da reserva' }}.
+    </p>
+    <button type="button" class="envio_btn envio_btn--outline" (click)="concluido.emit()">Concluir</button>
+  }
+</div>

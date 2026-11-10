@@ -114,7 +114,7 @@
             <th class="table_head_item">Placa</th>
             <th class="table_head_item">Tipo</th>
             <th class="table_head_item">Entrada</th>
-            <th class="table_head_item">Dias</th>
+            <th class="table_head_item">Permanência</th>
             <th class="table_head_item">Status</th>
             <th class="table_head_item">Pago</th>
             <th class="table_head_item">Valor Final</th>
@@ -131,7 +131,7 @@
               <td class="table_item">{{ r.placaVeiculo || '-' }}</td>
               <td class="table_item">{{ r.tipoVaga }}</td>
               <td class="table_item">{{ r.dataEntrada | date: 'dd/MM/yyyy' }}</td>
-              <td class="table_item">{{ r.qtdDias }}</td>
+              <td class="table_item">{{ permanencia(r) }}</td>
               <td class="table_item">
                 <span [class]="'badge ' + getStatusClass(r.status)">
                   {{ getStatusLabel(r.status) }}

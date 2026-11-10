@@ -1,0 +1,19 @@
+.client_page { width: 100%; min-height: 100dvh; background: #e7efff; display: flex; flex-direction: column; align-items: center; padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 24px; box-sizing: border-box; }
+.client_content { width: 100%; max-width: 440px; margin-block: auto; flex-shrink: 0; }
+.card { background: var(--white); border-radius: 16px; box-shadow: var(--shadow); padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.section_title { font-size: 1.2rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.hint { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.4; }
+.error_alert { background: var(--danger-light); color: var(--danger); padding: 12px 14px; border-radius: 12px; font-size: 0.9rem; }
+.form { display: flex; flex-direction: column; gap: 14px; }
+.input_group { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.input_label { font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); }
+.input_field { width: 100%; padding: 10px 14px; border: 1px solid var(--border-dark); border-radius: 10px; font-size: 0.9rem; color: var(--text-dark); background: var(--white); outline: none; box-sizing: border-box; }
+.input_field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+.input_field--uppercase { text-transform: uppercase; }
+.lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.item { border: 1px solid var(--border-dark); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 4px; font-size: 0.875rem; color: var(--text-dark); }
+.item--bloqueado { opacity: 0.75; background: var(--light-background); }
+.item_head { display: flex; justify-content: space-between; align-items: center; }
+.tag { background: var(--primary-50); color: var(--primary); border-radius: 999px; padding: 2px 10px; font-size: 0.75rem; font-weight: 600; }
+.btn_item { margin-top: 8px; padding: 10px; border: none; border-radius: 10px; background: var(--text-dark); color: var(--white); font-weight: 600; cursor: pointer; }
+.bloqueio { margin: 8px 0 0; font-size: 0.8rem; color: var(--danger); }

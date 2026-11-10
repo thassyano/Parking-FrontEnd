@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { ReservaFiltros } from '../../../core/models/reserva/reserva-filtros.model';
 import { Reserva } from '../../../core/models/reserva/reserva.model';
 import { ReservaService } from '../../../core/services/reserva/reserva.service';
+import { formatPermanenciaReserva } from '../../../core/utils/date/format-duration';
 import { scrollToTop } from '../../../core/utils/viewport/scroll-to-top';
 import { ReservationInfoComponent } from '../../../components/reservation-info/reservation-info.component';
 
@@ -137,6 +138,11 @@ export class AdminReservationsComponent implements OnInit {
   protected goToPage(page: number) {
     this.currentPage.set(page);
     scrollToTop(this.scroller);
+  }
+
+  /** Permanência prevista por extenso (dias, horas e minutos) para a coluna da tabela. */
+  protected permanencia(r: Reserva): string {
+    return formatPermanenciaReserva(r.dataEntrada, r.dataSaidaPrevista) || String(r.qtdDias);
   }
 
   protected getStatusClass(status: string): string {

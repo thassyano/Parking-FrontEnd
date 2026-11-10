@@ -23,6 +23,12 @@ import {
   AtualizarDadosVeiculoRequest,
   PreviaCheckout,
 } from '../../models/reserva/previa-checkout.model';
+import { EditarReservaAdminRequest } from '../../models/reserva/editar-reserva-request.model';
+import {
+  AlterarDadosClienteRequest,
+  ConsultaReservaClienteRequest,
+  ReservaClienteResumo,
+} from '../../models/reserva/reserva-cliente.model';
 import { ConfirmacaoReservaResponse } from '../../models/reserva/confirmacao-reserva-response.interface';
 import { ReservaLoteResponse } from '../../models/reserva/reserva-lote-response.interface';
 
@@ -97,6 +103,21 @@ export class ReservaService {
   /** Qualquer admin: altera marca, modelo e cor. */
   public atualizarDadosVeiculo(id: number, data: AtualizarDadosVeiculoRequest): Observable<Reserva> {
     return this.http.patch<Reserva>(`${this.url}/${id}/dados-veiculo`, data);
+  }
+
+  /** Admin: edição completa da reserva (cliente, veículo, vaga, período e observações). */
+  public editar(id: number, data: EditarReservaAdminRequest): Observable<Reserva> {
+    return this.http.patch<Reserva>(`${this.url}/${id}/editar`, data);
+  }
+
+  /** Cliente (sem login): reservas futuras da placa, desde que o telefone confira. POST para não expor dados na URL. */
+  public consultarMinhasReservas(data: ConsultaReservaClienteRequest): Observable<ReservaClienteResumo[]> {
+    return this.http.post<ReservaClienteResumo[]>(`${this.url}/consulta-cliente`, data);
+  }
+
+  /** Cliente (sem login): altera marca/modelo/cor e tipo de vaga da própria reserva. */
+  public alterarDadosCliente(id: number, data: AlterarDadosClienteRequest): Observable<Reserva> {
+    return this.http.patch<Reserva>(`${this.url}/${id}/alterar-dados-cliente`, data);
   }
 
   public cancelar(id: number): Observable<Reserva> {

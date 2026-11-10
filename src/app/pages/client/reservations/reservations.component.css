@@ -502,3 +502,11 @@
   cursor: not-allowed;
 }
 
+
+/* Tela de conclusão (envio do WhatsApp) sobrepõe o formulário */
+.conclusao_overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  overflow-y: auto;
+}
